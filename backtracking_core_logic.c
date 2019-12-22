@@ -12,6 +12,7 @@ Board* back_track(Board* board, int is_deterministic) {
 
 Board* deterministic_back_tracking(Board* board) {
     int** cur_board = board -> cur_board;
+    int board_size = board->size;
 }
 
 Board* randomized_back_tracking(Board* board) {
