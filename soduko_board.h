@@ -8,6 +8,7 @@ typedef struct _Board {
     int** fixed_board;
     int** cur_board;
     int*** possible_values;
+    int count_filled;
 } Board;
 
 

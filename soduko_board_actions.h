@@ -14,7 +14,7 @@ int set_value(int x, int y, int value, Board* board);
 int get_value(int x, int y, Board* board);
 int hint(int x, int y, Board* board);
 void validate_board(Board* board);
-void restart();
-void exit();
+void restart(int n);
+void exit_game(Board* board);
 
 #endif //EX3_
