@@ -2,8 +2,11 @@
 #ifndef SOFTWAREPROJ_SODUKO_BOARD_H
 #define SOFTWAREPROJ_SODUKO_BOARD_H
 
-struct _Board;  
-typedef struct _Board Board;
+typedef struct _Board {
+    int** solved_board;
+    int** cur_board;
+    int*** possible_values;
+} Board;
 
 
 #endif 
