@@ -4,7 +4,7 @@
 
 struct Board
 {
-    int** solved_baord;
+    int** solved_board;
     int** cur_board;
     int*** possible_values;
 };
