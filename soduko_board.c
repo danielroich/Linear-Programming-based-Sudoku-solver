@@ -37,6 +37,7 @@ int value_in_square(int row, int col, int value, Board* board){
     return 0;
 } 
 
+/* 0<=x,y<=8 */
 int set_value(int x, int y, int value, Board* board){
     if((value_in_row(x,value,board) +  value_in_col(y,value,board) + value_in_square(x-1,y-1,value,board) ) != 0){
         return 0;     
