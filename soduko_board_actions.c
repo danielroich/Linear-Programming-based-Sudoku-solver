@@ -57,8 +57,8 @@ int set_value(int x, int y, int value, Board* board){
             return 0;
     }    
     board->cur_board[x-1][y-1] = value;
-    print_board(board);
     board->count_filled++;
+    print_board(board);
     if(board->count_filled == (board->size)*(board->size))
         printf("Puzzle solved successfully\n");
         /*From this point, all commands except exit and restart are considered invalid.*/
@@ -119,11 +119,9 @@ void exit_game(Board* board){
     exit(0);
 }
 
-void restart(int n){
-    Board* board;
+void restart(Board* board){
     int fixed;
     int max_fill = ((board->size)*(board->size))-1;
-    board->size = n;
     printf("Please enter the number of cells to fill [0-%d]:\n",max_fill);
     if(feof(stdin)){exit_game(board);}
     scanf("%d",&fixed);
@@ -133,5 +131,5 @@ void restart(int n){
         scanf("%d",&fixed);
     }
     board->count_filled = fixed;
-    board->fixed_board = generate_puzzle(board->size,fixed); 
+    board->fixed_board = generate_puzzle(board->size,fixed); /*INITIALIZATION!*/
 }
