@@ -6,6 +6,7 @@ int back_track(Board* board, int is_deterministic) {
     int i;
     int is_sol_found;
     int** solved_boared;
+    Point* starting_point = {0,0};
 
     // Create 2D array to contain the sudoku and change it
     // Created to not change the current board iff the Sol does not exist
@@ -15,7 +16,7 @@ int back_track(Board* board, int is_deterministic) {
 
     if (is_deterministic == 0)
     {
-        is_sol_found = deterministic_back_tracking(board, 0, 0);
+        is_sol_found = deterministic_back_tracking(board, starting_point);
     }
     else {
         is_sol_found = randomized_back_tracking(board);
@@ -28,7 +29,7 @@ int back_track(Board* board, int is_deterministic) {
     return is_sol_found;
 }
 
-int deterministic_back_tracking(Board* board, int x, int y) {
+int deterministic_back_tracking(Board* board, Point* point) {
     int i;
     int possible_values_num;
     int board_rows = board->num_of_rows;
@@ -38,12 +39,12 @@ int deterministic_back_tracking(Board* board, int x, int y) {
 
     // If this statement is true we have covered all the boared with values
     // this indicates we have placed the entire boared with values in have finished solving it
-    if ( x == board->num_of_rows)
+    if (point->x == board->num_of_rows)
         return 1;
 
-    if (board->cur_board[x][y] != 0)
+    if (get_value_point(point,board) != BOARD_NULL_VALUE)
     {
-        advance_in_sudoku(board,x,y);
+        is_successful = deterministic_back_tracking(board, get_next_point(board,point));
     }
     
     else {
@@ -54,10 +55,10 @@ int deterministic_back_tracking(Board* board, int x, int y) {
 
         for (i = 1; i < (possible_values_num + 1); i++)
         {
-            is_set_successfull = set_value(x,y,i,board);
+            is_set_successfull = set_value_point(point,i,board);
 
             if (is_set_successfull) {
-                is_successful = advance_in_sudoku(board,x,y);
+                is_successful = deterministic_back_tracking(board, get_next_point(board,point));
             }
             else {
                 continue;
@@ -67,7 +68,7 @@ int deterministic_back_tracking(Board* board, int x, int y) {
                 return 1;
         }
         
-        set_value(x,y, BOARD_NULL_VALUE ,board);
+        set_value_point(point, BOARD_NULL_VALUE ,board);
         return 0;
     }
     
@@ -76,8 +77,24 @@ int deterministic_back_tracking(Board* board, int x, int y) {
 
     // TODO: free tried values
 }
-int advance_in_sudoku(Board* board, int x, int y) {
 
+// TODO: Check for allocated points and free them
+Point* get_next_point(Board* board, Point* point) {
+    int new_x;
+    int new_y;
+    Point* next_point;
+    int width = board->num_of_columns;
+    int height = board->num_of_columns;
+
+    if (point->y == (board->num_of_columns-1))
+    {
+        new_y = 0;
+        new_x = point-> x + 1;
+    }
+    
+    next_point = (Point*){new_x, new_y};
+
+    return next_point;
 }
 
 int randomized_back_tracking(Board* board) {

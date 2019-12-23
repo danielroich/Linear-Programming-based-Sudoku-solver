@@ -14,7 +14,14 @@ typedef struct _Board {
     int count_filled;
 } Board;
 
+typedef struct _Point {
+    int x;
+    int y;
+} Point;
+
 int set_value(int x, int y, int value, Board* board);
 int get_value(int x, int y, Board* board);
+int set_value_point(Point* point, int value, Board* board);
+int get_value_point(Point* point, Board* board);
 
 #endif 
