@@ -15,7 +15,7 @@ void print_board(Board* board){
             for(c = 0; c < size_square; c++){
                 for(d = 0; d < size_square; d++){
                     col = d + c*size_square;
-                    value = get_value(row,col,board);
+                    value = get_value(row-1,col-1,board);
                     if(board->fixed_board[row][col] != 0){
                         printf(".%d ",value);
                     }
@@ -35,7 +35,7 @@ void print_board(Board* board){
     printf("----------------------------------\n");
 }
 
-/* assume the values of X, Y, and Z are valid and correct between 1 and 9*/
+/* assume the values of X, Y, and Z are valid and correct */
 int set_value_user(int x, int y, int value, Board* board){
     if((board->fixed_board)[x-1][y-1] != 0){
         printf("Error: cell is fixed\n");
@@ -51,7 +51,7 @@ int set_value_user(int x, int y, int value, Board* board){
             printf("Error: value is invalid\n");
             return 0;
     }
-    /* else value set and count++ in func */    
+    /* else value was set and count++ in func */    
     print_board(board);
     return 1;
 }
@@ -64,10 +64,10 @@ int hint(int x, int y, Board* board){
 
 void validate_board(Board* board){
     Board* valid_board = back_track(board,1); /*deterministic*/
-    if(valid_board==NULL /*not vaild*/)
+    if(valid_board == 0)/*not vaild*/
         printf("Validation failed: board is unsolvable\n");
     else{
-        board->solved_board = &valid_board;
+        /* board->solved_board = &valid_board;*/
         printf("Validation passed: board is solvable\n");
     }
 }
