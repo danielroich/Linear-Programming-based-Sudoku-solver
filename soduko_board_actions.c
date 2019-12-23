@@ -35,13 +35,8 @@ void print_board(Board* board){
     printf("----------------------------------\n");
 }
 
-/* 1<=x,y<=size*/
-int get_value(int x, int y, Board* board){
-    return (board->cur_board)[x-1][y-1];
-}
-
-/* assume the values of X, Y, and Z are valid and correct */
-int set_value(int x, int y, int value, Board* board){
+/* assume the values of X, Y, and Z are valid and correct between 1 and 9*/
+int set_value_user(int x, int y, int value, Board* board){
     if((board->fixed_board)[x-1][y-1] != 0){
         printf("Error: cell is fixed\n");
         return 0;
@@ -52,50 +47,14 @@ int set_value(int x, int y, int value, Board* board){
         print_board(board);
         return 0;
     }
-    if((value_in_row(x,value,board) +  value_in_col(y,value,board) + value_in_square(x-1,y-1,value,board) ) != 0){
+    if(set_value(x-1,y-1,value,board) == 0){
             printf("Error: value is invalid\n");
             return 0;
-    }    
-    board->cur_board[x-1][y-1] = value;
-    board->count_filled++;
+    }
+    /* else value set and count++ in func */    
     print_board(board);
-    if(board->count_filled == (board->size)*(board->size))
-        printf("Puzzle solved successfully\n");
-        /*From this point, all commands except exit and restart are considered invalid.*/
-    return 0;
+    return 1;
 }
-
-int value_in_row(int row, int value, Board* board){
-    int i;
-    for (i=0; i<(board->size); i++){
-         if(get_value(row,i+1,board) == value)
-            return 1;
-    }
-    return 0;
-}
-
-int value_in_col(int col, int value, Board* board){
-    int i;
-    for (i=0; i<(board->size); i++){
-         if(get_value(i+1,col,board) == value)
-            return 1;
-    }
-    return 0;
-}
-
-int value_in_square(int row, int col, int value, Board* board){
-    int i,j;
-    int size_square = sqrt(board->size);
-    int top_left_corner_row = floor(row/size_square)*size_square; 
-    int top_left_corner_col = floor(col/size_square)*size_square; 
-    for(i= top_left_corner_row; i<(top_left_corner_row +size_square); i++){
-        for(j= top_left_corner_col; i<(top_left_corner_col +size_square); j++){
-            if(get_value(i+1,j+1,board) == value)
-                return 1;
-        }
-    }
-    return 0;
-} 
 
 /* assume that the values X, Y are valid integers in the correct range */
 int hint(int x, int y, Board* board){
@@ -132,4 +91,13 @@ void restart(Board* board){
     }
     board->count_filled = fixed;
     board->fixed_board = generate_puzzle(board->size,fixed); /*INITIALIZATION!*/
+}
+
+int is_filled(Board* board){
+    if(board->count_filled == (board->size)*(board->size)){
+        printf("Puzzle solved successfully\n");
+        return 1;
+        /*From this point, all commands except exit and restart are considered invalid.*/
+    }
+    return 0;
 }
