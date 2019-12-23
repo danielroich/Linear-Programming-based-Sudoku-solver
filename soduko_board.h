@@ -11,5 +11,7 @@ typedef struct _Board {
     int count_filled;
 } Board;
 
+int set_value(int x, int y, int value, Board* board);
+int get_value(int x, int y, Board* board);
 
 #endif 

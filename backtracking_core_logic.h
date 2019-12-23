@@ -6,6 +6,7 @@
 #define EX3_BACKTRACKING_CORE_LOGIC_H
 
 #include "soduko_board.h"
+#include "soduko_board_actions.h"
 
 Board* back_track(Board* board, int is_deterministic);
 
