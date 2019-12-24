@@ -8,8 +8,6 @@ Point* get_next_point(const Board* board, const Point* point) {
     int new_x;
     int new_y;
     Point* next_point;
-    int width = board->num_of_columns;
-    int height = board->num_of_columns;
 
     if (point->y == (board->num_of_columns-1))
     {
@@ -41,15 +39,13 @@ int rec_back_tracking(Board* board, Point* point, int* is_deterministic) {
     int i;
     int possible_values_size;
     int* possible_values;
-    int board_rows = board->num_of_rows;
     int checked_value;
-    int possible_values_cur_size;
     int is__solving_successful = 0;
     Point* next_point = get_next_point(board,point);
 
     // If this statement is true we have covered all the boared with values
     // this indicates we have placed the entire boared with values in have finished solving it
-    if (point->x == board->num_of_rows)
+    if (point->x == board->num_of_rows * board->num_of_columns)
         return 1;
 
     if (get_value_point(point,board) != BOARD_NULL_VALUE)
@@ -91,10 +87,9 @@ int get_possible_values(const Board* board, const Point* point, int* possible_va
     int counter = 0;
     int possible_values_num;
 
-    // if the board contains value in this point, return Null
+    // if the board contains value in this point, return error
     if (get_value_point(point, board) != BOARD_NULL_VALUE)
     {
-        // error
         return -1;
     }
     

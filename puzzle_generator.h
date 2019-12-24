@@ -8,6 +8,6 @@
 #include "soduko_board.h"
 #include "backtracking_core_logic.h"
 
-Board* generate_puzzle(int size, int fixed_cells)
+int generate_puzzle(Board*, int fixed_cells)
 
 #endif //EX3_PUZZLE_GENERATOR_H
