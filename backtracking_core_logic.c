@@ -1,9 +1,10 @@
 
 #include "soduko_board.h"
 #include <math.h>
+#include <time.h>
 
 // TODO: Check for allocated points and free them
-Point* get_next_point(Board* board, Point* point) {
+Point* get_next_point(const Board* board, const Point* point) {
     int new_x;
     int new_y;
     Point* next_point;
@@ -28,28 +29,22 @@ Point* get_next_point(Board* board, Point* point) {
 int back_track(Board* board, int is_deterministic) {
     int i;
     int is_sol_found;
-    int** solved_boared;
     Point* starting_point = {0,0};
 
-    if (is_deterministic == 0)
-    {
-        is_sol_found = deterministic_back_tracking(board, starting_point);
-    }
-    else {
-        is_sol_found = randomized_back_tracking(board);
-    }
+    is_sol_found = rec_back_tracking(board, starting_point, &is_deterministic);
 
     free(starting_point);
     return is_sol_found;
 }
 
-int deterministic_back_tracking(Board* board, Point* point) {
+int rec_back_tracking(Board* board, Point* point, int* is_deterministic) {
     int i;
     int possible_values_size;
     int* possible_values;
     int board_rows = board->num_of_rows;
-    int is__solving_successful;
     int checked_value;
+    int possible_values_cur_size;
+    int is__solving_successful = 0;
     Point* next_point = get_next_point(board,point);
 
     // If this statement is true we have covered all the boared with values
@@ -59,7 +54,7 @@ int deterministic_back_tracking(Board* board, Point* point) {
 
     if (get_value_point(point,board) != BOARD_NULL_VALUE)
     {
-        is__solving_successful =  deterministic_back_tracking(board, next_point);
+        is__solving_successful =  rec_back_tracking(board, next_point, is_deterministic);
     }
     
     else {
@@ -68,11 +63,11 @@ int deterministic_back_tracking(Board* board, Point* point) {
 
         for (i = 0; i < possible_values_size; i++)
         {
-            checked_value = get_next_value(possible_values, possible_values_size, 1);
+            checked_value = get_next_attampted_value(possible_values, possible_values_size - i, is_deterministic);
 
             set_value_point(point,checked_value,board);
             
-            is__solving_successful = deterministic_back_tracking(board, next_point);
+            is__solving_successful = rec_back_tracking(board, next_point, is_deterministic);
             
             if (is__solving_successful)
                 break;
@@ -91,7 +86,7 @@ int deterministic_back_tracking(Board* board, Point* point) {
 }
 
 // returns size and updates possible_values
-int get_possible_values(Board* board, Point* point, int* possible_values) {
+int get_possible_values(const Board* board, const Point* point, int* possible_values) {
     int i;
     int counter = 0;
     int possible_values_num;
@@ -99,7 +94,8 @@ int get_possible_values(Board* board, Point* point, int* possible_values) {
     // if the board contains value in this point, return Null
     if (get_value_point(point, board) != BOARD_NULL_VALUE)
     {
-        return 0;
+        // error
+        return -1;
     }
     
 
@@ -114,8 +110,30 @@ int get_possible_values(Board* board, Point* point, int* possible_values) {
         }
         set_value_point(point,BOARD_NULL_VALUE,board);
     }
+
+    return counter;
 }
 
-int get_next_value(int* possible_values, int possible_values_size, int is_deterministic) {
+int get_next_attampted_value(int* possible_values, int possible_values_size, int* is_deterministic) {
 
+    int chosen_val;
+    int rand_index;
+    int* new_possible_values = (int*) malloc((possible_values_size - 1) * sizeof(int));
+
+    if (*is_deterministic)
+    {
+        chosen_val = possible_values[0];
+        memcpy(new_possible_values, ++possible_values, (possible_values_size - 1) * sizeof(int));
+    }
+    else {
+        rand_index = rand() % possible_values_size;
+        chosen_val = possible_values[rand_index];
+        memcpy(new_possible_values, possible_values, rand_index * sizeof(int));
+        memcpy(new_possible_values, possible_values + rand_index + 1, (possible_values_size - rand_index - 1) * sizeof(int));
+    }
+
+
+    free(possible_values);
+    possible_values = new_possible_values;
+    return chosen_val;
 }
