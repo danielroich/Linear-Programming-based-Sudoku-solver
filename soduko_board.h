@@ -5,15 +5,12 @@
 int const BOARD_NULL_VALUE = 0;
 
 typedef struct _Board {
-    // in block
-    int num_of_rows;
-    int num_of_columns;
-    
-    int size;
+    int num_of_rows; /*in block*/
+    int num_of_columns; /*in block*/ 
+    int count_filled;
     int** solved_board;
     int** fixed_board;
     int** cur_board;
-    int count_filled;
 } Board;
 
 typedef struct _Point {

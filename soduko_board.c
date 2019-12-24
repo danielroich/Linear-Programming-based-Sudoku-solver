@@ -1,6 +1,6 @@
 #include "soduko_board.h"
 
-/* 0<=x,y<=size-1 */
+/* 0<=x,y<=row*col-1 */
 int get_value(int x, int y, Board* board){
     return (board->cur_board)[x][y];
 }
@@ -25,14 +25,12 @@ int value_in_col(int col, int value, Board* board){
     return 0;
 }
 
-/* fix!*/
 int value_in_square(int row, int col, int value, Board* board){
     int i,j;
-    int size_square = sqrt(board->size);
-    int top_left_corner_row = floor(row/size_square)*size_square; 
-    int top_left_corner_col = floor(col/size_square)*size_square; 
-    for(i= top_left_corner_row; i<(top_left_corner_row +size_square); i++){
-        for(j= top_left_corner_col; i<(top_left_corner_col +size_square); j++){
+    int top_left_corner_row = floor(row/board->num_of_rows)*board->num_of_rows; 
+    int top_left_corner_col = floor(col/board->num_of_columns)*board->num_of_columns; 
+    for(i= top_left_corner_row; i<board->num_of_rows; i++){
+        for(j= top_left_corner_col; j<board->num_of_columns; j++){
             if(get_value(i,j,board) == value)
                 return 1;
         }
@@ -40,7 +38,7 @@ int value_in_square(int row, int col, int value, Board* board){
     return 0;
 } 
 
-/* 0<=x,y<=size-1 */
+/* 0<=x,y<=row*col-1 */
 int set_value(int x, int y, int value, Board* board){
     if((value_in_row(x,value,board) || value_in_col(y,value,board) || value_in_square(x,y,value,board) ))
         return 0;     

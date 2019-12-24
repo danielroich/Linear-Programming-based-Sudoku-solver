@@ -3,32 +3,29 @@
 #include "soduko_board_actions.h"
 #include <math.h>
 
-/*fix!*/
 void print_board(Board* board){
-    int size_square = sqrt(board->size);
-    int size = (board->num_of_rows)*(board->num_of_columns);
     int a, b, c, d;
     int row, col, value;
     for(a = 0; a < board->num_of_columns; a++){ 
         printf("----------------------------------\n"); 
         for(b = 0; b < board->num_of_rows; b++){
-            row = b ;
+            row = b + a*(board->num_of_rows);
             printnf("| ");
-            for(c = 0; c < size_square; c++){
-                for(d = 0; d < size_square; d++){
-                    col = d + c*size_square;
+            for(c = 0; c < board->num_of_rows; c++){
+                for(d = 0; d < board->num_of_columns; d++){
+                    col = d + c*board->num_of_columns;
                     value = get_value(row,col,board);
-                    if(board->fixed_board[row][col] != 0){
+                    if(board->fixed_board[row][col] != BOARD_NULL_VALUE){
                         printf(".%d ",value);
                     }
                     else{
-                        if(board->cur_board[row][col] != BOARD_NULL_VALUE)
+                        if(value != BOARD_NULL_VALUE)
                             printf(" %d ",value);
                         else
                             printf("   ",value);
                     }
                 }
-                if(c != (size_square-1))
+                if(c != (board->num_of_rows-1))
                     printnf("| ");
             }
             printnf("|\n");
@@ -59,7 +56,7 @@ int set_value_user(int x, int y, int value, Board* board){
 }
 
 /* assume that the values X, Y are valid integers in the correct range */
-int hint(int x, int y, Board* board){
+void hint(int x, int y, Board* board){
     int value = board->solved_board[x-1][y-1];
     printf("Hint: set cell to %d\n",value);
 }
@@ -72,9 +69,23 @@ void validate_board(Board* board){
         printf("Validation passed: board is solvable\n");
 }
 
+void freeArray(int** arr, int size){
+    int i;
+    for (i = 0; i < size; i++) { 
+        free(arr[i]);
+    }
+    free(arr);
+}
+
 void exit_game(Board* board){
+    int size = (board->num_of_rows)*(board->num_of_columns);
     printf("Exiting…\n");
-    free(board); /*add!*/
+    free(&board->count_filled); 
+    free(&board->num_of_columns);
+    free(&board->num_of_rows);
+    freeArray(board->solved_board,size);
+    freeArray(board->fixed_board,size);
+    freeArray(board->cur_board,size);
     exit(0);
 }
 

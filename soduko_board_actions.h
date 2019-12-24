@@ -10,7 +10,7 @@
 #include "puzzle_generator.h"
 
 void print_board(Board* board);
-int hint(int x, int y, Board* board);
+void hint(int x, int y, Board* board);
 int set_value_user(int x, int y, int value, Board* board);
 void validate_board(Board* board);
 void restart(Board* board);
