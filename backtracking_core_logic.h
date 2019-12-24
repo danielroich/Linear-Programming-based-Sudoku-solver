@@ -8,7 +8,9 @@
 #include "soduko_board.h"
 #include "soduko_board_actions.h"
 
-Board* back_track(Board* board, int is_deterministic);
+// This functions tries to solve the sudoku board by backtracking
+// Returns 1 if successful and 0 otherwise
+int back_track(Board* board, int is_deterministic);
 
 
 #endif //EX3_BACKTRACKING_CORE_LOGIC_H
