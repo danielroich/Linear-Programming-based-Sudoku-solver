@@ -5,8 +5,10 @@
 int const BOARD_NULL_VALUE = 0;
 
 typedef struct _Board {
+    // in block
     int num_of_rows;
     int num_of_columns;
+    
     int size;
     int** solved_board;
     int** fixed_board;
