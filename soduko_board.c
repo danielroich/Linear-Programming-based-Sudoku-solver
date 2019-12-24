@@ -7,7 +7,8 @@ int get_value(int x, int y, Board* board){
 
 int value_in_row(int row, int value, Board* board){
     int i;
-    for (i=0; i<(board->size); i++){
+    int size = (board->num_of_rows)*(board->num_of_columns);
+    for (i=0; i<size; i++){
          if(get_value(row,i,board) == value)
             return 1;
     }
@@ -16,13 +17,15 @@ int value_in_row(int row, int value, Board* board){
 
 int value_in_col(int col, int value, Board* board){
     int i;
-    for (i=0; i<(board->size); i++){
+    int size = (board->num_of_rows)*(board->num_of_columns);
+    for (i=0; i<size; i++){
          if(get_value(i,col,board) == value)
             return 1;
     }
     return 0;
 }
 
+/* fix!*/
 int value_in_square(int row, int col, int value, Board* board){
     int i,j;
     int size_square = sqrt(board->size);
@@ -39,13 +42,10 @@ int value_in_square(int row, int col, int value, Board* board){
 
 /* 0<=x,y<=size-1 */
 int set_value(int x, int y, int value, Board* board){
-    if((value_in_row(x,value,board) +  value_in_col(y,value,board) + value_in_square(x,y,value,board) ) != 0){
+    if((value_in_row(x,value,board) || value_in_col(y,value,board) || value_in_square(x,y,value,board) ))
         return 0;     
-    }
-    else{
-        board->cur_board[x][y] = value;
-        board->count_filled++;
-        return 1;
-    }
+    board->cur_board[x][y] = value;
+    board->count_filled++;
+    return 1;
 }
 

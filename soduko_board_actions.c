@@ -3,24 +3,26 @@
 #include "soduko_board_actions.h"
 #include <math.h>
 
+/*fix!*/
 void print_board(Board* board){
     int size_square = sqrt(board->size);
+    int size = (board->num_of_rows)*(board->num_of_columns);
     int a, b, c, d;
     int row, col, value;
-    for(a = 0; a < size_square; a++){ 
+    for(a = 0; a < board->num_of_columns; a++){ 
         printf("----------------------------------\n"); 
-        for(b = 0; b < size_square; b++){
-            row = b;
+        for(b = 0; b < board->num_of_rows; b++){
+            row = b ;
             printnf("| ");
             for(c = 0; c < size_square; c++){
                 for(d = 0; d < size_square; d++){
                     col = d + c*size_square;
-                    value = get_value(row-1,col-1,board);
+                    value = get_value(row,col,board);
                     if(board->fixed_board[row][col] != 0){
                         printf(".%d ",value);
                     }
                     else{
-                        if(board->cur_board[row][col] != 0)
+                        if(board->cur_board[row][col] != BOARD_NULL_VALUE)
                             printf(" %d ",value);
                         else
                             printf("   ",value);
@@ -37,12 +39,12 @@ void print_board(Board* board){
 
 /* assume the values of X, Y, and Z are valid and correct */
 int set_value_user(int x, int y, int value, Board* board){
-    if((board->fixed_board)[x-1][y-1] != 0){
+    if((board->fixed_board)[x-1][y-1] != BOARD_NULL_VALUE){
         printf("Error: cell is fixed\n");
         return 0;
     }
     if(value == 0){
-        board->cur_board[x-1][y-1] = value;
+        board->cur_board[x-1][y-1] = BOARD_NULL_VALUE;
         board->count_filled--;
         print_board(board);
         return 0;
@@ -63,24 +65,23 @@ int hint(int x, int y, Board* board){
 }
 
 void validate_board(Board* board){
-    Board* valid_board = back_track(board,1); /*deterministic*/
+    int valid_board = back_track(board,1); /*deterministic*/
     if(valid_board == 0)/*not vaild*/
         printf("Validation failed: board is unsolvable\n");
-    else{
-        /* board->solved_board = &valid_board;*/
+    else
         printf("Validation passed: board is solvable\n");
-    }
 }
 
 void exit_game(Board* board){
     printf("Exiting…\n");
-    free(board);
+    free(board); /*add!*/
     exit(0);
 }
 
 void restart(Board* board){
     int fixed;
-    int max_fill = ((board->size)*(board->size))-1;
+    int size = (board->num_of_rows)*(board->num_of_columns);
+    int max_fill = size*size-1;
     printf("Please enter the number of cells to fill [0-%d]:\n",max_fill);
     if(feof(stdin)){exit_game(board);}
     scanf("%d",&fixed);
@@ -89,12 +90,12 @@ void restart(Board* board){
         if(feof(stdin)){exit_game(board);}
         scanf("%d",&fixed);
     }
-    board->count_filled = fixed;
-    board->fixed_board = generate_puzzle(board->size,fixed); /*INITIALIZATION!*/
+    generate_puzzle(board, fixed);
 }
 
 int is_filled(Board* board){
-    if(board->count_filled == (board->size)*(board->size)){
+    int size = (board->num_of_rows)*(board->num_of_columns);
+    if(board->count_filled == size*size){
         printf("Puzzle solved successfully\n");
         return 1;
         /*From this point, all commands except exit and restart are considered invalid.*/
