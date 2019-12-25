@@ -32,7 +32,7 @@ int parse_command(char* command, Board* board){
     }
 
     if(strcmp(token, "exit") == 0){
-        restart(board);
+        exit_game(board);
         return 5;
     }
 
