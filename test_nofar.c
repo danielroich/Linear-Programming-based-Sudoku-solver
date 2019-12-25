@@ -1,4 +1,51 @@
-#include "soduko_board_actions.h"
+#include <stdio.h>
+
+int const BOARD_NULL_VALUE = 0;
+
+typedef struct _Board {
+    int num_of_rows; /*in block*/
+    int num_of_columns; /*in block*/ 
+    int count_filled;
+    int** solved_board;
+    int** fixed_board;
+    int** cur_board;
+} Board;
+
+int get_value(int x, int y, Board* board){
+    return (board->cur_board)[x][y];
+}
+
+void print_board(Board* board){
+    int a, b, c, d;
+    int row, col, value;
+    for(a = 0; a < board->num_of_columns; a++){ 
+        printf("----------------------------------\n"); 
+        for(b = 0; b < board->num_of_rows; b++){
+            row = b + a*(board->num_of_rows);
+            printf("| ");
+            for(c = 0; c < board->num_of_rows; c++){
+                for(d = 0; d < board->num_of_columns; d++){
+                    col = d + c*board->num_of_columns;
+                    value = get_value(row,col,board);
+                    if(board->fixed_board[row][col] != BOARD_NULL_VALUE){
+                        printf(".%d ",value);
+                    }
+                    else{
+                        if(value != BOARD_NULL_VALUE)
+                            printf(" %d ",value);
+                        else
+                            printf("   ",value);
+                    }
+                }
+                if(c != (board->num_of_rows-1))
+                    printnf("| ");
+            }
+            printnf("|\n");
+        }     
+    }
+    printf("----------------------------------\n");
+}
+
 
 int main(){
     Board* b;
@@ -20,6 +67,6 @@ int main(){
     {3, 1, 2, BOARD_NULL_VALUE}
     };
     b->fixed_board = fix;
-
+    b->cur_board = fix;
     print_board(b);
 }
