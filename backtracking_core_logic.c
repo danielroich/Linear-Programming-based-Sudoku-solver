@@ -4,11 +4,13 @@
 #include <time.h>
 
 // TODO: Check for allocated points and free them
+// TODO: determine different kind of consts
 Point* get_next_point(const Board* board, const Point* point) {
     int new_x;
     int new_y;
     Point* next_point;
 
+    // change to calc size
     if (point->y == (board->num_of_columns-1))
     {
         new_y = 0;
@@ -25,7 +27,6 @@ Point* get_next_point(const Board* board, const Point* point) {
 }
 
 int back_track(Board* board, int is_deterministic) {
-    int i;
     int is_sol_found;
     Point* starting_point = {0,0};
 
@@ -35,7 +36,7 @@ int back_track(Board* board, int is_deterministic) {
     return is_sol_found;
 }
 
-int rec_back_tracking(Board* board, Point* point, int* is_deterministic) {
+int rec_back_tracking(Board* board, Point* point, const int* is_deterministic) {
     int i;
     int possible_values_size;
     int* possible_values;
@@ -102,6 +103,7 @@ int get_possible_values(const Board* board, const Point* point, int* possible_va
         if(set_value_point(point,i,board)) {
             ++counter;
             possible_values = (int*) realloc(possible_values, sizeof(int) * counter);
+            // put the number in the array
         }
         set_value_point(point,BOARD_NULL_VALUE,board);
     }

@@ -1,8 +1,8 @@
 
-#ifndef SOFTWAREPROJ_SODUKO_BOARD_H
-#define SOFTWAREPROJ_SODUKO_BOARD_H
+#ifndef SOFTWAREPROJ_SUDOKU_BOARD_H
+#define SOFTWAREPROJ_SUDOKU_BOARD_H
 
-int const BOARD_NULL_VALUE = 0;
+int const BOARD_NULL_VALUE;
 
 typedef struct _Board {
     int num_of_rows; /*in block*/
@@ -20,6 +20,8 @@ typedef struct _Point {
 
 int set_value(int x, int y, int value, Board* board);
 int get_value(int x, int y, Board* board);
+
+// is needed? because board is int**
 int set_value_point(Point* point, int value, Board* board);
 int get_value_point(Point* point, Board* board);
 

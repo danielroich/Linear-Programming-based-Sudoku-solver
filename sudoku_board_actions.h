@@ -2,8 +2,8 @@
 // Created by Daniel on 12/21/2019.
 //
 
-#ifndef EX3_SODUKO_BOARD_ACTIONS_H
-#define EX3_SODUKO_BOARD_ACTIONS_H
+#ifndef EX3_SUDOKU_BOARD_ACTIONS_H
+#define EX3_SUDOKU_BOARD_ACTIONS_H
 
 #include "backtracking_core_logic.h"
 #include "soduko_board.h"
