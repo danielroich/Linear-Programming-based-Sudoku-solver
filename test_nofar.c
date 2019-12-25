@@ -38,19 +38,18 @@ void print_board(Board* board){
                     }
                 }
                 if(c != (board->num_of_rows-1))
-                    printnf("| ");
+                    printf("| ");
             }
-            printnf("|\n");
+            printf("|\n");
         }     
     }
     printf("----------------------------------\n");
 }
 
-
 int main(){
-    Board* b;
-    b->num_of_columns = 2;
-    b->num_of_rows = 2;
+    Board* board;
+    board->num_of_columns = 2;
+    board->num_of_rows = 2;
     
     int sol[4][4] = {
     {1, 4, 3, 2},
@@ -58,15 +57,21 @@ int main(){
     {4, 2, 1, 3},
     {3, 1, 2, 4}
     };
-    b->solved_board = sol;
-    
-    int fix[4][4] = {
+    for(int i=0;i<4;i++)
+       board->solved_board[i]=sol[i]; 
+
+    int fix [4][4]= {
     {1, BOARD_NULL_VALUE, 3, 2},
     {2, 3, BOARD_NULL_VALUE, 1},
     {BOARD_NULL_VALUE, 2, 1, 3},
     {3, 1, 2, BOARD_NULL_VALUE}
     };
-    b->fixed_board = fix;
-    b->cur_board = fix;
-    print_board(b);
+
+    for(int i=0;i<4;i++)
+       board->fixed_board[i]=fix[i]; 
+    for(int i=0;i<4;i++)
+       board->cur_board[i]=fix[i]; 
+
+    printf("hey");
+
 }

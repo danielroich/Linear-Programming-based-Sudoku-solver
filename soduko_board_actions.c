@@ -26,9 +26,9 @@ void print_board(Board* board){
                     }
                 }
                 if(c != (board->num_of_rows-1))
-                    printnf("| ");
+                    printf("| ");
             }
-            printnf("|\n");
+            printf("|\n");
         }     
     }
     printf("----------------------------------\n");
