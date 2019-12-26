@@ -6,7 +6,7 @@
 #define EX3_SUDOKU_BOARD_ACTIONS_H
 
 #include "backtracking_core_logic.h"
-#include "sudoku_board.h"
+#include "soduko_board.h"
 #include "puzzle_generator.h"
 
 void print_board(Board* board);
