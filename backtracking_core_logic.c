@@ -37,7 +37,7 @@ int get_next_column(const Board* board, int cur_column) {
 /* returns size and updates possible_values */
 int get_possible_values(Board* board, int x, int y, int* possible_values) {
     int i;
-    int counter = 0;
+    int counter = 1;
     int possible_values_num;
 
     /* if the board contains value in this point, return error */
@@ -48,12 +48,11 @@ int get_possible_values(Board* board, int x, int y, int* possible_values) {
 
     possible_values_num = board->num_of_columns*board->num_of_rows;
 
-    for (i = 1; i < possible_values_num + 1; i++)
+    for (i = 0; i < possible_values_num; i++)
     {
-        if(set_value(x, y,i,board)) {
+        if(set_value(x, y,(i+1),board)) {
             ++counter;
-            possible_values = realloc(possible_values, sizeof(int) * counter);
-            possible_values[(i-1)] = i;
+            possible_values[i] = 1;
         }
         erase_value(x,y,board);
     }
@@ -62,33 +61,30 @@ int get_possible_values(Board* board, int x, int y, int* possible_values) {
 }
 
 int get_next_attampted_value(int* possible_values, int possible_values_size, int is_deterministic) {
-
-    int chosen_val;
-    int rand_index;
-    int* new_possible_values = (int*) malloc((possible_values_size - 1) * sizeof(int));
+    int i;
 
     if (is_deterministic)
     {
-        chosen_val = possible_values[0];
-        memcpy(new_possible_values, (possible_values+1), (possible_values_size - 1) * sizeof(int));
+        for (i = 0; i < possible_values_size ; ++i) {
+            if (possible_values[i] != 0) {
+                possible_values[i] = 0;
+                return (i + 1);
+            }
+        }
     }
     else {
-        rand_index = rand() % possible_values_size;
+       /* rand_index = rand() % possible_values_size;
         chosen_val = possible_values[rand_index];
         memcpy(new_possible_values, possible_values, rand_index * sizeof(int));
-        memcpy(new_possible_values, possible_values + rand_index + 1, (possible_values_size - rand_index - 1) * sizeof(int));
+        memcpy(new_possible_values, possible_values + rand_index + 1, (possible_values_size - rand_index - 1) * sizeof(int)); */
     }
-
-
-    free(possible_values);
-    possible_values = new_possible_values;
-    return chosen_val;
+    return -1;
 }
 
 int rec_back_tracking(Board* board, int x, int y, int is_deterministic) {
     int i;
     int possible_values_size;
-    int* possible_values = NULL;
+    int* possible_values = (int*)calloc(board->num_of_columns*board->num_of_rows, sizeof(int));
     int checked_value;
     int is__solving_successful = 0;
     int next_x = get_next_row(board,x,y);
