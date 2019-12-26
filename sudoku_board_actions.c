@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "sudoku_board_actions.h"
 #include <math.h>
+#include "puzzle_generator.h"
 
 void print_board(Board* board){
     int a, b, c, d;
@@ -22,7 +23,7 @@ void print_board(Board* board){
                         if(value != BOARD_NULL_VALUE)
                             printf(" %d ",value);
                         else
-                            printf("   ",value);
+                            printf("   ");
                     }
                 }
                 if(c != (board->num_of_rows-1))

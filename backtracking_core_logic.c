@@ -37,7 +37,7 @@ int get_next_column(const Board* board, int cur_column) {
 /* returns size and updates possible_values */
 int get_possible_values(Board* board, int x, int y, int* possible_values) {
     int i;
-    int counter = 1;
+    int counter = 0;
     int possible_values_num;
 
     /* if the board contains value in this point, return error */
@@ -60,12 +60,14 @@ int get_possible_values(Board* board, int x, int y, int* possible_values) {
     return counter;
 }
 
-int get_next_attampted_value(int* possible_values, int possible_values_size, int is_deterministic) {
+int get_next_attampted_value(int* possible_values, int possible_values_size, int is_deterministic, int size) {
     int i;
+    int rand_index;
+    int counter = 0;
 
     if (is_deterministic)
     {
-        for (i = 0; i < possible_values_size ; ++i) {
+        for (i = 0; i < size ; ++i) {
             if (possible_values[i] != 0) {
                 possible_values[i] = 0;
                 return (i + 1);
@@ -73,10 +75,16 @@ int get_next_attampted_value(int* possible_values, int possible_values_size, int
         }
     }
     else {
-       /* rand_index = rand() % possible_values_size;
-        chosen_val = possible_values[rand_index];
-        memcpy(new_possible_values, possible_values, rand_index * sizeof(int));
-        memcpy(new_possible_values, possible_values + rand_index + 1, (possible_values_size - rand_index - 1) * sizeof(int)); */
+        rand_index = rand() % possible_values_size;
+        for (i = 0; i < size; ++i) {
+            if (possible_values[i] == 1 && counter == rand_index) {
+                return (i+1);
+            }
+
+            if (possible_values[i] == 1) {
+                ++counter;
+            }
+        }
     }
     return -1;
 }
@@ -84,11 +92,13 @@ int get_next_attampted_value(int* possible_values, int possible_values_size, int
 int rec_back_tracking(Board* board, int x, int y, int is_deterministic) {
     int i;
     int possible_values_size;
-    int* possible_values = (int*)calloc(board->num_of_columns*board->num_of_rows, sizeof(int));
     int checked_value;
     int is__solving_successful = 0;
+    int size = board->num_of_columns*board->num_of_rows;
     int next_x = get_next_row(board,x,y);
     int next_y = get_next_column(board,y);
+    int* possible_values = (int*)calloc(size, sizeof(int));
+
 
     /*If this statement is true we have covered all the boared with values
      this indicates we have placed the entire boared with values in have finished solving it */
@@ -106,7 +116,7 @@ int rec_back_tracking(Board* board, int x, int y, int is_deterministic) {
 
         for (i = 0; i < possible_values_size; i++)
         {
-            checked_value = get_next_attampted_value(possible_values, possible_values_size - i, is_deterministic);
+            checked_value = get_next_attampted_value(possible_values, possible_values_size - i, is_deterministic, size);
 
             set_value(x, y,checked_value,board);
 

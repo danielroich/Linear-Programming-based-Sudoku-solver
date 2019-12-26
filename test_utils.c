@@ -11,10 +11,10 @@ int create_empty_board(Board* board, int rows, int columns) {
     board->num_of_rows = rows;
     cur_board = (int **)malloc(size * sizeof(int*));
     for (i=0; i<size; i++)
-        cur_board[i] = (int *)calloc(columns ,sizeof(int));
+        cur_board[i] = (int *)calloc(size ,sizeof(int));
     fixed_board = (int **)malloc(size * sizeof(int*));
     for (i=0; i<size; i++)
-        fixed_board[i] = (int *)calloc(columns ,sizeof(int));
+        fixed_board[i] = (int *)calloc(size ,sizeof(int));
     board->cur_board = cur_board;
     board->fixed_board = fixed_board;
 

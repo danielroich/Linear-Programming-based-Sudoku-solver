@@ -3,21 +3,31 @@
 #include <stdio.h>
 #include "test_utils.h"
 #include "backtracking_core_logic.h"
+#include "sudoku_board_actions.h"
 
 int test_free_board_deterministic_backtrack(int rows, int columns) {
     int answer;
     Board* board = malloc((sizeof(Board)));
     create_empty_board(board, rows, columns);
 
-    back_track(board, 1);
+    answer = back_track(board, 1);
+    free_board(board, rows, columns);
+    return answer;
+}
 
-    answer =  board->cur_board[0][0] == 3;
+int test_free_board_randomized_backtrack(int rows, int columns) {
+    int answer;
+    Board* board = malloc((sizeof(Board)));
+    create_empty_board(board, rows, columns);
+    print_board(board);
+    answer = back_track(board, 0);
+    print_board(board);
     free_board(board, rows, columns);
     return answer;
 }
 
 int main() {
 
-    printf("%d",test_free_board_deterministic_backtrack(3,3));
+    printf("%s result: %d \n", "test_free_board_randomized_backtrack", test_free_board_randomized_backtrack(3,3));
     return 0;
 }
