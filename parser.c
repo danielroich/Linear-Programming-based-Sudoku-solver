@@ -40,4 +40,3 @@ int parse_command(char* command, Board* board){
     printf("Error: invalid command\n");
     return 0;
 }
-
