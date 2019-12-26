@@ -31,7 +31,7 @@ int test_add_val_to_empty_board(int rows, int columns) {
 }
 
 int main() {
-
+    
     printf("tets");
     printf("%d",test_add_val_to_empty_board(9,9));
     return 0;

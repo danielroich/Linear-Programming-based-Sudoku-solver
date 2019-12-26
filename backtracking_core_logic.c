@@ -1,5 +1,5 @@
 
-#include "soduko_board.h"
+#include "sudoku_board.h"
 #include <math.h>
 #include <time.h>
 
