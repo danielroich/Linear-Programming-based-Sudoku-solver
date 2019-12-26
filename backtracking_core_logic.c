@@ -5,77 +5,83 @@
 
 // TODO: Check for allocated points and free them
 // TODO: determine different kind of consts
-Point* get_next_point(const Board* board, const Point* point) {
-    int new_x;
-    int new_y;
-    Point* next_point;
+int get_next_row(const Board* board, int cur_row, int cur_column) {
+    int new_row = cur_row;
+    int size = board->num_of_rows*board->num_of_columns;
 
-    // change to calc size
-    if (point->y == (board->num_of_columns-1))
+    if (cur_column == (size-1))
     {
-        new_y = 0;
-        new_x = (point-> x) + 1;
+        ++new_row;
+    }
+
+    return new_row;
+}
+
+int get_next_column(const Board* board, int cur_row, int cur_column) {
+    int new_column = cur_column;
+    int size = board->num_of_rows*board->num_of_columns;
+
+    if (cur_column == (size-1))
+    {
+        new_column = 0;
     }
     else {
-        new_y = (point-> y) + 1;
-        new_x = point-> x;
+        ++new_column;
     }
-    
-    next_point = (Point*){new_x, new_y};
 
-    return next_point;
+    return new_column;
 }
 
 int back_track(Board* board, int is_deterministic) {
     int is_sol_found;
-    Point* starting_point = {0,0};
+    int x_start = 0;
+    int y_start = 0;
 
-    is_sol_found = rec_back_tracking(board, starting_point, &is_deterministic);
+    is_sol_found = rec_back_tracking(board, x_start, y_start, &is_deterministic);
 
-    free(starting_point);
     return is_sol_found;
 }
 
-int rec_back_tracking(Board* board, Point* point, const int* is_deterministic) {
+int rec_back_tracking(Board* board, int x, int y, const int* is_deterministic) {
     int i;
     int possible_values_size;
     int* possible_values;
     int checked_value;
     int is__solving_successful = 0;
-    Point* next_point = get_next_point(board,point);
+    int next_x = get_next_row(board,x,y);
+    int next_y = get_next_column(board,x,y);
 
     // If this statement is true we have covered all the boared with values
     // this indicates we have placed the entire boared with values in have finished solving it
-    if (point->x == board->num_of_rows * board->num_of_columns)
+    if (x == board->num_of_rows * board->num_of_columns)
         return 1;
 
-    if (get_value_point(point,board) != BOARD_NULL_VALUE)
+    if (get_value(x,y,board) != BOARD_NULL_VALUE)
     {
-        is__solving_successful =  rec_back_tracking(board, next_point, is_deterministic);
+        is__solving_successful =  rec_back_tracking(board, next_x, next_y, is_deterministic);
     }
     
     else {
 
-        possible_values_size = get_possible_values(board,point, possible_values);
+        possible_values_size = get_possible_values(board, x, y, possible_values);
 
         for (i = 0; i < possible_values_size; i++)
         {
             checked_value = get_next_attampted_value(possible_values, possible_values_size - i, is_deterministic);
 
-            set_value_point(point,checked_value,board);
+            set_value(x, y,checked_value,board);
             
-            is__solving_successful = rec_back_tracking(board, next_point, is_deterministic);
+            is__solving_successful = rec_back_tracking(board, next_x, next_y, is_deterministic);
             
             if (is__solving_successful)
                 break;
             
-            set_value_point(point, BOARD_NULL_VALUE, board);
+            set_value_point(x, y, BOARD_NULL_VALUE, board);
         }
         
         // At this point we are sure that the board cannot be solved by the given board to the func
         // So we restore the current cell back to null and return false
         free(possible_values);
-        free(next_point);
         return is__solving_successful;
     }
     
@@ -83,24 +89,22 @@ int rec_back_tracking(Board* board, Point* point, const int* is_deterministic) {
 }
 
 // returns size and updates possible_values
-int get_possible_values(const Board* board, const Point* point, int* possible_values) {
+int get_possible_values(const Board* board, int x, int y, int* possible_values) {
     int i;
     int counter = 0;
     int possible_values_num;
 
     // if the board contains value in this point, return error
-    if (get_value_point(point, board) != BOARD_NULL_VALUE)
+    if (get_value(x, y, board) != BOARD_NULL_VALUE)
     {
         return -1;
     }
-    
 
-    //TODO: What happend when the board isn't 9x9
-    possible_values_num = sqrt(board->num_of_columns);
+    possible_values_num = board->num_of_columns*board->num_of_rows;
 
     for (i = 1; i < possible_values_num + 1; i++)
     {
-        if(set_value_point(point,i,board)) {
+        if(set_value(x, y,i,board)) {
             ++counter;
             possible_values = (int*) realloc(possible_values, sizeof(int) * counter);
             // put the number in the array

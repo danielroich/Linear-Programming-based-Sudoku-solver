@@ -21,8 +21,4 @@ typedef struct _Point {
 int set_value(int x, int y, int value, Board* board);
 int get_value(int x, int y, Board* board);
 
-// is needed? because board is int**
-int set_value_point(Point* point, int value, Board* board);
-int get_value_point(Point* point, Board* board);
-
 #endif 
