@@ -39,7 +39,17 @@ int value_in_square(int row, int col, int value, Board* board){
         }
     }
     return 0;
-} 
+}
+
+int erase_value(int x, int y, Board* board) {
+
+    if (board->cur_board[x][y] != BOARD_NULL_VALUE) {
+        board->count_filled--;
+    }
+
+    board->cur_board[x][y] = BOARD_NULL_VALUE;
+    return 1;
+}
 
 /* 0<=x,y<=row*col-1 */
 int set_value(int x, int y, int value, Board* board){

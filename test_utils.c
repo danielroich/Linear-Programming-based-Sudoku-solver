@@ -1,8 +1,4 @@
-//
-// Created by Daniel on 12/26/2019.
-//
 
-#include "test_utils.h"
 #include "sudoku_board.h"
 #include <stdlib.h>
 
@@ -25,7 +21,7 @@ int create_empty_board(Board* board, int rows, int columns) {
     return 1;
 }
 
-int free_board(Board* board, int rows, int columns) {
+int free_board(Board* board) {
     int i;
     int size = board->num_of_rows * board->num_of_columns;
     for (i=0; i<size; i++) {
@@ -36,4 +32,6 @@ int free_board(Board* board, int rows, int columns) {
     free(board->cur_board);
     free(board->fixed_board);
     free(board);
+
+    return 1;
 }
