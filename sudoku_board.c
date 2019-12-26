@@ -32,8 +32,8 @@ int value_in_square(int row, int col, int value, Board* board){
     int i,j;
     int top_left_corner_row = floor(row/board->num_of_rows)*board->num_of_rows; 
     int top_left_corner_col = floor(col/board->num_of_columns)*board->num_of_columns; 
-    for(i= top_left_corner_row; i<board->num_of_rows; i++){
-        for(j= top_left_corner_col; j<board->num_of_columns; j++){
+    for(i= top_left_corner_row; i<top_left_corner_row+board->num_of_rows; i++){
+        for(j= top_left_corner_col; j<top_left_corner_col+board->num_of_columns; j++){
             if(get_value(i,j,board) == value)
                 return 1;
         }
