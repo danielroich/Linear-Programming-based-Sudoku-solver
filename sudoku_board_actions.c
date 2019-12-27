@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "sudoku_board_actions.h"
 #include <math.h>
+#include <time.h>
 #include "puzzle_generator.h"
 
 void print_board(Board* board){
@@ -112,4 +113,8 @@ int is_filled(Board* board){
         /*From this point, all commands except exit and restart are considered invalid.*/
     }
     return 0;
+}
+
+void seed(int seed) {
+    srand(seed);
 }

@@ -12,5 +12,6 @@ int set_value_user(int x, int y, int value, Board* board);
 void validate_board(Board* board);
 void restart(Board* board);
 void exit_game(Board* board);
+void seed(int seed);
 
 #endif
