@@ -36,7 +36,18 @@ void print_board(Board* board){
     printf("----------------------------------\n");
 }
 
-/* assume the values of X, Y, and Z are valid and correct */
+int is_filled(Board* board){
+    int size = (board->num_of_rows)*(board->num_of_columns);
+    if(board->count_filled == size*size){
+        return 1;
+        /*From this point, all commands except exit and restart are considered invalid.*/
+    }
+    return 0;
+}
+
+/* assume the values of X, Y, and Z are valid and correct 
+return 0 if Error or Erase
+announces if game is over (full board) */
 int set_value_user(int x, int y, int value, Board* board){
     if((board->fixed_board)[x-1][y-1] != BOARD_NULL_VALUE){
         printf("Error: cell is fixed\n");
@@ -51,8 +62,11 @@ int set_value_user(int x, int y, int value, Board* board){
             printf("Error: value is invalid\n");
             return 0;
     }
-    /* else value was set and count++ in func */    
+    /* else value was set and filled++ in set_value */    
     print_board(board);
+    if(is_filled(board) == 1){
+        printf("Puzzle solved successfully\n");
+    }
     return 1;
 }
 
@@ -70,26 +84,27 @@ void validate_board(Board* board){
         printf("Validation passed: board is solvable\n");
 }
 
-void freeArray(int** arr, int size){
-    int i;
-    for (i = 0; i < size; i++) { 
-        free(arr[i]);
-    }
-    free(arr);
-}
-
+/* free memo and exit*/
 void exit_game(Board* board){
+    int i;
     int size = (board->num_of_rows)*(board->num_of_columns);
     printf("Exiting…\n");
     free(&board->count_filled); 
     free(&board->num_of_columns);
     free(&board->num_of_rows);
-    freeArray(board->solved_board,size);
-    freeArray(board->fixed_board,size);
-    freeArray(board->cur_board,size);
+    for (i = 0; i < size; i++) { 
+        free(board->solved_board[i]);
+        free(board->fixed_board[i]);
+        free(board->cur_board[i]);
+    }
+    free(board->solved_board);
+    free(board->fixed_board);
+    free(board->cur_board);
     exit(0);
 }
 
+/* set BOARD_NULL_VALUE to cur/solved/fixed and count_filled = 0
+call generate_puzzle with user new fixed */
 void restart(Board* board){
     int fixed, i, j;
     int size = (board->num_of_rows)*(board->num_of_columns);
@@ -112,16 +127,6 @@ void restart(Board* board){
         }
     }
     generate_puzzle(board, fixed);
-}
-
-int is_filled(Board* board){
-    int size = (board->num_of_rows)*(board->num_of_columns);
-    if(board->count_filled == size*size){
-        printf("Puzzle solved successfully\n");
-        return 1;
-        /*From this point, all commands except exit and restart are considered invalid.*/
-    }
-    return 0;
 }
 
 void seed(int seed) {

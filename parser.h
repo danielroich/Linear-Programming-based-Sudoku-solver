@@ -5,6 +5,6 @@
 #include "sudoku_board_actions.h"
 #include "backtracking_core_logic.h"
 
-int parse_command(char* command);
+int parse_command(char* command, Board* board);
 
 #endif

@@ -13,5 +13,6 @@ void validate_board(Board* board);
 void restart(Board* board);
 void exit_game(Board* board);
 void seed(int seed);
+int is_filled(Board* board);
 
 #endif

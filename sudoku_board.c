@@ -3,12 +3,13 @@
 #include <math.h>
 
 int const BOARD_NULL_VALUE = 0;
+/* all functions in this file get 0<=x,y<=row*col-1 */
 
-/* 0<=x,y<=row*col-1 */
 int get_value(int x, int y, Board* board){
     return (board->cur_board)[x][y];
 }
 
+/* return 1 if value was found in row*/
 int value_in_row(int row, int value, Board* board){
     int i;
     int size = (board->num_of_rows)*(board->num_of_columns);
@@ -19,6 +20,7 @@ int value_in_row(int row, int value, Board* board){
     return 0;
 }
 
+/* return 1 if value was found in col*/
 int value_in_col(int col, int value, Board* board){
     int i;
     int size = (board->num_of_rows)*(board->num_of_columns);
@@ -29,6 +31,7 @@ int value_in_col(int col, int value, Board* board){
     return 0;
 }
 
+/* return 1 if value was found in square*/
 int value_in_square(int row, int col, int value, Board* board){
     int i,j;
     int top_left_corner_row = floor(row/board->num_of_rows)*board->num_of_rows; 
@@ -42,6 +45,14 @@ int value_in_square(int row, int col, int value, Board* board){
     return 0;
 }
 
+int set_value(int x, int y, int value, Board* board){
+    if((value_in_row(x,value,board) || value_in_col(y,value,board) || value_in_square(x,y,value,board) ))
+        return 0;     
+    board->cur_board[x][y] = value;
+    board->count_filled++;
+    return 1;
+}
+
 int erase_value(int x, int y, Board* board) {
 
     if (board->cur_board[x][y] != BOARD_NULL_VALUE) {
@@ -49,15 +60,6 @@ int erase_value(int x, int y, Board* board) {
     }
 
     board->cur_board[x][y] = BOARD_NULL_VALUE;
-    return 1;
-}
-
-/* 0<=x,y<=row*col-1 */
-int set_value(int x, int y, int value, Board* board){
-    if((value_in_row(x,value,board) || value_in_col(y,value,board) || value_in_square(x,y,value,board) ))
-        return 0;     
-    board->cur_board[x][y] = value;
-    board->count_filled++;
     return 1;
 }
 
