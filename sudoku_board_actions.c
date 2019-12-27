@@ -91,7 +91,7 @@ void exit_game(Board* board){
 }
 
 void restart(Board* board){
-    int fixed;
+    int fixed, i, j;
     int size = (board->num_of_rows)*(board->num_of_columns);
     int max_fill = size*size-1;
     printf("Please enter the number of cells to fill [0-%d]:\n",max_fill);
@@ -101,6 +101,15 @@ void restart(Board* board){
         printf("Error: invalid number of cells to fill (should be between 0 and %d)\n",max_fill);
         if(feof(stdin)){exit_game(board);}
         scanf("%d",&fixed);
+    }
+    /*null values board*/
+    for(i=0; i<size; i++){
+        for(j=0; j<size; j++){
+            board->cur_board[i][j]=BOARD_NULL_VALUE;
+            board->solved_board[i][j]=BOARD_NULL_VALUE;
+            board->fixed_board[i][j]=BOARD_NULL_VALUE;
+            board->count_filled = 0;
+        }
     }
     generate_puzzle(board, fixed);
 }
