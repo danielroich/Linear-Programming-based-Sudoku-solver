@@ -1,4 +1,5 @@
 #include "sudoku_board.h"
+#include <stdlib.h>
 #include <math.h>
 
 int const BOARD_NULL_VALUE = 0;

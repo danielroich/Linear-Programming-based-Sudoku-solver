@@ -16,5 +16,6 @@ typedef struct _Board {
 int set_value(int x, int y, int value, Board* board);
 int get_value(int x, int y, Board* board);
 int erase_value(int x, int y, Board* board);
+int create_empty_board(Board* board, int rows, int columns);
 
 #endif 
