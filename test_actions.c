@@ -1,6 +1,7 @@
 #include "parser.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 void create_solved_board(Board *board){
     int i;    
@@ -123,5 +124,7 @@ int main() {
     
     create_80_board(board);
     //set_value_user(9,9,4,board); //winner test
-    printf("%d",parse_command("set 9 9 4",board));
+    char* com= "set 9 9 4";
+    parse_command(com,board);
+
 }
