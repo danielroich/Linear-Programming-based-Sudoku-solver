@@ -11,7 +11,7 @@ int main() {
     if(feof(stdin)){exit_game(board);}
     while(1==1){
         fgets(command,1024,stdin);
-        parse_command(command);
+        parse_command(command, board);
         if(feof(stdin)){exit_game(board);}
     }
     return 0;
