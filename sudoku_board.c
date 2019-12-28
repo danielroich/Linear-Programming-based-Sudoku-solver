@@ -63,6 +63,21 @@ int erase_value(int x, int y, Board* board) {
     return 1;
 }
 
+int free_board(Board* board) {
+    int i;
+    int size = board->num_of_rows * board->num_of_columns;
+    for (i=0; i<size; i++) {
+        free(board->cur_board[i]);
+        free(board->fixed_board[i]);
+    }
+
+    free(board->cur_board);
+    free(board->fixed_board);
+    free(board);
+
+    return 1;
+}
+
 int create_empty_board(Board* board, int rows, int columns) {
     int i;
     int **cur_board;

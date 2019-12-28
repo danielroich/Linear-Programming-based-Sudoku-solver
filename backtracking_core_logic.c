@@ -1,10 +1,5 @@
-
 #include "sudoku_board.h"
-#include <math.h>
 #include <stdlib.h>
-#include <time.h>
-#include <string.h>
-#include <stdio.h>
 
 
 int get_next_row(const Board* board, int cur_row, int cur_column) {

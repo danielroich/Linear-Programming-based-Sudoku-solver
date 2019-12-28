@@ -1,8 +1,38 @@
 #include "sudoku_board.h"
+#include "backtracking_core_logic.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 int generate_puzzle(Board* board, int fixed_cells) {
-    printf("celss %d", fixed_cells);
-    printf("%d", board->num_of_rows);
-    return 0;
+    int i ;
+    int j;
+    int selected_row;
+    int selected_column;
+    int size = board->num_of_columns * board->num_of_rows;
+    int **fixed_board = (int **)malloc(size * sizeof(int*));
+    for (i=0; i<size; i++)
+        fixed_board[i] = (int *)calloc(size ,sizeof(int));
+    back_track(board,0);
+
+    while(fixed_cells != 0 ) {
+        selected_row = rand() % size;
+        selected_column = rand() % size;
+
+        if (fixed_board[selected_row][selected_column] == BOARD_NULL_VALUE) {
+            --fixed_cells;
+            fixed_board[selected_row][selected_column] = 1;
+        }
+    }
+
+    for (i = 0; i < size; ++i) {
+        for (j = 0; j < size; ++j) {
+            if (fixed_board[i][j] == BOARD_NULL_VALUE) {
+                erase_value(i,j,board);
+            }
+        }
+    }
+
+    /* TODO: add the fixed board to the board and handle memory */
+
+    return 1;
 }
