@@ -2,6 +2,7 @@
 #include "backtracking_core_logic.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "2d_array_utils.h"
 
 int generate_puzzle(Board* board, int fixed_cells) {
     int i ;
@@ -13,6 +14,8 @@ int generate_puzzle(Board* board, int fixed_cells) {
     for (i=0; i<size; i++)
         fixed_board[i] = (int *)calloc(size ,sizeof(int));
     back_track(board,0);
+
+    copy_board_values(board->solved_board, board->cur_board, size);
 
     while(fixed_cells != 0 ) {
         selected_row = rand() % size;
@@ -32,7 +35,9 @@ int generate_puzzle(Board* board, int fixed_cells) {
         }
     }
 
-    /* TODO: add the fixed board to the board and handle memory */
+    copy_board_values(board->fixed_board, board->cur_board, size);
+    free_2d_array(fixed_board, size);
 
     return 1;
 }
+
