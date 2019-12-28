@@ -3,6 +3,6 @@
 
 void copy_board_values(int** to, int** from, int size);
 
-void free_2d_array(int **array, size);
+void free_2d_array(int **array, int size);
 
 #endif

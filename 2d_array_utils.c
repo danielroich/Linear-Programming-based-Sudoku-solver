@@ -1,5 +1,6 @@
 
 #include "2d_array_utils.h"
+#include "stdlib.h"
 
 void copy_board_values(int** to, int** from, int size) {
     int i;
@@ -11,7 +12,7 @@ void copy_board_values(int** to, int** from, int size) {
     }
 }
 
-void free_2d_array(int **array, size) {
+void free_2d_array(int **array, int size) {
     int i;
     for (i = 0; i < size; ++i) {
         free(array[i]);
