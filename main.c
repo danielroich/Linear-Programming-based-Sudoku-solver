@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int main(int argc, char *argv) {
+int main(int argc, char **argv) {
     int seed_num;
     char* command = malloc((sizeof(char)*1024));
     Board* board = malloc((sizeof(Board)));
@@ -10,7 +10,7 @@ int main(int argc, char *argv) {
     if (argc  <= 1) {
         return 0;
     }
-    seed_num = (argv[2] - '0');
+    seed_num = (*argv[2] - '0');
     seed(seed_num);
 
     create_empty_board(board,3,3);
