@@ -7,13 +7,11 @@
 return num op or 0 if invalid command
 if board filled can restart and exit only */
 int parse_command(char* command, Board* board){
-    char* command_parse=malloc(1024*sizeof(char));
     int x,y,z;
     char* token; 
     int filled = is_filled(board);
-    strcpy(command_parse,command);
 
-    token = strtok(command_parse," \t\r\n");
+    token = strtok(command," \t\r\n");
     
     if(token == NULL){free(token);return 0;}
 

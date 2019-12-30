@@ -40,4 +40,3 @@ int generate_puzzle(Board* board, int fixed_cells) {
 
     return 1;
 }
-

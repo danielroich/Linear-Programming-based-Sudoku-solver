@@ -15,7 +15,6 @@ int main(int argc, char **argv) {
 
     create_empty_board(board,3,3);
     restart(board);
-    print_board(board);
     if(feof(stdin)){exit_game(board);}
     while(1){
         fgets(command,1024,stdin);

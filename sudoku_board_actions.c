@@ -88,7 +88,7 @@ void validate_board(Board* board){
 void exit_game(Board* board){
     int i;
     int size = (board->num_of_rows)*(board->num_of_columns);
-    printf("Exiting…\n");
+    printf("Exiting...\n");
     free(&board->count_filled); 
     free(&board->num_of_columns);
     free(&board->num_of_rows);
@@ -127,6 +127,7 @@ void restart(Board* board){
         }
     }
     generate_puzzle(board, fixed);
+    print_board(board);
 }
 
 void seed(int seed) {
