@@ -5,20 +5,11 @@
 #include "sudoku_board_actions.h"
 #include "puzzle_generator.h"
 
-int test_empty_board_generation(int rows, int columns) {
+int test_exact_board_generation(int rows, int columns, int fixed) {
     int answer;
     Board* board = malloc((sizeof(Board)));
     create_empty_board(board, rows, columns);
-    answer = generate_puzzle(board, 0);
-    print_board(board);
-    return answer;
-}
-
-int test_full_board_generation(int rows, int columns) {
-    int answer;
-    Board* board = malloc((sizeof(Board)));
-    create_empty_board(board, rows, columns);
-    answer = generate_puzzle(board, (rows * columns) * (rows * columns));
+    answer = generate_puzzle(board, fixed);
     print_board(board);
     return answer;
 }
@@ -34,8 +25,6 @@ int test_random_filled__board_generation(int rows, int columns) {
 
 int main() {
 
-    printf("%s result: %d \n", "test_full_board_generation", test_full_board_generation(3,3));
-    printf("%s result: %d \n", "test_empty_board_generation", test_empty_board_generation(3,3));
-    printf("%s result: %d \n", "test_random_filled__board_generation", test_random_filled__board_generation(3,3));
+    printf("%s result: %d \n", "test_exact_board_generation", test_exact_board_generation(3,3, 5));
     return 0;
 }

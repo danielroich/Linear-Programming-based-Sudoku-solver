@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
     if (argc  <= 1) {
         return 0;
     }
-    seed_num = (*argv[2] - '0');
+    seed_num = (argv[1][0] - '0');
     seed(seed_num);
 
     create_empty_board(board,3,3);

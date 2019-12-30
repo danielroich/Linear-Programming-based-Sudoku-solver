@@ -82,17 +82,20 @@ int create_empty_board(Board* board, int rows, int columns) {
     int i;
     int **cur_board;
     int **fixed_board;
+    int **solved_board;
     int size = rows * columns;
     board->num_of_columns = columns;
     board->num_of_rows = rows;
     cur_board = (int **)malloc(size * sizeof(int*));
-    for (i=0; i<size; i++)
-        cur_board[i] = (int *)calloc(size ,sizeof(int));
     fixed_board = (int **)malloc(size * sizeof(int*));
-    for (i=0; i<size; i++)
-        fixed_board[i] = (int *)calloc(size ,sizeof(int));
+    solved_board = (int **)malloc(size * sizeof(int*));
+    for (i=0; i<size; i++) {
+        cur_board[i] = (int *) calloc(size, sizeof(int));
+        fixed_board[i] = (int *) calloc(size, sizeof(int));
+        solved_board[i] = (int *) calloc(size, sizeof(int));
+    }
     board->cur_board = cur_board;
     board->fixed_board = fixed_board;
-
+    board->solved_board = solved_board;
     return 1;
 }
