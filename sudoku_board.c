@@ -1,4 +1,5 @@
 #include "sudoku_board.h"
+#include "2d_array_utils.h"
 #include <stdlib.h>
 #include <math.h>
 
@@ -79,14 +80,18 @@ int free_board(Board* board) {
 }
 
 int create_empty_board(Board* board, int rows, int columns) {
-    int i;
+    /*int i;
     int **cur_board;
     int **fixed_board;
-    int **solved_board;
+    int **solved_board; */
     int size = rows * columns;
     board->num_of_columns = columns;
     board->num_of_rows = rows;
-    cur_board = (int **)malloc(size * sizeof(int*));
+    board->cur_board  = create_2d_array(size);
+    board->fixed_board  = create_2d_array(size);
+    board->solved_board  = create_2d_array(size);
+
+    /*cur_board = (int **)malloc(size * sizeof(int*));
     fixed_board = (int **)malloc(size * sizeof(int*));
     solved_board = (int **)malloc(size * sizeof(int*));
     for (i=0; i<size; i++) {
@@ -96,6 +101,6 @@ int create_empty_board(Board* board, int rows, int columns) {
     }
     board->cur_board = cur_board;
     board->fixed_board = fixed_board;
-    board->solved_board = solved_board;
+    board->solved_board = solved_board; */
     return 1;
 }

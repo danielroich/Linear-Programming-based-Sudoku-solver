@@ -20,3 +20,15 @@ void free_2d_array(int **array, int size) {
 
     free(array);
 }
+
+int**  create_2d_array(int size) {
+    int i;
+    int ** array;
+    array = (int **)malloc(size * sizeof(int*));
+
+    for (i=0; i<size; i++) {
+        array[i] = (int *) calloc(size, sizeof(int));
+    }
+
+    return array;
+}

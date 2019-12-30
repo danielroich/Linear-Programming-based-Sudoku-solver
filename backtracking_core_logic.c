@@ -129,7 +129,6 @@ int rec_back_tracking(Board* board, int x, int y, int is_deterministic) {
         return is__solving_successful;
     }
 
-    /* TODO: free tried values */
     return 1;
 }
 
