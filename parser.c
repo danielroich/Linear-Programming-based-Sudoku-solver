@@ -22,7 +22,7 @@ int parse_command(char* command, Board* board){
         y = atoi(token);
         token = (strtok(NULL, " \t\r\n"));
         z = atoi(token);
-        set_value_user(x,y,z,board);
+        set_value_user(y,x,z,board);
         free(token);
         return 1;
     }
@@ -32,7 +32,7 @@ int parse_command(char* command, Board* board){
         x = atoi(token);
         token = (strtok(NULL, " \t\r\n"));
         y = atoi(token);
-        hint(x,y,board);
+        hint(y,x,board);
         free(token);
         return 2;
     }
