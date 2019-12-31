@@ -99,17 +99,12 @@ void exit_game(Board* board){
     int i;
     int size = (board->num_of_rows)*(board->num_of_columns);
     printf("Exiting...\n");
-    free(&board->count_filled); 
+    free(&board->count_filled);
     free(&board->num_of_columns);
     free(&board->num_of_rows);
-    for (i = 0; i < size; i++) { 
-        free(board->solved_board[i]);
-        free(board->fixed_board[i]);
-        free(board->cur_board[i]);
-    }
-    free(board->solved_board);
-    free(board->fixed_board);
-    free(board->cur_board);
+    free_2d_array(board->solved_board);
+    free_2d_array(board->fixed_board);
+    free_2d_array(board->cur_board);
     exit(0);
 }
 
@@ -119,13 +114,16 @@ void restart(Board* board){
     int fixed, i, j;
     int size = (board->num_of_rows)*(board->num_of_columns);
     int max_fill = size*size-1;
+    int count_scan;
     printf("Please enter the number of cells to fill [0-%d]:\n",max_fill);
     if(feof(stdin)){exit_game(board);}
-    scanf("%d",&fixed);
+    count_scan = scanf("%d",&fixed);
+    if(count_scan == 0){exit(0);}
     while(fixed<0 || fixed>max_fill){ /*assume the user enters a single valid integer*/
         printf("Error: invalid number of cells to fill (should be between 0 and %d)\n",max_fill);
         if(feof(stdin)){exit_game(board);}
-        scanf("%d",&fixed);
+        count_scan = scanf("%d",&fixed);
+        if(count_scan == 0){exit(0);}
     }
     /*null values board*/
     for(i=0; i<size; i++){
