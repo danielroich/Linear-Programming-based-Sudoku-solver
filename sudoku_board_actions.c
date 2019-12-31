@@ -96,15 +96,14 @@ void validate_board(Board* board){
 
 /* free memo and exit*/
 void exit_game(Board* board){
-    int i;
     int size = (board->num_of_rows)*(board->num_of_columns);
     printf("Exiting...\n");
     free(&board->count_filled);
     free(&board->num_of_columns);
     free(&board->num_of_rows);
-    free_2d_array(board->solved_board);
-    free_2d_array(board->fixed_board);
-    free_2d_array(board->cur_board);
+    free_2d_array(board->solved_board,size);
+    free_2d_array(board->fixed_board,size);
+    free_2d_array(board->cur_board,size);
     exit(0);
 }
 

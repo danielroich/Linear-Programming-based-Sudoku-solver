@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "sudoku_board_actions.h"
 #include <stdlib.h>
 #include <stdio.h>
 
