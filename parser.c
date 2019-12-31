@@ -8,7 +8,7 @@ return num op or 0 if invalid command
 if board filled can restart and exit only */
 int parse_command(char* command, Board* board){
     int x,y,z;
-    char* token; 
+    char* token;
     int filled = is_filled(board);
 
     token = strtok(command," \t\r\n");
