@@ -114,12 +114,12 @@ void restart(Board* board){
     printf("Please enter the number of cells to fill [0-%d]:\n",max_fill);
     if(feof(stdin)){exit_game(board);}
     count_scan = scanf("%d",&fixed);
-    if(count_scan == 0){exit(0);}
+    if(count_scan == 0){printf("Error: scanf has failed\n");exit(0);}
     while(fixed<0 || fixed>max_fill){ /*assume the user enters a single valid integer*/
         printf("Error: invalid number of cells to fill (should be between 0 and %d)\n",max_fill);
         if(feof(stdin)){exit_game(board);}
         count_scan = scanf("%d",&fixed);
-        if(count_scan == 0){exit(0);}
+        if(count_scan == 0){printf("Error: scanf has failed\n");exit(0);}
     }
     /*null values board*/
     for(i=0; i<size; i++){
