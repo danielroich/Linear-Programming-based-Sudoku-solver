@@ -1,5 +1,4 @@
 #include "stdio.h"
-#include "2d_array_utils.h"
 #include "stdlib.h"
 
 void copy_board_values(int** to, int** from, int size) {

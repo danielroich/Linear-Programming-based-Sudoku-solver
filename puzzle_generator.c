@@ -1,6 +1,5 @@
 #include "sudoku_board.h"
 #include "backtracking_core_logic.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include "2d_array_utils.h"
 
