@@ -10,9 +10,7 @@ int generate_puzzle(Board* board, int fixed_cells) {
     int selected_row;
     int selected_column;
     int size = board->num_of_columns * board->num_of_rows;
-    int **fixed_board = (int **)malloc(size * sizeof(int*));
-    for (i=0; i<size; i++)
-        fixed_board[i] = (int *)calloc(size ,sizeof(int));
+    int **fixed_board = create_2d_array(size);
     back_track(board,0);
 
     copy_board_values(board->solved_board, board->cur_board, size);

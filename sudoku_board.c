@@ -64,26 +64,7 @@ int erase_value(int x, int y, Board* board) {
     return 1;
 }
 
-int free_board(Board* board) {
-    int i;
-    int size = board->num_of_rows * board->num_of_columns;
-    for (i=0; i<size; i++) {
-        free(board->cur_board[i]);
-        free(board->fixed_board[i]);
-    }
-
-    free(board->cur_board);
-    free(board->fixed_board);
-    free(board);
-
-    return 1;
-}
-
 int create_empty_board(Board* board, int rows, int columns) {
-    /*int i;
-    int **cur_board;
-    int **fixed_board;
-    int **solved_board; */
     int size = rows * columns;
     board->num_of_columns = columns;
     board->num_of_rows = rows;
@@ -91,16 +72,5 @@ int create_empty_board(Board* board, int rows, int columns) {
     board->fixed_board  = create_2d_array(size);
     board->solved_board  = create_2d_array(size);
 
-    /*cur_board = (int **)malloc(size * sizeof(int*));
-    fixed_board = (int **)malloc(size * sizeof(int*));
-    solved_board = (int **)malloc(size * sizeof(int*));
-    for (i=0; i<size; i++) {
-        cur_board[i] = (int *) calloc(size, sizeof(int));
-        fixed_board[i] = (int *) calloc(size, sizeof(int));
-        solved_board[i] = (int *) calloc(size, sizeof(int));
-    }
-    board->cur_board = cur_board;
-    board->fixed_board = fixed_board;
-    board->solved_board = solved_board; */
     return 1;
 }

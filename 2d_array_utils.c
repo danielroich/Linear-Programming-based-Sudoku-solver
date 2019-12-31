@@ -1,4 +1,4 @@
-
+#include "stdio.h"
 #include "2d_array_utils.h"
 #include "stdlib.h"
 
@@ -26,8 +26,18 @@ int**  create_2d_array(int size) {
     int ** array;
     array = (int **)malloc(size * sizeof(int*));
 
+    if (array == NULL) {
+        printf("Error: create_2d_array has failed\n");
+        exit(0);
+    }
+
     for (i=0; i<size; i++) {
         array[i] = (int *) calloc(size, sizeof(int));
+
+        if(array[i] == NULL) {
+            printf("Error: create_2d_array has failed\n");
+            exit(0);
+        }
     }
 
     return array;

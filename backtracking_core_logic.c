@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 
+
 int get_next_row(const Board* board, int cur_row, int cur_column) {
     int new_row = cur_row;
     int size = board->num_of_rows*board->num_of_columns;
