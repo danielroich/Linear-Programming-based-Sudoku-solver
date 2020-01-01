@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 
-
 int get_next_row(const Board* board, int cur_row, int cur_column) {
     int new_row = cur_row;
     int size = board->num_of_rows*board->num_of_columns;
@@ -85,6 +84,17 @@ int get_next_attampted_value(int* possible_values, int possible_values_size, int
     return -1;
 }
 
+int get_single_possible_value(int* possible_values, int size) {
+    int i;
+    for (i = 0; i < size; ++i) {
+        if(possible_values[i] == 1) {
+            return (i+1);
+        }
+    }
+
+    return -1;
+}
+
 int rec_back_tracking(Board* board, int x, int y, int is_deterministic) {
     int i;
     int possible_values_size;
@@ -112,8 +122,13 @@ int rec_back_tracking(Board* board, int x, int y, int is_deterministic) {
 
         for (i = 0; i < possible_values_size; i++)
         {
-            checked_value = get_next_attampted_value(possible_values, possible_values_size - i, is_deterministic, size);
-
+            if (possible_values_size == 1) {
+                checked_value = get_single_possible_value(possible_values,size);
+            }
+            else {
+                checked_value = get_next_attampted_value(possible_values, possible_values_size - i, is_deterministic,
+                                                         size);
+            }
             set_value(x, y,checked_value,board);
 
             is__solving_successful = rec_back_tracking(board, next_x, next_y, is_deterministic);
