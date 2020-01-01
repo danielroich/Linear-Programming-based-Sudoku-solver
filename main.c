@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define DEFAULT_SEED 5
+
 int main(int argc, char **argv) {
 
     int seed_num;
@@ -13,8 +15,9 @@ int main(int argc, char **argv) {
     if(board==NULL){printf("Error: malloc has failed\n");exit(0);}
 
     if (argc  <= 1) {
-        return 0;
+        seed_num = DEFAULT_SEED;
     }
+
     seed_num = (argv[1][0] - '0');
     seed(seed_num);
 
