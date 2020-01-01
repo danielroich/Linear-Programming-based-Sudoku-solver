@@ -4,7 +4,7 @@ EXEC = sudoku
 COMP_FLAG = -ansi -Wall -Wextra -Werror -pedantic-errors
 
 $(EXEC): $(OBJS)
-	$(CC) $(OBJS) -o $@
+	$(CC) $(OBJS) -lm -o $@
 main.o: main.c parser.h
 	$(CC) $(COMP_FLAG) -c $*.c
 2d_array_utils.o: 2d_array_utils.c
