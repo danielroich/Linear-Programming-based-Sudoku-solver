@@ -26,12 +26,11 @@ int main(int argc, char *argv[]) {
     create_empty_board(board,3,3);
     restart(board);
 
-    if(feof(stdin)){exit_game(board);}
-    while(1){
+    while(!feof(stdin)){
         fgets(command,1024,stdin);
         parse_command(command, board);
-        if(feof(stdin)){exit_game(board);}
     }
+    exit_game(board);
 
     return 0;
 }
