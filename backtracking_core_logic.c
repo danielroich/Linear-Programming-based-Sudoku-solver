@@ -73,6 +73,7 @@ int get_next_attampted_value(int* possible_values, int possible_values_size, int
         rand_index = rand() % possible_values_size;
         for (i = 0; i < size; ++i) {
             if (possible_values[i] == 1 && counter == rand_index) {
+                possible_values[i] = 0;
                 return (i+1);
             }
 
@@ -88,6 +89,7 @@ int get_single_possible_value(int* possible_values, int size) {
     int i;
     for (i = 0; i < size; ++i) {
         if(possible_values[i] == 1) {
+            possible_values[i] = 0;
             return (i+1);
         }
     }
@@ -113,7 +115,7 @@ int rec_back_tracking(Board* board, int x, int y, int is_deterministic) {
 
     if (get_value(x,y,board) != BOARD_NULL_VALUE)
     {
-        is__solving_successful =  rec_back_tracking(board, next_x, next_y, is_deterministic);
+        return rec_back_tracking(board, next_x, next_y, is_deterministic);
     }
 
     else {
@@ -122,7 +124,7 @@ int rec_back_tracking(Board* board, int x, int y, int is_deterministic) {
 
         for (i = 0; i < possible_values_size; i++)
         {
-            if (possible_values_size == 1) {
+            if (i == (possible_values_size - 1)) {
                 checked_value = get_single_possible_value(possible_values,size);
             }
             else {
@@ -134,7 +136,7 @@ int rec_back_tracking(Board* board, int x, int y, int is_deterministic) {
             is__solving_successful = rec_back_tracking(board, next_x, next_y, is_deterministic);
 
             if (is__solving_successful)
-                break;
+                return 1;
 
             erase_value(x,y,board);
         }
@@ -142,10 +144,9 @@ int rec_back_tracking(Board* board, int x, int y, int is_deterministic) {
         /* At this point we are sure that the board cannot be solved by the given board to the func
          So we restore the current cell back to null and return false */
         free(possible_values);
-        return is__solving_successful;
+        erase_value(x,y,board);
+        return 0;
     }
-
-    return 1;
 }
 
 int back_track(Board* board, int is_deterministic) {

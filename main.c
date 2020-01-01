@@ -18,7 +18,8 @@ int main(int argc, char *argv[]) {
         seed_num = DEFAULT_SEED;
     }
     else {
-        seed_num = (argv[1][0] - '0');
+
+        seed_num = atoi(argv[1]);
     }
 
     seed(seed_num);

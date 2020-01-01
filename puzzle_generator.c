@@ -15,8 +15,9 @@ int generate_puzzle(Board* board, int fixed_cells) {
     copy_board_values(board->solved_board, board->cur_board, size);
 
     while(fixed_cells != 0 ) {
-        selected_row = rand() % size;
         selected_column = rand() % size;
+        selected_row = rand() % size;
+
 
         if (fixed_board[selected_row][selected_column] == BOARD_NULL_VALUE) {
             --fixed_cells;
