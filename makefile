@@ -13,7 +13,7 @@ backtracking_core_logic.o: backtracking_core_logic.c sudoku_board.h
 	$(CC) $(COMP_FLAG) -c $*.c
 parser.o: parser.c sudoku_board_actions.h
 	$(CC) $(COMP_FLAG) -c $*.c
-sudoku_board_actions.o: sudoku_board_actions.c puzzle_generator.h 2d_array_utils.h
+sudoku_board_actions.o: sudoku_board_actions.c puzzle_generator.h 2d_array_utils.h backtracking_core_logic.h
 	$(CC) $(COMP_FLAG) -c $*.c
 sudoku_board.o: sudoku_board.c sudoku_board.h 2d_array_utils.h
 	$(CC) $(COMP_FLAG) -c $*.c

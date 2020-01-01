@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "backtracking_core_logic.h"
 #include "puzzle_generator.h"
 #include "2d_array_utils.h"
 
