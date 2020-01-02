@@ -26,8 +26,7 @@ int main(int argc, char *argv[]) {
     create_empty_board(board,3,3);
     restart(board);
 
-    while(!feof(stdin)){
-        fgets(command,1024,stdin);
+    while(fgets(command,1024,stdin) && !feof(stdin)){
         parse_command(command, board);
     }
 
