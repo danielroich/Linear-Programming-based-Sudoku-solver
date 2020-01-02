@@ -30,7 +30,8 @@ int main(int argc, char *argv[]) {
         fgets(command,1024,stdin);
         parse_command(command, board);
     }
-    exit_game(board);
 
+    free(command);
+    exit_game(board);
     return 0;
 }

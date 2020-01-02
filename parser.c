@@ -69,6 +69,7 @@ int parse_command(char* command, Board* board){
     }
 
     if(strcmp(token, "exit") == 0){
+        free(command);
         exit_game(board);
         return 5;
     }
