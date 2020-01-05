@@ -99,6 +99,7 @@ void exit_game(Board* board){
     free_2d_array(board->solved_board,size);
     free_2d_array(board->fixed_board,size);
     free_2d_array(board->cur_board,size);
+    free(board);
     exit(0);
 }
 

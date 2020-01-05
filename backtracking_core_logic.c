@@ -116,6 +116,7 @@ int rec_back_tracking(Board* board, int x, int y, int is_deterministic) {
 
     if (get_value(x,y,board) != BOARD_NULL_VALUE)
     {
+        free(possible_values);
         return rec_back_tracking(board, next_x, next_y, is_deterministic);
     }
 

@@ -11,8 +11,18 @@ int main(int argc, char *argv[]) {
     char* command = malloc((sizeof(char)*1024));
     Board* board = malloc((sizeof(Board)));
 
-    if(command==NULL){printf("Error: malloc has failed\n");exit(0);}
-    if(board==NULL){printf("Error: malloc has failed\n");exit(0);}
+    if(command==NULL){
+        printf("Error: malloc has failed\n");
+        free(board);
+        free(command);
+        exit(0);
+    }
+    if(board==NULL) {
+        printf("Error: malloc has failed\n");
+        free(board);
+        free(command);
+        exit(0);
+    }
 
     if (argc  <= 1) {
         seed_num = DEFAULT_SEED;
