@@ -110,8 +110,9 @@ int rec_back_tracking(Board* board, int x, int y, int is_deterministic) {
 
     /*If this statement is true we have covered all the boared with values
      this indicates we have placed the entire boared with values in have finished solving it */
-    if (x == board->num_of_rows * board->num_of_columns)
-        return 1;
+    if (x == board->num_of_rows * board->num_of_columns) {
+        free(possible_values);
+        return 1; }
 
     if (get_value(x,y,board) != BOARD_NULL_VALUE)
     {
@@ -136,8 +137,10 @@ int rec_back_tracking(Board* board, int x, int y, int is_deterministic) {
             is__solving_successful = rec_back_tracking(board, next_x, next_y, is_deterministic);
 
             if (is__solving_successful)
+            {
+                free(possible_values);
                 return 1;
-
+            }
             erase_value(x,y,board);
         }
 
