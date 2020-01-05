@@ -57,7 +57,7 @@ int set_value_user(int x, int y, int value, Board* board){
         print_board(board);
         return 0;
     }
-    if(set_value(x-1,y-1,value,board) == 0){
+    if(set_value(x-1,y-1,value,board) == 0 && board->cur_board[x-1][y-1]!=value){
             printf("Error: value is invalid\n");
             return 0;
     }
