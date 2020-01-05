@@ -9,7 +9,7 @@ main.o: main.c parser.h
 	$(CC) $(COMP_FLAG) -c $*.c
 2d_array_utils.o: 2d_array_utils.c
 	$(CC) $(COMP_FLAG) -c $*.c
-backtracking_core_logic.o: backtracking_core_logic.c sudoku_board.h
+backtracking_core_logic.o: backtracking_core_logic.c sudoku_board.h 2d_array_utils.h
 	$(CC) $(COMP_FLAG) -c $*.c
 parser.o: parser.c sudoku_board_actions.h
 	$(CC) $(COMP_FLAG) -c $*.c

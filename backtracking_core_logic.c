@@ -1,4 +1,5 @@
 #include "sudoku_board.h"
+#include "2d_array_utils.h"
 #include <stdlib.h>
 #include "stdio.h"
 
@@ -154,12 +155,15 @@ int rec_back_tracking(Board* board, int x, int y, int is_deterministic) {
 }
 
 int back_track(Board* board, int is_deterministic) {
-    int is_sol_found;
+    int is_sol_found = 0;
     int x_start = 0;
     int y_start = 0;
 
     is_sol_found = rec_back_tracking(board, x_start, y_start, is_deterministic);
 
+    if(is_sol_found) {
+        copy_board_values(board->solved_board, board->cur_board, board->num_of_rows * board->num_of_columns);
+    }
     return is_sol_found;
 }
 

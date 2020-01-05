@@ -77,14 +77,16 @@ void hint(int x, int y, Board* board){
 
 void validate_board(Board* board){
     int **cur_board_copy;
-    int valid_board;
+    int valid_board = 0;
     int fixed = board->count_filled;
     int size = board->num_of_rows * board->num_of_columns;
     cur_board_copy = create_2d_array(size);
     copy_board_values(cur_board_copy, board->cur_board, size);
     valid_board = back_track(board,1); /*deterministic*/
-    free_2d_array(board->cur_board,size);
-    board->cur_board = cur_board_copy;
+
+    copy_board_values(board->cur_board, cur_board_copy, size);
+    free_2d_array(cur_board_copy, size);
+
     board ->count_filled= fixed;
     if(valid_board == 0)/*not vaild*/
         printf("Validation failed: board is unsolvable\n");

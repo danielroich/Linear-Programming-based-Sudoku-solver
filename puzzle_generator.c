@@ -12,8 +12,6 @@ int generate_puzzle(Board* board, int fixed_cells) {
     int **fixed_board = create_2d_array(size);
     back_track(board,0);
 
-    copy_board_values(board->solved_board, board->cur_board, size);
-
     while(fixed_cells != 0 ) {
         selected_column = rand() % size;
         selected_row = rand() % size;
