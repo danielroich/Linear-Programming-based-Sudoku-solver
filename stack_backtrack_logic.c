@@ -36,7 +36,7 @@ int get_possible_values(Board* board, int x, int y, int* possible_values) {
     int possible_values_num;
 
     /* if the board contains value in this point, return error */
-    if (get_value(x, y, board) != BOARD_NULL_VALUE)
+    if (get_value(x, y, board,0) != BOARD_NULL_VALUE)
     {
         return -1;
     }
@@ -127,7 +127,7 @@ int stack_based_back_track(Board* board) {
             continue;
         }
 
-        if (get_value(x,y,board) != BOARD_NULL_VALUE) {
+        if (get_value(x,y,board,0) != BOARD_NULL_VALUE) {
 
             if (cur_state.is_default)
             {

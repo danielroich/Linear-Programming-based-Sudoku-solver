@@ -37,7 +37,7 @@ int get_possible_values(Board* board, int x, int y, int* possible_values) {
     int possible_values_num;
 
     /* if the board contains value in this point, return error */
-    if (get_value(x, y, board) != BOARD_NULL_VALUE)
+    if (get_value(x, y, board,0) != BOARD_NULL_VALUE)
     {
         return -1;
     }
@@ -46,7 +46,7 @@ int get_possible_values(Board* board, int x, int y, int* possible_values) {
 
     for (i = 0; i < possible_values_num; i++)
     {
-        if(set_value(x, y,(i+1),board)) {
+        if(set_value(x, y,(i+1),board),0) {
             ++counter;
             possible_values[i] = 1;
         }
@@ -115,7 +115,7 @@ int rec_back_tracking(Board* board, int x, int y, int is_deterministic) {
         free(possible_values);
         return 1; }
 
-    if (get_value(x,y,board) != BOARD_NULL_VALUE)
+    if (get_value(x,y,board,0) != BOARD_NULL_VALUE)
     {
         free(possible_values);
         return rec_back_tracking(board, next_x, next_y, is_deterministic);
