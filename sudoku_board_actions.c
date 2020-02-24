@@ -7,32 +7,44 @@
 void print_board(Board* board){
     int a, b, c, d;
     int row, col, value;
+    int separator, i;
+    separator = 4*board->num_of_columns*board->num_of_rows + board->num_of_rows + 1;
     for(a = 0; a < board->num_of_columns; a++){ 
-        printf("----------------------------------\n"); 
+        
+        for(i=0;i<separator;i++){
+            printf("-");
+        }
+        printf("\n"); 
+        
         for(b = 0; b < board->num_of_rows; b++){
             row = b + a*(board->num_of_rows);
-            printf("| ");
+            printf("| "); /*space?*/
             for(c = 0; c < board->num_of_rows; c++){
                 for(d = 0; d < board->num_of_columns; d++){
                     col = d + c*board->num_of_columns;
                     value = get_value(row,col,board);
                     if(board->fixed_board[row][col] != BOARD_NULL_VALUE){
-                        printf(".%d ",value);
+                        printf(" %2d.",value);
                     }
                     else{
                         if(value != BOARD_NULL_VALUE)
-                            printf(" %d ",value);
+                            printf(" %2d ",value);
                         else
-                            printf("   ");
+                            printf("    ");
                     }
                 }
                 if(c != (board->num_of_rows-1))
-                    printf("| ");
+                    printf("| "); /*space?*/
             }
             printf("|\n");
         }     
     }
-    printf("----------------------------------\n");
+
+    for(i=0;i<separator;i++){
+            printf("-");
+        }
+    printf("\n");
+
 }
 
 int is_filled(Board* board){
