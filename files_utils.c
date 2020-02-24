@@ -9,7 +9,7 @@ int write_file_from_board (Board* board, char* path){
     
     fptr = fopen(path,'w'); 
     if(fptr ==NULL){
-        printf("Error: invalid command\n");
+        printf("Error: invalid file\n");
         return 0;
     }   
     size = board->num_of_rows*board->num_of_columns;
@@ -36,62 +36,76 @@ int write_file_from_board (Board* board, char* path){
 }
 
 int read_file_to_board (Board* board, char* path){
-    int row,col,size,count,i,j,value;
+    int row,col,size;
+    int value,count,count_scan,count_dot;
+    int i,j;
     char ch;
     FILE* fptr;
     
     fptr = fopen(path,'r'); 
     if(fptr ==NULL){
-        printf("Error: invalid command\n");
+        printf("Error: invalid file\n");
+        fclose(fptr);
         return 0;
     }
-    count=0;
-    while(count<2 && ch != EOF){
-        ch = fgetc(fptr);
-        if (ch != '\n' && ch != '\t' && ch != '\r' && ch != ' '){
+
+    count = 0;
+    while(!feof(fptr) && count<2){
+        count_scan = fscanf(fptr,"%d",&value);
+        if(count_scan != 0){
             if(count == 0){
-                row = atoi(ch);
-                count++;
+                row = value;
+            }
+            else {
+                col = value;
+            }
+        }
+    }
+    if(count<2){
+        printf("Error: invalid file\n");
+        fclose(fptr);
+        return 0;
+    }
+    
+    create_empty_board(board,row,col);
+    
+    size = row*col; 
+    count = 0;
+    count_dot = 0;
+    i = 0;
+    j = 0;
+
+    while(!feof(fptr) && i<size){
+        count_scan = fscanf(fptr,"%d",&value); 
+        if(!feof(fptr)){
+            count_dot = fscanf(fptr,"."); /*sure not another int*/
+        }
+        if(count_scan != 0){
+            if(value > size || value < 1){
+                printf("Error: invalid file\n");
+                fclose(fptr);
+                return 0;
+            }
+            if(count_dot == 1){
+                board->fixed_board[i][j]=value;
             }
             else{
-                col = atoi(ch);
-                count++;
-            }
-        }
-    }
-    if(count != 2){
-        return 0;
-    }
-    create_empty_board(board,row,col);
-    size = row*col; /*each single digit*/
-    i=0;
-    j=0;
-    while (ch != EOF)
-    {
-        ch = fgetc(fptr);
-        if (ch != '\n' && ch != '\t' && ch != '\r' && ch != ' '){
-            value = atoi(ch);
-            if(ch != EOF){
-                ch = fgetc(fptr); /* what if two digits in cell? */
-                if(ch == '.'){
-                    board->fixed_board[i][j]=value;
-                }
-                else{
-                    if(value == 0){
+                if(value == 0){
                         board->cur_board[i][j]=BOARD_NULL_VALUE;
                     }
-                    else{
-                        board->cur_board[i][j]=value;
-                    }
+                else{
+                    board->cur_board[i][j]=value;
                 }
-                if(j!=size-1){j++;}
-                else{i++;j=0;}
-                if(i==size+1){fclose(fptr); return 0;}
             }
-            
+            if(j!=size-1){j++;}
+            else{i++;j=0;}
         }
-    } 
-
+    }
+    if(i!=size){
+        printf("Error: invalid file\n");
+         fclose(fptr);
+        return 0;
+    }
     fclose(fptr);
-    return 0;
+    return 1;
 }

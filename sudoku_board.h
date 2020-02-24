@@ -20,8 +20,6 @@ typedef struct _Board {
     Mode mode;
 } Board;
 
-
-
 int set_value(int x, int y, int value, Board* board);
 int get_value(int x, int y, Board* board);
 int erase_value(int x, int y, Board* board);
