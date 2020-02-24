@@ -9,3 +9,9 @@ sudoku_lib/CMakeLists.txt
 
 CMakeLists.txt
 
+
+.vscode/launch.json
+
+.vscode/tasks.json
+
+*.exe
