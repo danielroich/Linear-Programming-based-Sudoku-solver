@@ -15,4 +15,8 @@ void exit_game(Board* board);
 void seed(int seed);
 int is_filled(Board* board);
 
+void solve(Board* board, char* path); //read
+void edit(Board* board, char* path); //read
+void save(Board* board, char* path); //write
+
 #endif
