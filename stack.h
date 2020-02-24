@@ -7,13 +7,13 @@
 typedef struct _Stack {
     int top_item_index;
     BacktrackState* items;
-    unsigned capacity;
+    int capacity;
 } Stack;
 
-int isEmpty(Stack* stack);
+int isEmpty(Stack* stack); 
 void push(Stack* stack, BacktrackState item);
 BacktrackState pop(Stack* stack);
-BacktrackState* peek(Stack* stack);
-Stack* createStack(unsigned capacity);
+BacktrackState peek(Stack* stack);
+Stack* createStack(int capacity);
 
 #endif

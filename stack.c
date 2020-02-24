@@ -1,7 +1,7 @@
 #include "stack.h"
 #include <stdlib.h>
 
-Stack* createStack(unsigned capacity) {
+Stack* createStack(int capacity) {
     Stack* stack = (Stack*) malloc(sizeof(Stack));
     stack->capacity = capacity;
     stack->items = (BacktrackState*) malloc(capacity * sizeof(BacktrackState));
