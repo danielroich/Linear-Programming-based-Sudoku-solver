@@ -3,6 +3,7 @@
 #include "backtracking_core_logic.h"
 #include "puzzle_generator.h"
 #include "2d_array_utils.h"
+#include "files_utils.h"
 
 void print_board(Board* board){
     int a, b, c, d;
@@ -22,7 +23,7 @@ void print_board(Board* board){
             for(c = 0; c < board->num_of_rows; c++){
                 for(d = 0; d < board->num_of_columns; d++){
                     col = d + c*board->num_of_columns;
-                    value = get_value(row,col,board);
+                    value = get_value(row,col,board,0);
                     if(board->fixed_board[row][col] != BOARD_NULL_VALUE){
                         printf(" %2d.",value);
                     }
@@ -69,7 +70,7 @@ int set_value_user(int x, int y, int value, Board* board){
         print_board(board);
         return 0;
     }
-    if(set_value(x-1,y-1,value,board) == 0 && board->cur_board[x-1][y-1]!=value){
+    if(set_value(x-1,y-1,value,board,0) == 0 && board->cur_board[x-1][y-1]!=value){
             printf("Error: value is invalid\n");
             return 0;
     }
@@ -157,3 +158,18 @@ void seed(int seed) {
     srand(seed);
 }
 
+void solve(Board* board, char* path){
+    int succeeded;
+    succeeded = read_file_to_board(board,path);
+    if(succeeded == 0){
+        printf("Error: invalid file\n");
+        board->mode = INIT;
+        /*dont have to clean board still in INIT mode*/
+    }
+    else{
+        board->mode=SOLVE;
+    }
+} 
+
+void edit(Board* board, char* path); //read
+void save(Board* board, char* path); //write

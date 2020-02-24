@@ -44,7 +44,6 @@ int read_file_to_board (Board* board, char* path){
     
     fptr = fopen(path,'r'); 
     if(fptr ==NULL){
-        printf("Error: invalid file\n");
         fclose(fptr);
         return 0;
     }
@@ -62,7 +61,6 @@ int read_file_to_board (Board* board, char* path){
         }
     }
     if(count<2){
-        printf("Error: invalid file\n");
         fclose(fptr);
         return 0;
     }
@@ -82,28 +80,36 @@ int read_file_to_board (Board* board, char* path){
         }
         if(count_scan != 0){
             if(value > size || value < 1){
-                printf("Error: invalid file\n");
                 fclose(fptr);
                 return 0;
             }
             if(count_dot == 1){
-                board->fixed_board[i][j]=value;
+                if(value == 0){
+                    board->fixed_board[i][j]=BOARD_NULL_VALUE;
+                }
+                else{
+                    if(is_legal(i,j,value,board,1)){
+                        board->fixed_board[i][j]=value;
+                    }
+                    else{
+                        fclose(fptr);
+                        return 0;
+                    }
+                }
+            }
+            if(value == 0){
+                    board->cur_board[i][j]=BOARD_NULL_VALUE;
             }
             else{
-                if(value == 0){
-                        board->cur_board[i][j]=BOARD_NULL_VALUE;
-                    }
-                else{
                     board->cur_board[i][j]=value;
-                }
+                    if(count_dot == 0){board->count_filled++;}; /*not fixed*/
             }
             if(j!=size-1){j++;}
             else{i++;j=0;}
         }
     }
     if(i!=size){
-        printf("Error: invalid file\n");
-         fclose(fptr);
+        fclose(fptr);
         return 0;
     }
     fclose(fptr);

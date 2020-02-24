@@ -21,8 +21,9 @@ typedef struct _Board {
 } Board;
 
 int set_value(int x, int y, int value, Board* board);
-int get_value(int x, int y, Board* board);
+int get_value(int x, int y, Board* board, int fixed_board);
 int erase_value(int x, int y, Board* board);
 int create_empty_board(Board* board, int rows, int columns);
+int is_legal(int x, int y, int value, Board* board, int is_fix);
 
 #endif 
