@@ -4,6 +4,12 @@
 
 int const BOARD_NULL_VALUE = 0;
 
+typedef enum _Mode {
+    INIT,
+    EDIT,
+    SOLVE
+} Mode;
+
 typedef struct _Board {
     int num_of_rows; /*in block*/
     int num_of_columns; /*in block*/ 
@@ -11,7 +17,10 @@ typedef struct _Board {
     int** solved_board;
     int** fixed_board;
     int** cur_board;
+    Mode mode;
 } Board;
+
+
 
 int set_value(int x, int y, int value, Board* board);
 int get_value(int x, int y, Board* board);

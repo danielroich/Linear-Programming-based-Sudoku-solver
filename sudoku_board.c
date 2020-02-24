@@ -69,6 +69,7 @@ int create_empty_board(Board* board, int rows, int columns) {
     board->cur_board  = create_2d_array(size);
     board->fixed_board  = create_2d_array(size);
     board->solved_board  = create_2d_array(size);
+    board->mode = INIT;
 
     return 1;
 }
