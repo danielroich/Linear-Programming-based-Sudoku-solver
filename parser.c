@@ -73,6 +73,12 @@ int parse_command(char* command, Board* board){
         exit_game(board);
         return 5;
     }
+
+    if(strcmp(token, "num_of_solutions") == 0){
+        int num = number_of_solutions(board);
+        printf("the number of solutions is: %d \n",num);
+        return 6;
+    }
     
     /*a command that doesn't match any of the commands defined*/
     printf("Error: invalid command\n");

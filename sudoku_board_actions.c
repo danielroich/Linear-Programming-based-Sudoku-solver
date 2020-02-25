@@ -4,6 +4,7 @@
 #include "puzzle_generator.h"
 #include "2d_array_utils.h"
 #include "files_utils.h"
+#include "stack_backtrack_logic.h"
 
 void print_board(Board* board){
     int a, b, c, d;
@@ -55,6 +56,15 @@ int is_filled(Board* board){
         /*From this point, all commands except exit and restart are considered invalid.*/
     }
     return 0;
+}
+
+int number_of_solutions(Board* board) {
+    if (board->mode != INIT)
+    {
+        return stack_based_back_track(board);
+    }
+    
+    return -1;
 }
 
 /* assume the values of X, Y, and Z are valid and correct 

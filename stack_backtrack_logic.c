@@ -117,8 +117,11 @@ int stack_based_back_track(Board* board) {
     Stack* stack = createStack(board_size);
     int* possible_values;
     BacktrackState cur_state = {x,y,possible_values_size, possible_values, 1};
+    BacktrackState flag_state = {-1,-1,possible_values_size, possible_values, 1};
+    push(stack,flag_state);
 
     do {
+
         /*If this statement is true we have covered all the boared with values
         this indicates we have placed the entire boared with values in have finished solving it */
         if (cur_state.row == board_size) {
@@ -174,9 +177,11 @@ int stack_based_back_track(Board* board) {
         else {
             cur_state = pop(stack);
         }
-    } while(!isEmpty(stack));
+    } while(cur_state.row != -1);
     
     free(stack->items);
     free(stack);
     /* check that the inner fields in items are cleaned */
+
+    return counter;
 }

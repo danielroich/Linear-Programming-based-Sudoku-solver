@@ -14,7 +14,7 @@ void restart(Board* board);
 void exit_game(Board* board);
 void seed(int seed);
 int is_filled(Board* board);
-
+int number_of_solutions(Board* board);
 void solve(Board* board, char* path);
 void edit(Board* board, char* path);
 void save(Board* board, char* path);
