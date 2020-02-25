@@ -6,8 +6,8 @@
 #include "sudoku_board.h"
 #include "puzzle_generator.h"
 
-void solve(Board* board, char* path);
-void edit(Board* board, char* path);
+int solve(Board* board, char* path);
+int edit(Board* board, char* path);
 void mark_errors(Board* board, int is_mark);
 void print_board(Board* board);
 int set_value_user(int x, int y, int value, Board* board);

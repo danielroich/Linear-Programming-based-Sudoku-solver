@@ -33,40 +33,39 @@ void exit_game(Board* board){
 }
 
 /*COMMAND 1*/ 
-void solve(Board* board, char* path){
+int solve(Board* board, char* path){
     int succeeded;
-    succeeded = read_file_to_board(board,path);
+    succeeded = read_file_to_board(board,path,1);
     if(succeeded == 0){
         printf("Error: invalid file\n");
         board->mode = INIT;
+        return 0;
         /*dont have to clean board still in INIT mode*/
     }
     else{
         board->mode=SOLVE;
+        return 1;
     }
 }  
 
 /*COMMAND 2*/
 /* in Edit mode we always mark errors, regardless of the value of the "mark errors", remains value*/
-void edit(Board* board, char* path) //read
-{
+int edit(Board* board, char* path) {
     if(path == NULL){
-        create_empty_board(board,3,3);
-        board->mode = EDIT;  
+        create_empty_board(board,3,3); 
     }
     else{
         int succeeded;
-        succeeded = read_file_to_board(board,path);
+        succeeded = read_file_to_board(board,path,0);
         if(succeeded == 0){
             printf("Error: invalid file\n");
             board->mode = INIT;
+            return 0;
             /*dont have to clean board still in INIT mode*/
         }
-        else{
-            board->mode = EDIT;
-        }
     }
-    
+    board->mode = EDIT; 
+    return 1;
 }
 
 /*COMMAND 3*/

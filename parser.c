@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "moves_list.h"
 #include "sudoku_board_actions.h"
 #include <string.h>
 #include <stdio.h>
@@ -10,6 +11,7 @@ if board filled can restart and exit only */
 int parse_command(char* command, Board* board, Moves* moves){
     int x,y,z;
     char* token;
+    int succeeded;
     int filled = is_filled(board);
 
     token = strtok(command," \t\r\n");
@@ -18,12 +20,30 @@ int parse_command(char* command, Board* board, Moves* moves){
 
     /*COMMAND 1*/ 
     if(strcmp(token, "solve")==0){
-        return 1;
+        token = (strtok(NULL, " \t\r\n"));
+        if(token == NULL){
+            printf("Error: invalid command\n");
+            return 0;}
+        succeeded = solve(board,token);
+        if(succeeded){
+            moves = NULL;
+            return 1;
+        }
+        return 0;
     }
     
     /*COMMAND 2*/ 
     if(strcmp(token, "edit")==0){
-        return 2;
+        token = (strtok(NULL, " \t\r\n"));
+        if(token == NULL){
+            edit(board,NULL);
+        }
+        succeeded = edit(board,token);
+        if(succeeded){
+            moves = NULL;
+            return 2;
+        }
+        return 0;
     }
     
     /*COMMAND 3*/ 

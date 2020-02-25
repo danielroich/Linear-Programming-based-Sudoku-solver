@@ -36,7 +36,7 @@ int write_file_from_board (Board* board,const char* path){
     return 0;
 }
 
-int read_file_to_board (Board* board, const char* path){
+int read_file_to_board (Board* board, const char* path, int check_errors){
     int row,col,size;
     int value,count,count_scan,count_dot;
     int i,j;
@@ -95,12 +95,18 @@ int read_file_to_board (Board* board, const char* path){
                     board->fixed_board[i][j]=BOARD_NULL_VALUE;
                 }
                 else{
-                    if(is_legal(i,j,value,board,1)){
+                    if(check_errors == 0){
                         board->fixed_board[i][j]=value;
                     }
                     else{
-                        fclose(fptr);
-                        return 0;
+                        if(is_legal(i,j,value,board,1)){
+                            board->fixed_board[i][j]=value;
+                        }
+                        else
+                        {
+                            fclose(fptr);
+                            return 0;
+                        }
                     }
                 }
             }
