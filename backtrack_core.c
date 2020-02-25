@@ -1,7 +1,6 @@
 #include "backtrack_core.h"
 #include "2d_array_utils.h"
 #include <stdlib.h>
-#include "sudoku_board_actions.h"
 
 int get_next_row(const Board* board, int cur_row, int cur_column) {
     int new_row = cur_row;

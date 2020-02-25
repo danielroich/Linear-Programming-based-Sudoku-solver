@@ -15,7 +15,7 @@ int get_num_of_parameters(Board* board) {
     {
         for (j = 0; j < board->num_of_columns; j++)
         {
-            if (board->cur_board[i][j] != BOARD_NULL_VALUE)
+            if (get_value(i,j,board,0) != BOARD_NULL_VALUE)
             {
                 counter += get_possible_values(board,i,j,possible_values);
             }   
