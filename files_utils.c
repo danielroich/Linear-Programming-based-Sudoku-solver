@@ -40,6 +40,7 @@ int read_file_to_board (Board* board, const char* path){
     int row,col,size;
     int value,count,count_scan,count_dot;
     int i,j;
+    char ch;
     FILE* fptr;
         const char* r = "r";
 
@@ -56,9 +57,11 @@ int read_file_to_board (Board* board, const char* path){
         if(count_scan != 0){
             if(count == 0){
                 row = value;
+                count++;
             }
             else {
                 col = value;
+                count++;
             }
         }
     }
@@ -70,18 +73,20 @@ int read_file_to_board (Board* board, const char* path){
     create_empty_board(board,row,col);
     
     size = row*col; 
-    count = 0;
     count_dot = 0;
     i = 0;
     j = 0;
 
     while(!feof(fptr) && i<size){
         count_scan = fscanf(fptr,"%d",&value); 
+        count_dot = 0;
         if(!feof(fptr)){
-            count_dot = fscanf(fptr,"."); /*sure not another int*/
+            fscanf(fptr,"%c",&ch); /*sure not another int*/
+            if(ch == '.'){
+                count_dot = 1;} 
         }
         if(count_scan != 0){
-            if(value > size || value < 1){
+            if(value > size || value < 0){
                 fclose(fptr);
                 return 0;
             }
