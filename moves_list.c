@@ -2,6 +2,10 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+void clean_list(Moves** moves){
+    *moves = NULL;
+}
+
 /* for moves: set, autofill, generate, guess */
 void clean_nexts(Moves* moves){
     if(moves && (moves->curr)){

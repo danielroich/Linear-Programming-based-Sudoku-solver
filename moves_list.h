@@ -10,6 +10,7 @@ typedef struct _Moves {
     Board* Board_state;
 } Moves;
 
+void clean_list(Moves** moves);
 void clean_nexts(Moves* moves);
 void back_to_first_move(Moves* moves);
 int curr_to_next(Moves* moves);

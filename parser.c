@@ -26,7 +26,7 @@ int parse_command(char* command, Board* board, Moves* moves){
             return 0;}
         succeeded = solve(board,token);
         if(succeeded){
-            moves = NULL;
+            clean_list(&moves);
             return 1;
         }
         return 0;
@@ -40,7 +40,7 @@ int parse_command(char* command, Board* board, Moves* moves){
         }
         succeeded = edit(board,token);
         if(succeeded){
-            moves = NULL;
+            clean_list(&moves);
             return 2;
         }
         return 0;
