@@ -7,6 +7,27 @@
 #include "stack_backtrack_logic.h"
 #include "sudoku_board.h"
 
+/*COMMAND 1*/ 
+void solve(Board* board, char* path){
+    int succeeded;
+    succeeded = read_file_to_board(board,path);
+    if(succeeded == 0){
+        printf("Error: invalid file\n");
+        board->mode = INIT;
+        /*dont have to clean board still in INIT mode*/
+    }
+    else{
+        board->mode=SOLVE;
+    }
+} 
+
+/*COMMAND 2*/ 
+void edit(Board* board, char* path); //read
+
+/*COMMAND 3*/
+void mark_errors(); 
+
+/*COMMAND 4*/
 void print_board(Board* board){
     int a, b, c, d;
     int row, col, value;
@@ -50,24 +71,7 @@ void print_board(Board* board){
 
 }
 
-int is_filled(Board* board){
-    int size = (board->num_of_rows)*(board->num_of_columns);
-    if(board->count_filled == size*size){
-        return 1;
-        /*From this point, all commands except exit and restart are considered invalid.*/
-    }
-    return 0;
-}
-
-int number_of_solutions(Board* board) {
-    if (board->mode != INIT)
-    {
-        return stack_based_back_track(board);
-    }
-    
-    return -1;
-}
-
+/*COMMAND 5*/
 /* assume the values of X, Y, and Z are valid and correct 
 return 0 if Error or Erase
 announces if game is over (full board) */
@@ -93,12 +97,8 @@ int set_value_user(int x, int y, int value, Board* board){
     return 1;
 }
 
-/* assume that the values X, Y are valid integers in the correct range */
-void hint(int x, int y, Board* board){
-    int value = board->solved_board[x-1][y-1];
-    printf("Hint: set cell to %d\n",value);
-}
-
+/*COMMAND 6*/
+void validate_ILP();
 void validate_board(Board* board){
     int **cur_board_copy;
     int valid_board = 0;
@@ -118,17 +118,47 @@ void validate_board(Board* board){
         printf("Validation passed: board is solvable\n");
 }
 
-/* free memo and exit*/
-void exit_game(Board* board){
-    int size = (board->num_of_rows)*(board->num_of_columns);
-    printf("Exiting...\n");
-    free_2d_array(board->solved_board,size);
-    free_2d_array(board->fixed_board,size);
-    free_2d_array(board->cur_board,size);
-    free(board);
-    exit(0);
+/*COMMAND 7*/
+void guess_LP(float threshold);
+
+/*COMMAND 8*/
+void generate_ILP();
+
+/*COMMAND 9*/
+void undo();
+
+/*COMMAND 10*/
+void redo();
+
+/*COMMAND 11*/
+void save(Board* board, char* path); //write
+
+/*COMMAND 12*/
+void hint_ILP();
+/* assume that the values X, Y are valid integers in the correct range */
+void hint(int x, int y, Board* board){
+    int value = board->solved_board[x-1][y-1];
+    printf("Hint: set cell to %d\n",value);
 }
 
+/*COMMAND 13*/
+void guess_hint_LP();
+
+/*COMMAND 14*/
+int number_of_solutions(Board* board) {
+    if (board->mode != INIT)
+    {
+        return stack_based_back_track(board);
+    }
+    
+    return -1;
+}
+
+/*COMMAND 15*/
+void autofill();
+
+/*COMMAND 16*/
+void reset();
 /* set BOARD_NULL_VALUE to cur/solved/fixed and count_filled = 0
 call generate_puzzle with user new fixed */
 void restart(Board* board){
@@ -165,22 +195,27 @@ void restart(Board* board){
     print_board(board);
 }
 
+/*COMMAND 17*/
+/* free memo and exit*/
+void exit_game(Board* board){
+    int size = (board->num_of_rows)*(board->num_of_columns);
+    printf("Exiting...\n");
+    free_2d_array(board->solved_board,size);
+    free_2d_array(board->fixed_board,size);
+    free_2d_array(board->cur_board,size);
+    free(board);
+    exit(0);
+}
+
+int is_filled(Board* board){
+    int size = (board->num_of_rows)*(board->num_of_columns);
+    if(board->count_filled == size*size){
+        return 1;
+        /*From this point, all commands except exit and restart are considered invalid.*/
+    }
+    return 0;
+}
+
 void seed(int seed) {
     srand(seed);
 }
-
-void solve(Board* board, char* path){
-    int succeeded;
-    succeeded = read_file_to_board(board,path);
-    if(succeeded == 0){
-        printf("Error: invalid file\n");
-        board->mode = INIT;
-        /*dont have to clean board still in INIT mode*/
-    }
-    else{
-        board->mode=SOLVE;
-    }
-} 
-
-void edit(Board* board, char* path); //read
-void save(Board* board, char* path); //write
