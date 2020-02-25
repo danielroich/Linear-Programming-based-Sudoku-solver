@@ -1,17 +1,295 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "LP.h"
 #include "gurobi_c.h"
+#include "backtrack_core.h"
+
+int get_num_of_parameters(Board* board) {
+    int i;
+    int j;
+    int counter = 0;
+    for (i = 0; i < board->num_of_rows; i++)
+    {
+        for (j = 0; j < board->num_of_columns; j++)
+        {
+            if (board->cur_board[i][j] != BOARD_NULL_VALUE)
+            {
+                ++counter;
+            }
+            
+        }
+    }
+    return counter;
+}
+
+void add_single_value_per_cell_constraints(Board* board, GRBmodel *model, int *ind, int *val, GRBenv *env) {
+    int i;
+    int j;
+    int k;
+    char *i_char;
+    int error = 0;
+    char unique_name[2048] = "a";
+    int counter = 0;
+    int chars_to_copy;
+    int* possible_values = (int*)calloc(board->num_of_columns * board->num_of_rows, sizeof(int));
+    int possible_value_size;
+    for (i = 0; i < board->num_of_rows; i++)
+    {
+        for (j = 0; j < board->num_of_columns; j++)
+        {
+            possible_value_size = get_possible_values(board,i,j, possible_values);
+
+            if (possible_value_size = -1)
+                continue;
+
+            for (k = 0; k < possible_value_size; k++)
+            {
+                ind[k] = k + counter;
+                val[k] = 1;
+                counter++;
+            }
+
+            /* generate unique name by concatinating i value to the unique name string */
+            chars_to_copy = (int)((ceil(log10(i))+1)*sizeof(char));
+            sprintf(i_char, "%d",chars_to_copy);
+            strcat(unique_name,i_char);
+
+            error = GRBaddconstr(model, possible_value_size, ind, val, GRB_EQUAL, 1, unique_name);
+            if (error) {
+                printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
+                return -1;
+            }
+
+            /* clean the data */
+            for (k = 0; k < possible_value_size; k++)
+            {
+                ind[k] = 0;
+                val[k] = 0;
+
+            }
+        }
+    }
+}
+
+void add_rows_constraints(Board* board, GRBmodel *model, int *ind, int *val, GRBenv *env) {
+    int i;
+    int j;
+    int k;
+    int index_in_row;
+    char *i_char;
+    int val_written = 0;
+    int board_size = board->num_of_columns * board->num_of_rows;
+    int error = 0;
+    int optional_occurences = 0;
+    char unique_name[2048] = "b";
+    int counter = 0;
+    int chars_to_copy;
+    int* possible_values = (int*)calloc(board_size, sizeof(int));
+    int possible_value_size;
+    for (i = 0; i < board->num_of_rows; i++)
+    {
+        for (index_in_row = 0; index_in_row < board_size; index_in_row++)
+        {
+            for (j = 0; j < board->num_of_columns; j++)
+            {
+                possible_value_size = get_possible_values(board,i,j, possible_values);
+
+                if (possible_value_size = -1)
+                    continue;
+
+                for (k = 0; k < possible_value_size; k++)
+                {
+                    if (possible_values[index_in_row] == 1 && val_written == 0)
+                    {
+                        val_written = 1;
+                        ++optional_occurences;
+                        ind[k] = k + counter;
+                        val[k] = 1;
+                    }   
+                    counter++;
+                }
+
+                val_written = 0;
+            }     
+
+            if(optional_occurences == 0)
+                continue;
+
+            /* generate unique name by concatinating i value to the unique name string */
+            chars_to_copy = (int)((ceil(log10(i))+1)*sizeof(char));
+            sprintf(i_char, "%d",chars_to_copy);
+            strcat(unique_name,i_char);
+
+            error = GRBaddconstr(model, optional_occurences, ind, val, GRB_EQUAL, 1, unique_name);
+            if (error) {
+                printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
+                return -1;
+            }
+
+            /* clean the data */
+            for (k = 0; k < optional_occurences; k++)
+            {
+                ind[k] = 0;
+                val[k] = 0;
+
+            }         
+        } 
+    }
+}
+
+void add_column_constraints(Board* board, GRBmodel *model, int *ind, int *val, GRBenv *env) {
+    int i;
+    int j;
+    int k;
+    int index_to_check;
+    char *i_char;
+    int board_size = board->num_of_columns * board->num_of_rows;
+    int error = 0;
+    int optional_occurences = 0;
+    char unique_name[2048] = "c";
+    int counter = 0;
+    int val_written = 0;
+    int chars_to_copy;
+    int column_to_check;
+    int* possible_values = (int*)calloc(board_size, sizeof(int));
+    int possible_value_size;
+     for (index_to_check = 0; index_to_check < board_size; index_to_check++)
+     {
+         for (column_to_check = 0; column_to_check < board->num_of_columns; column_to_check++)
+         {
+            for (i = 0; i < board->num_of_rows; i++) {
+
+                for (j = 0; j < board->num_of_columns; j++)
+                {
+                    possible_value_size = get_possible_values(board,i,j, possible_values);
+
+                    if (possible_value_size = -1)
+                        continue;
+
+                    for (k = 0; k < possible_value_size; k++)
+                    {
+                        if (j == column_to_check && possible_values[index_to_check] == 1 && val_written == 0)
+                        {
+                            val_written = 1;
+                            ++optional_occurences;
+                            ind[k] = k + counter;
+                            val[k] = 1;
+                        }   
+                        counter++;
+                    }
+
+                    val_written = 0;
+                }     
+            }
+
+            if(optional_occurences == 0)
+                    continue;
+
+            /* generate unique name by concatinating i value to the unique name string */
+            chars_to_copy = (int)((ceil(log10(i))+1)*sizeof(char));
+            sprintf(i_char, "%d",chars_to_copy);
+            strcat(unique_name,i_char);
+
+            error = GRBaddconstr(model, optional_occurences, ind, val, GRB_EQUAL, 1, unique_name);
+            if (error) {
+                printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
+                return -1;
+            }
+
+            /* clean the data */
+            for (k = 0; k < optional_occurences; k++)
+            {
+                ind[k] = 0;
+                val[k] = 0;
+
+            }  
+         }
+    }
+}
+
+void add_square_constraints(Board* board, GRBmodel *model, int *ind, int *val, GRBenv *env) {
+    int i;
+    int j;
+    int k;
+    int index_to_check;
+    char *i_char;
+    int board_size = board->num_of_columns * board->num_of_rows;
+    int error = 0;
+    int optional_occurences = 0;
+    char unique_name[2048] = "d";
+    int counter = 0;
+    int val_written = 0;
+    int chars_to_copy;
+    int value_to_check;
+    int* possible_values = (int*)calloc(board_size, sizeof(int));
+    int possible_value_size;
+     for (index_to_check = 0; index_to_check < board_size; index_to_check++)
+     {
+         for (value_to_check = 0; value_to_check < board->num_of_columns; value_to_check++)
+         {
+            for (i = 0; i < board->num_of_rows; i++) {
+
+                for (j = 0; j < board->num_of_columns; j++)
+                {
+                    possible_value_size = get_possible_values(board,i,j, possible_values);
+
+                    if (possible_value_size = -1)
+                        continue;
+
+                    for (k = 0; k < possible_value_size; k++)
+                    {
+                        if (j == value_to_check && possible_values[index_to_check] == 1 && val_written == 0)
+                        {
+                            val_written = 1;
+                            ++optional_occurences;
+                            ind[k] = k + counter;
+                            val[k] = 1;
+                        }   
+                        counter++;
+                    }
+
+                    val_written = 0;
+                }     
+            }
+
+            if(optional_occurences == 0)
+                    continue;
+
+            /* generate unique name by concatinating i value to the unique name string */
+            chars_to_copy = (int)((ceil(log10(i))+1)*sizeof(char));
+            sprintf(i_char, "%d",chars_to_copy);
+            strcat(unique_name,i_char);
+
+            error = GRBaddconstr(model, optional_occurences, ind, val, GRB_EQUAL, 1, unique_name);
+            if (error) {
+                printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
+                return -1;
+            }
+
+            /* clean the data */
+            for (k = 0; k < optional_occurences; k++)
+            {
+                ind[k] = 0;
+                val[k] = 0;
+
+            }  
+         }
+    }
+}
 
 int validate(Board* board) {
+    int i;
+    int num_of_params = get_num_of_parameters(board);
+    int board_size = board->num_of_columns * board->num_of_rows;
     GRBenv   *env   = NULL;
     GRBmodel *model = NULL;
     int       error = 0;
-    double    sol[3];
-    int       ind[3];
-    double    val[3];
-    double    obj[3];
-    char      vtype[3];
+    double    *sol = (double*) malloc(num_of_params * sizeof(double));
+    int       *ind = (int*) malloc(board_size * sizeof(int));
+    double    *val = (double*) malloc(board_size * sizeof(double));
+    double    *obj = (double*) malloc(num_of_params * sizeof(double));
+    char      *vtype = (char*) malloc(num_of_params * sizeof(char));
     int       optimstatus;
     double    objval;
 
@@ -36,16 +314,19 @@ int validate(Board* board) {
   }
 
   /* Add variables */
-  
-  /* coefficients - for x,y,z (cells 0,1,2 in "obj") */
-  obj[0] = 1; obj[1] = 3; obj[2] = 2;
-  
-  /* variable types - for x,y,z (cells 0,1,2 in "vtype") */
-  /* other options: GRB_INTEGER, GRB_CONTINUOUS */
-  vtype[0] = GRB_BINARY; vtype[1] = GRB_BINARY; vtype[2] = GRB_BINARY;
+  for (i = 0; i < num_of_params; i++)
+  {
+      /* variable types - for x,y,z (cells 0,1,2 in "vtype") */
+      /* other options: GRB_INTEGER, GRB_CONTINUOUS */
+      vtype[i] = GRB_BINARY;
+
+      /* coefficients - for x,y,z (cells 0,1,2 in "obj")
+        maximize x+y+z+k.. */
+      obj[i] = 1;
+  }
   
   /* add variables to model */
-  error = GRBaddvars(model, 3, 0, NULL, NULL, NULL, obj, NULL, NULL, vtype, NULL);
+  error = GRBaddvars(model, num_of_params, 0, NULL, NULL, NULL, obj, NULL, NULL, vtype, NULL);
   if (error) {
 	  printf("ERROR %d GRBaddvars(): %s\n", error, GRBgeterrormsg(env));
 	  return -1;
@@ -67,32 +348,12 @@ int validate(Board* board) {
   }
 
 
-  /* First constraint: x + 2 y + 3 z <= 5 */
-  
-  /* variables x,y,z (0,1,2) */
-  ind[0] = 0; ind[1] = 1; ind[2] = 2;
-  /* coefficients (according to variables in "ind") */
-  val[0] = 1; val[1] = 2; val[2] = 3;
+  add_single_value_per_cell_constraints(board,model,ind,val, env);
 
-  /* add constraint to model - note size 3 + operator GRB_LESS_EQUAL */
-  /* -- equation value (5.0) + unique constraint name */
-  error = GRBaddconstr(model, 3, ind, val, GRB_LESS_EQUAL, 5, "c0");
-  if (error) {
-	  printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
-	  return -1;
-  }
+  add_rows_constraints(board,model,ind,val, env);
 
-  /* Second constraint: x + y >= 1 */
-  ind[0] = 0; ind[1] = 1;
-  val[0] = 1; val[1] = 1;
-  
-  /* add constraint to model - note size 2 + operator GRB_GREATER_EQUAL */
-  /* -- equation value (1.0) + unique constraint name */
-  error = GRBaddconstr(model, 2, ind, val, GRB_GREATER_EQUAL, 1.0, "c1");
-  if (error) {
-	  printf("ERROR %d 2nd GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
-	  return -1;
-  }
+  add_column_constraints(board,model,ind,val, env);
+
 
   /* Optimize model - need to call this before calculation */
   error = GRBoptimize(model);
