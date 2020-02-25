@@ -50,7 +50,9 @@ int read_file_to_board (Board* board, const char* path, int check_errors){
         fclose(fptr);
         return 0;
     }
-
+    
+    row = 0;
+    col = 0;
     count = 0;
     while(!feof(fptr) && count<2){
         count_scan = fscanf(fptr,"%d",&value);
