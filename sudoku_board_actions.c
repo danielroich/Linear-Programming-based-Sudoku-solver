@@ -60,7 +60,6 @@ int is_filled(Board* board){
 }
 
 int number_of_solutions(Board* board) {
-     return stack_based_back_track(board);
     if (board->mode != INIT)
     {
         return stack_based_back_track(board);
