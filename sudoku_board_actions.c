@@ -203,7 +203,7 @@ void undo();
 void redo();
 
 /*COMMAND 11*/
-void save(Board* board, char* path); //write
+void save(Board* board, char* path);
 
 /*COMMAND 12*/
 void hint_ILP();
