@@ -9,15 +9,15 @@ int get_num_of_parameters(Board* board) {
     int i;
     int j;
     int counter = 0;
+    int* possible_values = (int*)calloc(board->num_of_columns * board->num_of_rows, sizeof(int));
     for (i = 0; i < board->num_of_rows; i++)
     {
         for (j = 0; j < board->num_of_columns; j++)
         {
             if (board->cur_board[i][j] != BOARD_NULL_VALUE)
             {
-                ++counter;
-            }
-            
+                counter += get_possible_values(board,i,j,possible_values);
+            }   
         }
     }
     return counter;
@@ -222,6 +222,20 @@ void add_square_constraints(Board* board, GRBmodel *model, int *ind, int *val, G
     int val_written = 0;
     int chars_to_copy;
     int value_to_check;
+    int top_left_corner_row;
+    int top_left_corner_col;
+    int **square_num_matrix = (int**) malloc(sizeof(int*) * board->num_of_columns);
+    for (i = 0; i < board->num_of_rows; i++)
+    {
+        square_num_matrix[i] = (int*) malloc(sizeof(int) * board->num_of_rows);
+        for (j = 0; i < board->num_of_rows; i++)
+        {
+            square_num_matrix[i][j] = counter;
+            ++counter;
+        }     
+    }
+    counter = 0;
+    
     int* possible_values = (int*)calloc(board_size, sizeof(int));
     int possible_value_size;
      for (index_to_check = 0; index_to_check < board_size; index_to_check++)
@@ -237,9 +251,13 @@ void add_square_constraints(Board* board, GRBmodel *model, int *ind, int *val, G
                     if (possible_value_size = -1)
                         continue;
 
+                    top_left_corner_row = floor(i/board->num_of_rows)*board->num_of_rows; 
+                    top_left_corner_col = floor(j/board->num_of_columns)*board->num_of_columns; 
+
                     for (k = 0; k < possible_value_size; k++)
                     {
-                        if (j == value_to_check && possible_values[index_to_check] == 1 && val_written == 0)
+                        if (square_num_matrix[(top_left_corner_row / board->num_of_columns)][(top_left_corner_col / board->num_of_rows)]
+                         == index_to_check && possible_values[value_to_check] == 1 && val_written == 0)
                         {
                             val_written = 1;
                             ++optional_occurences;
@@ -354,6 +372,7 @@ int validate(Board* board) {
 
   add_column_constraints(board,model,ind,val, env);
 
+  add_square_constraints(board,model,ind,val, env);
 
   /* Optimize model - need to call this before calculation */
   error = GRBoptimize(model);
@@ -386,7 +405,7 @@ int validate(Board* board) {
 
   /* get the solution - the assignment to each variable */
   /* 3-- number of variables, the size of "sol" should match */
-  error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, 3, sol);
+  error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, num_of_params, sol);
   if (error) {
 	  printf("ERROR %d GRBgetdblattrarray(): %s\n", error, GRBgeterrormsg(env));
 	  return -1;
