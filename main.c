@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     }
 
     seed(seed_num);
-    create_empty_board(board,3,3);
+    create_empty_board(board,2,2);
     restart(board);
 
     while(fgets(command,1024,stdin) && !feof(stdin)){

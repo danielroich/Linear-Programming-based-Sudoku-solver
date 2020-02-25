@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "backtrack_core.h"
 #include "sudoku_board_actions.h"
-
+#include <stdio.h>
 
 BacktrackState prepare_empty_state(int board_size, int cur_x, int cur_y) {
     int possible_values_size =0;
@@ -14,14 +14,12 @@ BacktrackState prepare_empty_state(int board_size, int cur_x, int cur_y) {
 
 int stack_based_back_track(Board* board) {
     int checked_value;
-
     int counter = 0;
     int board_size = board->num_of_columns*board->num_of_rows;
-    Stack* stack = createStack(board_size);
+    Stack* stack = createStack(board_size*board_size);
     BacktrackState cur_state = prepare_empty_state(board_size,0,0);
 
     do {
-
         int next_x = get_next_row(board,cur_state.row,cur_state.column);
         int next_y = get_next_column(board,cur_state.column);
 
@@ -33,7 +31,7 @@ int stack_based_back_track(Board* board) {
             continue;
         }
 
-        if (get_value(cur_state.row,cur_state.column,board,0) != BOARD_NULL_VALUE) {
+        if (get_value(cur_state.row,cur_state.column,board,1) != BOARD_NULL_VALUE) {
 
             if (cur_state.is_default)
             {
