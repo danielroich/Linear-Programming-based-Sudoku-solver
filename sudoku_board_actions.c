@@ -44,13 +44,29 @@ void solve(Board* board, char* path){
     else{
         board->mode=SOLVE;
     }
-} 
+}  
 
 /*COMMAND 2*/
 /* in Edit mode we always mark errors, regardless of the value of the "mark errors", remains value*/
 void edit(Board* board, char* path) //read
 {
-    board->mode = EDIT;
+    if(path == NULL){
+        create_empty_board(board,3,3);
+        board->mode = EDIT;  
+    }
+    else{
+        int succeeded;
+        succeeded = read_file_to_board(board,path);
+        if(succeeded == 0){
+            printf("Error: invalid file\n");
+            board->mode = INIT;
+            /*dont have to clean board still in INIT mode*/
+        }
+        else{
+            board->mode = EDIT;
+        }
+    }
+    
 }
 
 /*COMMAND 3*/

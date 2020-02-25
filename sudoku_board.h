@@ -17,8 +17,8 @@ typedef struct _Board {
     int** solved_board;
     int** fixed_board;
     int** cur_board;
-    Mode mode;
     int mark_errors;
+    Mode mode;
 } Board;
 
 int set_value(int x, int y, int value, Board* board, int is_fix);
