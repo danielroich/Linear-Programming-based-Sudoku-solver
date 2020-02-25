@@ -28,7 +28,7 @@ void push(Stack* stack, BacktrackState item)
 
 BacktrackState pop(Stack* stack) 
 { 
-    BacktrackState default_state = {-1,-1};
+    BacktrackState default_state = {-1,-1,0,NULL,0,1};
     if (isEmpty(stack)) 
 
         // because it was initilized on the stack, the value could not be used outside
@@ -39,7 +39,7 @@ BacktrackState pop(Stack* stack)
 // Function to return the top from stack without removing it 
 BacktrackState peek(Stack* stack) 
 { 
-    BacktrackState default_state = {-1,-1};
+     BacktrackState default_state = {-1,-1,0,NULL,0,1};
     if (isEmpty(stack)) {
          // because it was initilized on the stack, the value could not be used outside
         return default_state;

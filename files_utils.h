@@ -3,7 +3,7 @@
 
 #include "sudoku_board.h"
 
-int read_file_to_board (Board* board, char* path);
-int write_file_from_board (Board* board, char* path);
+int read_file_to_board (Board* board, const char* path);
+int write_file_from_board (Board* board, const char* path);
 
 #endif

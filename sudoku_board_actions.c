@@ -5,6 +5,7 @@
 #include "2d_array_utils.h"
 #include "files_utils.h"
 #include "stack_backtrack_logic.h"
+#include "sudoku_board.h"
 
 void print_board(Board* board){
     int a, b, c, d;
@@ -59,6 +60,7 @@ int is_filled(Board* board){
 }
 
 int number_of_solutions(Board* board) {
+     return stack_based_back_track(board);
     if (board->mode != INIT)
     {
         return stack_based_back_track(board);

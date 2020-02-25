@@ -3,11 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-int write_file_from_board (Board* board, char* path){
+int write_file_from_board (Board* board,const char* path){
     int i,j,size;
     FILE* fptr;
+    const char* w = "w";
     
-    fptr = fopen(path,'w'); 
+    fptr = fopen(path,w); 
     if(fptr ==NULL){
         printf("Error: invalid file\n");
         return 0;
@@ -35,14 +36,15 @@ int write_file_from_board (Board* board, char* path){
     return 0;
 }
 
-int read_file_to_board (Board* board, char* path){
+int read_file_to_board (Board* board, const char* path){
     int row,col,size;
     int value,count,count_scan,count_dot;
     int i,j;
-    char ch;
     FILE* fptr;
+        const char* r = "r";
+
     
-    fptr = fopen(path,'r'); 
+    fptr = fopen(path,r); 
     if(fptr ==NULL){
         fclose(fptr);
         return 0;
