@@ -7,7 +7,7 @@
 /* interpret user input and call actions
 return num op or 0 if invalid command
 if board filled can restart and exit only */
-int parse_command(char* command, Board* board){
+int parse_command(char* command, Board* board, Moves* moves){
     int x,y,z;
     char* token;
     int filled = is_filled(board);

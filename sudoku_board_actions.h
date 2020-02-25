@@ -8,7 +8,7 @@
 
 void solve(Board* board, char* path);
 void edit(Board* board, char* path);
-
+void mark_errors(Board* board, int is_mark);
 void print_board(Board* board);
 int set_value_user(int x, int y, int value, Board* board);
 void validate_board(Board* board);

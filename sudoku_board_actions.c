@@ -46,11 +46,18 @@ void solve(Board* board, char* path){
     }
 } 
 
-/*COMMAND 2*/ 
-void edit(Board* board, char* path); //read
+/*COMMAND 2*/
+/* in Edit mode we always mark errors, regardless of the value of the "mark errors", remains value*/
+void edit(Board* board, char* path) //read
+{
+    board->mode = EDIT;
+}
 
 /*COMMAND 3*/
-void mark_errors(); 
+/* is_mark is 1 or 0 */
+void mark_errors(Board* board, int is_mark){
+    board->mark_errors = is_mark;
+} 
 
 /*COMMAND 4*/
 void print_board(Board* board){
@@ -76,11 +83,16 @@ void print_board(Board* board){
                         printf(" %2d.",value);
                     }
                     else{
-                        if(value != BOARD_NULL_VALUE)
-                            printf(" %2d ",value);
+                        if(value != BOARD_NULL_VALUE){
+                            if(is_legal(row,col,value,board,0) == 0 && (board->mode==EDIT || board->mark_errors == 1)){
+                                printf(" %2d*",value);
+                            }
+                            else
+                                printf(" %2d ",value);
+                        }   
                         else
                             printf("    ");
-                    }
+                    } 
                 }
                 if(c != (board->num_of_rows-1))
                     printf("| "); /*space?*/
