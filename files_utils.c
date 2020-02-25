@@ -38,7 +38,7 @@ int write_file_from_board (Board* board,const char* path){
 
 int read_file_to_board (Board* board, const char* path, int check_errors){
     int row,col,size;
-    int value,count,count_scan,count_dot;
+    int value,count,count_scan,count_dot,count_char;
     int i,j;
     char ch;
     FILE* fptr;
@@ -74,6 +74,7 @@ int read_file_to_board (Board* board, const char* path, int check_errors){
     
     size = row*col; 
     count_dot = 0;
+    count_char = 0;
     i = 0;
     j = 0;
 
@@ -81,8 +82,8 @@ int read_file_to_board (Board* board, const char* path, int check_errors){
         count_scan = fscanf(fptr,"%d",&value); 
         count_dot = 0;
         if(!feof(fptr)){
-            fscanf(fptr,"%c",&ch); /*sure not another int*/
-            if(ch == '.'){
+            count_char = fscanf(fptr,"%c",&ch); /*sure not another int*/
+            if(count_char != 0 && ch == '.'){
                 count_dot = 1;} 
         }
         if(count_scan != 0){
