@@ -20,6 +20,21 @@ void seed(int seed) {
     srand(seed);
 }
 
+int is_winner(Board* board){
+    int i, j;
+    int size = (board->num_of_rows)*(board->num_of_columns);
+    if(board->count_filled != size*size){
+        return 0;
+    }
+    for (i=0; i<size; i++){
+        for (j=0; j<size; j++){
+            if(is_legal(i,j,board->cur_board[i][j],board,0) == 0)
+                return 0;
+        }
+    }
+    return 1;
+}
+
 /*COMMAND 17*/
 /* free memo and exit*/
 void exit_game(Board* board){
@@ -124,33 +139,36 @@ void print_board(Board* board){
 }
 
 /*COMMAND 5*/
-/* assume the values of X, Y, and Z are valid and correct 
-return 0 if Error or Erase
-announces if game is over (full board) */
 int set_value_user(int x, int y, int value, Board* board){
-    if((board->fixed_board)[x-1][y-1] != BOARD_NULL_VALUE){
+    int size = board->num_of_columns * board->num_of_rows;
+    if(x<0 || x>=size || y<0 || y>=size || value <0 || value>size){
+        printf("Error: out of range\n");
+        return 0;
+    }
+    if((board->fixed_board)[x][y] != BOARD_NULL_VALUE && board->mode == SOLVE){
         printf("Error: cell is fixed\n");
         return 0;
     }
     if(value == 0){
-        erase_value(x-1,y-1,board);
+        erase_value(x,y,board);
         print_board(board);
-        return 0;
+        return 1;
     }
-    if(set_value(x-1,y-1,value,board,0) == 0 && board->cur_board[x-1][y-1]!=value){
-            printf("Error: value is invalid\n");
-            return 0;
+    board->cur_board[x][y] = value;
+    /*TODO*/
+    if(board->mode == EDIT){
+       board->fixed_board[x][y] = value; 
     }
-    /* else value was set and filled++ in set_value */    
+    board->count_filled++;
     print_board(board);
-    if(is_filled(board) == 1){
+    if(is_winner(board) == 1){
         printf("Puzzle solved successfully\n");
     }
-    return 1;
+    return 1;   
 }
 
 /*COMMAND 6*/
-void validate_ILP();
+/* TODO: change to validate with ILP*/ 
 void validate_board(Board* board){
     int **cur_board_copy;
     int valid_board = 0;
@@ -171,10 +189,12 @@ void validate_board(Board* board){
 }
 
 /*COMMAND 7*/
-void guess_LP(float threshold);
+/* TODO: guess with LP*/
+void guess(float threshold);
 
 /*COMMAND 8*/
-void generate_ILP();
+/* TODO: generate with ILP*/
+void generate();
 
 /*COMMAND 9*/
 void undo();

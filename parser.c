@@ -54,11 +54,23 @@ int parse_command(char* command, Board* board, Moves* moves){
     
     /*COMMAND 3*/ 
     if(strcmp(token, "mark_errors")==0 && board->mode == SOLVE){
+        token = (strtok(NULL, " \t\r\n"));
+        if(token == NULL){
+            printf("Error: invalid command\n");
+            return 0;}
+        x = atoi(token);
+        if(x!=0 && x!=1){
+            printf("Error: invalid command\n");
+             return 0;       
+        }
+        mark_errors(board,x);
+        add_new_move(moves,board);
         return 3;
     }
 
     /*COMMAND 4*/ 
     if(strcmp(token, "print_board")==0 && board->mode != INIT){
+        print_board(board);
         return 4;
     }
 
@@ -83,7 +95,7 @@ int parse_command(char* command, Board* board, Moves* moves){
             return 0;}
         z = atoi(token);
 
-        set_value_user(y,x,z,board);
+        set_value_user(y-1,x-1,z,board);
         return 5;
     }
 
