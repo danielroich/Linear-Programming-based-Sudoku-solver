@@ -7,6 +7,31 @@
 #include "stack_backtrack_logic.h"
 #include "sudoku_board.h"
 
+int is_filled(Board* board){
+    int size = (board->num_of_rows)*(board->num_of_columns);
+    if(board->count_filled == size*size){
+        return 1;
+        /*From this point, all commands except exit and restart are considered invalid.*/
+    }
+    return 0;
+}
+
+void seed(int seed) {
+    srand(seed);
+}
+
+/*COMMAND 17*/
+/* free memo and exit*/
+void exit_game(Board* board){
+    int size = (board->num_of_rows)*(board->num_of_columns);
+    printf("Exiting...\n");
+    free_2d_array(board->solved_board,size);
+    free_2d_array(board->fixed_board,size);
+    free_2d_array(board->cur_board,size);
+    free(board);
+    exit(0);
+}
+
 /*COMMAND 1*/ 
 void solve(Board* board, char* path){
     int succeeded;
@@ -193,29 +218,4 @@ void restart(Board* board){
     }
     generate_puzzle(board, fixed);
     print_board(board);
-}
-
-/*COMMAND 17*/
-/* free memo and exit*/
-void exit_game(Board* board){
-    int size = (board->num_of_rows)*(board->num_of_columns);
-    printf("Exiting...\n");
-    free_2d_array(board->solved_board,size);
-    free_2d_array(board->fixed_board,size);
-    free_2d_array(board->cur_board,size);
-    free(board);
-    exit(0);
-}
-
-int is_filled(Board* board){
-    int size = (board->num_of_rows)*(board->num_of_columns);
-    if(board->count_filled == size*size){
-        return 1;
-        /*From this point, all commands except exit and restart are considered invalid.*/
-    }
-    return 0;
-}
-
-void seed(int seed) {
-    srand(seed);
 }

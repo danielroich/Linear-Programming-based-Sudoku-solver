@@ -109,7 +109,7 @@ int read_file_to_board (Board* board, const char* path){
             }
             else{
                     board->cur_board[i][j]=value;
-                    if(count_dot == 0){board->count_filled++;}; /*not fixed*/
+                    board->count_filled++; /*?*/
             }
             if(j!=size-1){j++;}
             else{i++;j=0;}

@@ -4,9 +4,9 @@
 #include "sudoku_board.h"
 
 typedef struct _Moves {
-    Moves* prev;
-    Moves* curr;
-    Moves* next;
+    struct _Moves* prev;
+    struct _Moves* curr;
+    struct _Moves* next;
     Board* Board_state;
 } Moves;
 

@@ -40,17 +40,17 @@ int curr_to_prev(Moves* moves){
 }
 
 void add_new_move(Moves* moves, Board* board){
-    Moves* new;
-    new->next=NULL;
-    new->Board_state=board;
+    Moves* new_node ={0};
+    new_node->Board_state=board;
+    new_node->next=NULL;
     if(moves == NULL){ /*emptylist*/    
-        new->curr= new;
-        new->prev=NULL;
-        moves=new;
+        new_node->curr= new_node;
+        new_node->prev=NULL;
+        moves=new_node;
     }
     else{ /*call only when curr is the last node*/
-        (moves->curr)->next=new;
-        new->prev=moves->curr;
-        moves->curr=new;
+        (moves->curr)->next=new_node;
+        new_node->prev=moves->curr;
+        moves->curr=new_node;
     }
 }
