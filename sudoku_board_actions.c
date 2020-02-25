@@ -6,6 +6,24 @@
 #include "files_utils.h"
 #include "stack_backtrack_logic.h"
 #include "sudoku_board.h"
+#include "moves_list.h"
+
+int is_erroneous(Board* board){
+    int i, j, value;
+    int size = (board->num_of_rows)*(board->num_of_columns);
+    for (i=0; i<size; i++){
+        for (j=0; j<size; j++){
+            if(board->cur_board[i][j] != BOARD_NULL_VALUE){
+                value = board->cur_board[i][j];
+                board->cur_board[i][j] = BOARD_NULL_VALUE; /*not clash with himself*/
+                if(is_legal(i,j,value,board,0) == 0)
+                    return 1;
+                board->cur_board[i][j]=value;
+            }
+        }
+    }
+    return 0;
+}
 
 int is_filled(Board* board){
     int size = (board->num_of_rows)*(board->num_of_columns);
@@ -21,17 +39,12 @@ void seed(int seed) {
 }
 
 int is_winner(Board* board){
-    int i, j;
     int size = (board->num_of_rows)*(board->num_of_columns);
     if(board->count_filled != size*size){
         return 0;
     }
-    for (i=0; i<size; i++){
-        for (j=0; j<size; j++){
-            if(is_legal(i,j,board->cur_board[i][j],board,0) == 0)
-                return 0;
-        }
-    }
+    if(is_erroneous == 1)
+        return 0;
     return 1;
 }
 
@@ -94,6 +107,7 @@ void print_board(Board* board){
     int a, b, c, d;
     int row, col, value;
     int separator, i;
+    int try;
     separator = 4*board->num_of_columns*board->num_of_rows + board->num_of_rows + 1;
     for(a = 0; a < board->num_of_columns; a++){ 
         
@@ -114,11 +128,14 @@ void print_board(Board* board){
                     }
                     else{
                         if(value != BOARD_NULL_VALUE){
+                            board->cur_board[row][col]=BOARD_NULL_VALUE; /*not clash with himself*/
                             if(is_legal(row,col,value,board,0) == 0 && (board->mode==EDIT || board->mark_errors == 1)){
                                 printf(" %2d*",value);
                             }
-                            else
+                            else{
                                 printf(" %2d ",value);
+                            }
+                            board->cur_board[row][col]=value;
                         }   
                         else
                             printf("    ");
@@ -139,6 +156,7 @@ void print_board(Board* board){
 }
 
 /*COMMAND 5*/
+/*TODO: mode edit? is winner? with/without print board?*/
 int set_value_user(int x, int y, int value, Board* board){
     int size = board->num_of_columns * board->num_of_rows;
     if(x<0 || x>=size || y<0 || y>=size || value <0 || value>size){
@@ -155,7 +173,7 @@ int set_value_user(int x, int y, int value, Board* board){
         return 1;
     }
     board->cur_board[x][y] = value;
-    /*TODO*/
+    
     if(board->mode == EDIT){
        board->fixed_board[x][y] = value; 
     }
@@ -197,33 +215,36 @@ void guess(float threshold);
 void generate();
 
 /*COMMAND 9*/
-void undo();
+void undo(Board* board, Moves* moves){
+}    
 
 /*COMMAND 10*/
-void redo();
+void redo(Board* board, Moves* moves);
 
 /*COMMAND 11*/
-void save(Board* board, char* path);
+int save(Board* board, char* path){
+    int succeeded;
+    succeeded = write_file_from_board(board,path);
+    return succeeded;
+}
 
 /*COMMAND 12*/
-void hint_ILP();
-/* assume that the values X, Y are valid integers in the correct range */
+/* TODO: hint with ILP + check range of x,y*/
 void hint(int x, int y, Board* board){
     int value = board->solved_board[x-1][y-1];
     printf("Hint: set cell to %d\n",value);
 }
 
 /*COMMAND 13*/
-void guess_hint_LP();
+/* TODO: hint with LP*/
+void guess_hint();
 
 /*COMMAND 14*/
-int number_of_solutions(Board* board) {
-    if (board->mode != INIT)
-    {
-        return stack_based_back_track(board);
-    }
-    
-    return -1;
+int number_solutions(Board* board) {
+    int number;
+    number = stack_based_back_track(board);
+    printf("the number of solutions is: %d \n",number);
+    return 0;
 }
 
 /*COMMAND 15*/

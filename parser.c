@@ -14,11 +14,11 @@ int parse_command(char* command, Board* board, Moves* moves){
     int succeeded;
     int filled = is_filled(board);
 
-    /* TODO: Remove, only for compilation */
+    /* TODO: Remove, only for compilation 
     if (moves->Board_state->count_filled == 1)
     {
         return -1;
-    }
+    }*/
 
     token = strtok(command," \t\r\n");
     
@@ -95,22 +95,25 @@ int parse_command(char* command, Board* board, Moves* moves){
             return 0;}
         z = atoi(token);
 
-        set_value_user(y-1,x-1,z,board);
+        succeeded = set_value_user(y-1,x-1,z,board);
+        if(succeeded == 1){
+            add_new_move(moves,board);
+        }
         return 5;
     }
 
-    /*COMMAND 6*/
+    /*COMMAND 6 TODO*/
     if(strcmp(token, "validate") == 0 && board->mode != INIT && !filled){
         validate_board(board);
         return 6;
     }
 
-    /*COMMAND 7*/
+    /*COMMAND 7 TODO*/
     if(strcmp(token,"guess")==0 && board->mode == SOLVE){
         return 7;
     }
 
-    /*COMMAND 8*/
+    /*COMMAND 8 TODO*/
     if(strcmp(token,"generate")==0 && board->mode == EDIT){
         return 8;
     }
@@ -127,10 +130,17 @@ int parse_command(char* command, Board* board, Moves* moves){
 
     /*COMMAND 11*/
     if(strcmp(token,"save")==0 && board->mode != INIT){
+        token = (strtok(NULL, " \t\r\n"));
+        if(token == NULL){
+            printf("Error: invalid command\n");
+            return 0;}
+        succeeded = save(board,token);
+        if(!succeeded)
+            return 0;
         return 11;
     }
 
-    /*COMMAND 12*/
+    /*COMMAND 12 TODO*/
     if(strcmp(token, "hint") == 0 && board->mode == SOLVE && !filled){
 
         token = (strtok(NULL, " \t\r\n"));
@@ -149,15 +159,14 @@ int parse_command(char* command, Board* board, Moves* moves){
         return 12;
     }
 
-    /*COMMAND 13*/
+    /*COMMAND 13 TODO*/
     if(strcmp(token,"guess_hint")==0 && board->mode == SOLVE){
         return 13;
     }
 
     /*COMMAND 14*/
     if(strcmp(token, "num_solutions") == 0 && board->mode != INIT){
-        int num = number_of_solutions(board);
-        printf("the number of solutions is: %d \n",num);
+        number_solutions(board);
         return 14;
     }
 

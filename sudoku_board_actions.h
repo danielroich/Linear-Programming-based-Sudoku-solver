@@ -13,10 +13,10 @@ void print_board(Board* board);
 int set_value_user(int x, int y, int value, Board* board);
 void validate_board(Board* board);
 
-void save(Board* board, char* path);
+int save(Board* board, char* path);
 void hint(int x, int y, Board* board);
 
-int number_of_solutions(Board* board);
+int number_solutions(Board* board);
 
 void restart(Board* board);
 void exit_game(Board* board);
