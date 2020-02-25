@@ -14,6 +14,12 @@ int parse_command(char* command, Board* board, Moves* moves){
     int succeeded;
     int filled = is_filled(board);
 
+    /* TODO: Remove, only for compilation */
+    if (moves->Board_state->count_filled == 1)
+    {
+        return -1;
+    }
+
     token = strtok(command," \t\r\n");
     
     if(token == NULL){return 0;}

@@ -4,6 +4,7 @@
 #include "LP.h"
 #include "gurobi_c.h"
 #include "backtrack_core.h"
+#include <math.h>
 
 int get_num_of_parameters(Board* board) {
     int i;
@@ -23,11 +24,11 @@ int get_num_of_parameters(Board* board) {
     return counter;
 }
 
-void add_single_value_per_cell_constraints(Board* board, GRBmodel *model, int *ind, int *val, GRBenv *env) {
+int add_single_value_per_cell_constraints(Board* board, GRBmodel *model, int *ind, double *val, GRBenv *env) {
     int i;
     int j;
     int k;
-    char *i_char;
+    char i_char[4096];
     int error = 0;
     char unique_name[2048] = "a";
     int counter = 0;
@@ -40,7 +41,7 @@ void add_single_value_per_cell_constraints(Board* board, GRBmodel *model, int *i
         {
             possible_value_size = get_possible_values(board,i,j, possible_values);
 
-            if (possible_value_size = -1)
+            if (possible_value_size == -1)
                 continue;
 
             for (k = 0; k < possible_value_size; k++)
@@ -55,7 +56,7 @@ void add_single_value_per_cell_constraints(Board* board, GRBmodel *model, int *i
             sprintf(i_char, "%d",chars_to_copy);
             strcat(unique_name,i_char);
 
-            error = GRBaddconstr(model, possible_value_size, ind, val, GRB_EQUAL, 1, unique_name);
+            error = GRBaddconstr(model, possible_value_size, ind, val, GRB_EQUAL,1, unique_name);
             if (error) {
                 printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
                 return -1;
@@ -70,14 +71,15 @@ void add_single_value_per_cell_constraints(Board* board, GRBmodel *model, int *i
             }
         }
     }
+    return 1;
 }
 
-void add_rows_constraints(Board* board, GRBmodel *model, int *ind, int *val, GRBenv *env) {
+int add_rows_constraints(Board* board, GRBmodel *model, int *ind, double *val, GRBenv *env) {
     int i;
     int j;
     int k;
     int index_in_row;
-    char *i_char;
+    char i_char[4096];
     int val_written = 0;
     int board_size = board->num_of_columns * board->num_of_rows;
     int error = 0;
@@ -95,7 +97,7 @@ void add_rows_constraints(Board* board, GRBmodel *model, int *ind, int *val, GRB
             {
                 possible_value_size = get_possible_values(board,i,j, possible_values);
 
-                if (possible_value_size = -1)
+                if (possible_value_size == -1)
                     continue;
 
                 for (k = 0; k < possible_value_size; k++)
@@ -136,14 +138,16 @@ void add_rows_constraints(Board* board, GRBmodel *model, int *ind, int *val, GRB
             }         
         } 
     }
+
+    return 1;
 }
 
-void add_column_constraints(Board* board, GRBmodel *model, int *ind, int *val, GRBenv *env) {
+int add_column_constraints(Board* board, GRBmodel *model, int *ind, double *val, GRBenv *env) {
     int i;
     int j;
     int k;
     int index_to_check;
-    char *i_char;
+    char i_char[4096];
     int board_size = board->num_of_columns * board->num_of_rows;
     int error = 0;
     int optional_occurences = 0;
@@ -164,7 +168,7 @@ void add_column_constraints(Board* board, GRBmodel *model, int *ind, int *val, G
                 {
                     possible_value_size = get_possible_values(board,i,j, possible_values);
 
-                    if (possible_value_size = -1)
+                    if (possible_value_size == -1)
                         continue;
 
                     for (k = 0; k < possible_value_size; k++)
@@ -206,14 +210,15 @@ void add_column_constraints(Board* board, GRBmodel *model, int *ind, int *val, G
             }  
          }
     }
+    return 1;
 }
 
-void add_square_constraints(Board* board, GRBmodel *model, int *ind, int *val, GRBenv *env) {
+int add_square_constraints(Board* board, GRBmodel *model, int *ind, double *val, GRBenv *env) {
     int i;
     int j;
     int k;
     int index_to_check;
-    char *i_char;
+    char i_char[4096];
     int board_size = board->num_of_columns * board->num_of_rows;
     int error = 0;
     int optional_occurences = 0;
@@ -248,7 +253,7 @@ void add_square_constraints(Board* board, GRBmodel *model, int *ind, int *val, G
                 {
                     possible_value_size = get_possible_values(board,i,j, possible_values);
 
-                    if (possible_value_size = -1)
+                    if (possible_value_size == -1)
                         continue;
 
                     top_left_corner_row = floor(i/board->num_of_rows)*board->num_of_rows; 
@@ -294,6 +299,7 @@ void add_square_constraints(Board* board, GRBmodel *model, int *ind, int *val, G
             }  
          }
     }
+    return 1;
 }
 
 int validate(Board* board) {
