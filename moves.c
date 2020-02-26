@@ -12,7 +12,7 @@ void free_node(Moves* node){
 /* for moves: solve, edit */
 void clean_list(Moves* moves){
     Moves* node = moves;
-    back_to_first_move(moves);
+    back_to_first_move(node);
     while(node){
         Moves* next = node->next;
         free_node(node);

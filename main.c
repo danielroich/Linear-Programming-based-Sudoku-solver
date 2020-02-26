@@ -11,6 +11,7 @@ int main(int argc, char *argv[]) {
     char* command = (char*) malloc((sizeof(char)*1024));
     Board* board = (Board*) malloc((sizeof(Board)));
     Moves* moves = (Moves*)malloc(sizeof(Moves));
+    moves=NULL; /*TODO*/
 
     if(command==NULL){
         printf("Error: malloc has failed\n");

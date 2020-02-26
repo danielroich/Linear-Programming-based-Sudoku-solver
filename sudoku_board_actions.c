@@ -9,46 +9,10 @@
 #include "puzzle_generator.h"
 #include "LP.h"
 
-int is_erroneous(Board* board){
-    int i, j, value;
-    int size = (board->num_of_rows)*(board->num_of_columns);
-    for (i=0; i<size; i++){
-        for (j=0; j<size; j++){
-            if(board->cur_board[i][j] != BOARD_NULL_VALUE){
-                value = board->cur_board[i][j];
-                board->cur_board[i][j] = BOARD_NULL_VALUE; /*not clash with himself*/
-                if(is_legal(i,j,value,board,0) == 0)
-                    return 1;
-                board->cur_board[i][j]=value;
-            }
-        }
-    }
-    return 0;
-}
-
-int is_filled(Board* board){
-    int size = (board->num_of_rows)*(board->num_of_columns);
-    if(board->count_filled == size*size){
-        return 1;
-    }
-    return 0;
-}
-
-void seed(int seed) {
-    srand(seed);
-}
-
 int is_winner(Board* board){
-    /* TODO: change */
-    int is_erroneous = 0;
-
-    int size = (board->num_of_rows)*(board->num_of_columns);
-    if(board->count_filled != size*size){
-        return 0;
-    }
-    if(is_erroneous == 1)
-        return 0;
-    return 1;
+    if(is_filled(board) && is_erroneous_board(board)==0)
+        return 1;
+    return 0;
 }
 
 /*COMMAND 17*/
@@ -126,14 +90,12 @@ void print_board(Board* board){
                     }
                     else{
                         if(value != BOARD_NULL_VALUE){
-                            board->cur_board[row][col]=BOARD_NULL_VALUE; /*not clash with himself*/
-                            if(is_legal(row,col,value,board,0) == 0 && (board->mode==EDIT || board->mark_errors == 1)){
+                            if(is_erroneous_cell(board,row,col) && (board->mode==EDIT || board->mark_errors == 1)){
                                 printf(" %2d*",value);
                             }
                             else{
                                 printf(" %2d ",value);
                             }
-                            board->cur_board[row][col]=value;
                         }   
                         else
                             printf("    ");
@@ -170,12 +132,10 @@ int set_value_user(int x, int y, int value, Board* board){
         print_board(board);
         return 1;
     }
-    board->cur_board[x][y] = value;
-    
+    set_value_without_check(x,y,value,board);
     if(board->mode == EDIT){
        board->fixed_board[x][y] = value; 
     }
-    board->count_filled++;
     print_board(board);
     if(is_winner(board) == 1){
         printf("Puzzle solved successfully\n");
@@ -285,4 +245,8 @@ void restart(Board* board){
     }
     generate_puzzle(board, fixed);
     print_board(board);
+}
+
+void seed(int seed) {
+    srand(seed);
 }

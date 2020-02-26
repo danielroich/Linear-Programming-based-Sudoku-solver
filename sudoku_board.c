@@ -51,6 +51,12 @@ int value_in_square(int row, int col, int value, Board* board,int is_fix){
     return 0;
 }
 
+int is_legal(int x, int y, int value, Board* board, int is_fix){
+    if((value_in_row(x,value,board,is_fix) || value_in_col(y,value,board,is_fix) || value_in_square(x,y,value,board,is_fix) ))
+        return 0;
+    return 1;
+}
+
 int set_value(int x, int y, int value, Board* board,int is_fix){
     if(is_legal(x,y,value,board,is_fix)==0){
         return 0;}     
@@ -69,6 +75,11 @@ int erase_value(int x, int y, Board* board) {
     return 1;
 }
 
+void set_value_without_check(int x, int y, int value, Board* board){
+    board->cur_board[x][y] = value;    
+    board->count_filled++;
+}
+
 int create_empty_board(Board* board, int rows, int columns) {
     int size = rows * columns;
     board->num_of_columns = columns;
@@ -78,12 +89,6 @@ int create_empty_board(Board* board, int rows, int columns) {
     board->solved_board  = create_2d_array(size);
     board->mode = INIT;
     board->mark_errors = 1; 
-    return 1;
-}
-
-int is_legal(int x, int y, int value, Board* board, int is_fix){
-    if((value_in_row(x,value,board,is_fix) || value_in_col(y,value,board,is_fix) || value_in_square(x,y,value,board,is_fix) ))
-        return 0;
     return 1;
 }
 
@@ -104,4 +109,39 @@ void free_board(Board* board){
     free_2d_array(board->fixed_board,size);
     free_2d_array(board->cur_board,size);
     free(board);
+}
+
+int is_erroneous_cell(Board* board,int row, int col){
+    int successed;
+    int value;
+    if(board->cur_board[row][col] != BOARD_NULL_VALUE){
+        value = get_value(row,col,board,0);
+        erase_value(row,col,board);
+        successed = set_value(row,col,value,board,0);
+        if(successed == 0){
+            set_value_without_check(row,col,value,board);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int is_erroneous_board(Board* board){
+    int i, j;
+    int size = (board->num_of_rows)*(board->num_of_columns);
+    for (i=0; i<size; i++){
+        for (j=0; j<size; j++){
+            if(is_erroneous_cell(board,i,j))
+                return 1;
+        }
+    }
+    return 0;
+}
+
+int is_filled(Board* board){
+    int size = (board->num_of_rows)*(board->num_of_columns);
+    if(board->count_filled == size*size){
+        return 1;
+    }
+    return 0;
 }

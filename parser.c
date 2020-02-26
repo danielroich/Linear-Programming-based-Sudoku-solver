@@ -11,7 +11,7 @@ int parse_command(char* command, Board* board, Moves* moves){
     int x,y,z;
     char* token;
     int succeeded;
-    int filled = is_filled(board);
+    int filled = is_winner(board); /*TODO*/
 
     /* TODO: Remove, only for compilation 
     if (moves->Board_state->count_filled == 1)

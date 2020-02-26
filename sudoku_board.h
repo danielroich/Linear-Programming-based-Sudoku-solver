@@ -21,12 +21,16 @@ typedef struct _Board {
     Mode mode;
 } Board;
 
-int set_value(int x, int y, int value, Board* board, int is_fix);
 int get_value(int x, int y, Board* board, int is_fix);
-int erase_value(int x, int y, Board* board);
-int create_empty_board(Board* board, int rows, int columns);
 int is_legal(int x, int y, int value, Board* board, int is_fix);
+int set_value(int x, int y, int value, Board* board, int is_fix);
+int erase_value(int x, int y, Board* board);
+void set_value_without_check(int x, int y, int value, Board* board);
+int create_empty_board(Board* board, int rows, int columns);
 void copy_board(Board* from_board,Board* to_board);
 void free_board(Board* board);
+int is_erroneous_cell(Board* board,int row, int col);
+int is_erroneous_board(Board* board);
+int is_filled(Board* board);
 
 #endif 

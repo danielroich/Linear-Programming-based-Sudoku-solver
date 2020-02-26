@@ -21,6 +21,6 @@ void restart(Board* board);
 void exit_game(Board* board);
 
 void seed(int seed);
-int is_filled(Board* board);
+int is_winner(Board* board);
 
 #endif
