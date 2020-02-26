@@ -9,6 +9,7 @@
 int get_num_of_parameters(Board* board) {
     int i;
     int j;
+    int s;
     int counter = 0;
     int board_size = board->num_of_columns * board->num_of_rows;
     int* possible_values = (int*)calloc(board_size, sizeof(int));
@@ -16,18 +17,29 @@ int get_num_of_parameters(Board* board) {
     {
         for (j = 0; j < board_size; j++)
         {
+            for (s = 0; s < board_size; s++)
+            {
+                possible_values[s] = 0;
+            }
             if (get_value(i,j,board,0) == BOARD_NULL_VALUE)
             {
-                printf("index: %d, %d and counter before is: %d\n", i,j,counter);
+                printf("printing possible values for index: %d, %d\n", i,j);
                 counter += get_possible_values(board,i,j,possible_values);
-                printf("the val of counter now is: %d\n", counter);
+                printf("possible values are: \n");
+                for (s = 0; s < board_size; s++)
+                {
+                    if(possible_values[s] == 1)
+                        printf("%d ",(s+1));
+                }
+                printf("\n");
+         
             }   
         }
     }
     return counter;
 }
 
-void print_results(Board* board, double* sol) {
+void print_results(Board* board, double* sol, int num_of_params) {
     int i;
     int j;
     int k;
@@ -43,22 +55,33 @@ void print_results(Board* board, double* sol) {
         {
             if (get_value(i,j,board,0) == BOARD_NULL_VALUE)
             {
+                printf("printing sol for index: %d, %d\n",i,j);
                 temp_counter= counter;
                 counter += get_possible_values(board,i,j,possible_values);
+                printf("temp_counter = %d counter = %d \n",temp_counter,counter);
+                printf("possible values are: \n");
+                for (s = 0; s < board_size; s++)
+                {
+                    if(possible_values[s] == 1)
+                        printf("%d",(s+1));
+                }
+                printf("\n");
                 for (k = temp_counter; k < counter; k++)
                 {
-                    if (sol[k+temp_counter] == 1)
+                    if (sol[k] == 1)
                     {
+                        
                         chosen_posbbile_values_index = k-temp_counter;
                         for (s = 0; s < board_size; s++)
                         {
-                            if(chosen_posbbile_values_index == 0 && possible_values[s] == 1) {
-                                printf("for cell %d,%d the value chosen is: %d \n",i,j,s);
+                            if(possible_values[s] == 1) {
+                                if(chosen_posbbile_values_index == 0) {
+                                    printf("for cell %d,%d the value chosen is: %d \n",i,j,(s+1));
+                                    break;
+                                }
+                                --chosen_posbbile_values_index;
                             }
-
-                            --chosen_posbbile_values_index;
                         }
-                        
                     }
                     
                 }
@@ -66,13 +89,13 @@ void print_results(Board* board, double* sol) {
             }   
         }
     }
-    return counter;
 }
 
 int add_single_value_per_cell_constraints(Board* board, GRBmodel *model, int *ind, double *val, GRBenv *env) {
     int i;
     int j;
     int k;
+    int s;
     char i_char[4096];
     int error = 0;
     char unique_name[2048] = "a";
@@ -85,6 +108,7 @@ int add_single_value_per_cell_constraints(Board* board, GRBmodel *model, int *in
     {
         for (j = 0; j < board_size; j++)
         {
+            printf("adding single value constraint to index %d,%d\n", i,j);
             possible_value_size = get_possible_values(board,i,j, possible_values);
 
             if (possible_value_size == -1)
@@ -92,16 +116,16 @@ int add_single_value_per_cell_constraints(Board* board, GRBmodel *model, int *in
 
             for (k = 0; k < possible_value_size; k++)
             {
-                ind[k] = k + counter;
+                printf("marked 1 to index %d in ind array for gurobi\n", counter);
+                ind[k] = counter;
                 val[k] = 1;
                 counter++;
             }
 
             /* generate unique name by concatinating i value to the unique name string */
-            chars_to_copy = (int)((ceil(log10(i))+1)*sizeof(char));
+            chars_to_copy = i != 0 ? (int)((ceil(log10(i))+1)*sizeof(char)) : 1;
             sprintf(i_char, "%d",chars_to_copy);
             strcat(unique_name,i_char);
-            printf("unique name is: %s and i_char is %s\n", unique_name, i_char);
 
             error = GRBaddconstr(model, possible_value_size, ind, val, GRB_EQUAL,1, unique_name);
             if (error) {
@@ -125,35 +149,37 @@ int add_rows_constraints(Board* board, GRBmodel *model, int *ind, double *val, G
     int i;
     int j;
     int k;
-    int index_in_row;
+    int value_of_constraint;
     char i_char[4096];
     int val_written = 0;
-    int board_size = board->num_of_columns * board->num_of_rows;
     int error = 0;
+    int board_size = board->num_of_columns * board->num_of_rows;
     int optional_occurences = 0;
     char unique_name[2048] = "b";
     int counter = 0;
     int chars_to_copy;
     int* possible_values = (int*)calloc(board_size, sizeof(int));
     int possible_value_size;
-    for (i = 0; i < board->num_of_rows; i++)
-    {
-        for (index_in_row = 0; index_in_row < board_size; index_in_row++)
-        {
-            for (j = 0; j < board->num_of_columns; j++)
-            {
+     for (value_of_constraint = 1; value_of_constraint <= board_size; value_of_constraint++){
+        for (i = 0; i < board_size; i++){
+            optional_occurences=0;
+            for (j = 0; j < board_size; j++){
+
                 possible_value_size = get_possible_values(board,i,j, possible_values);
 
-                if (possible_value_size == -1)
+                if (possible_value_size == -1 || possible_values[value_of_constraint-1] == 0);
                     continue;
+
+                printf("adding row value constraint to index %d,%d for number %d\n", i,j, value_of_constraint);
 
                 for (k = 0; k < possible_value_size; k++)
                 {
-                    if (possible_values[index_in_row] == 1 && val_written == 0)
+                    if (possible_values[value_of_constraint-1] == 1 && val_written == 0)
                     {
+                        printf("marked 1 to index %d in ind array for gurobi\n", counter);
                         val_written = 1;
                         ++optional_occurences;
-                        ind[k] = k + counter;
+                        ind[k] = counter;
                         val[k] = 1;
                     }   
                     counter++;
@@ -169,6 +195,7 @@ int add_rows_constraints(Board* board, GRBmodel *model, int *ind, double *val, G
             chars_to_copy = (int)((ceil(log10(i))+1)*sizeof(char));
             sprintf(i_char, "%d",chars_to_copy);
             strcat(unique_name,i_char);
+            printf("unique name is: %s and i_char is %s\n", unique_name, i_char);
 
             error = GRBaddconstr(model, optional_occurences, ind, val, GRB_EQUAL, 1, unique_name);
             if (error) {
@@ -182,10 +209,9 @@ int add_rows_constraints(Board* board, GRBmodel *model, int *ind, double *val, G
                 ind[k] = 0;
                 val[k] = 0;
 
-            }         
-        } 
-    }
-
+            }       
+        }
+    }  
     return 1;
 }
 
@@ -421,9 +447,9 @@ int validate(Board* board) {
 
  
   add_single_value_per_cell_constraints(board,model,ind,val, env);
-    /*
+   
   add_rows_constraints(board,model,ind,val, env);
-
+ /*
   add_column_constraints(board,model,ind,val, env);
 
   add_square_constraints(board,model,ind,val, env);
@@ -472,8 +498,8 @@ int validate(Board* board) {
   /* solution found */
   if (optimstatus == GRB_OPTIMAL) {
     printf("Optimal objective: %.4e\n", objval);
-
-    printf("  x=%.2f, y=%.2f, z=%.2f\n", sol[0], sol[1], sol[2]);
+    
+    print_results(board,sol,num_of_params);
   }
   /* no solution found */
   else if (optimstatus == GRB_INF_OR_UNBD) {

@@ -34,6 +34,13 @@ int get_possible_values(Board* board, int x, int y, int* possible_values) {
     int i;
     int counter = 0;
     int possible_values_num;
+    int board_size = board->num_of_columns * board->num_of_rows;
+
+    /* ckean the possible values array in order to start fresh and if needed return 0 in the not possible values */
+     for (i = 0; i < board_size; i++)
+        {
+            possible_values[i] = 0;
+        }
 
     /* if the board contains value in this point, return error */
     if (get_value(x, y, board,0) != BOARD_NULL_VALUE)

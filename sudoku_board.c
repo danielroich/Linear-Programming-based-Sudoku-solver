@@ -1,6 +1,7 @@
 #include "sudoku_board.h"
 #include "2d_array_utils.h"
 #include <math.h>
+#include <stdlib.h>
 
 int const BOARD_NULL_VALUE = 0;
 
