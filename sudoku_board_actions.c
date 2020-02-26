@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "sudoku_board_actions.h"
 #include "backtracking_core_logic.h"
 #include "puzzle_generator.h"
 #include "2d_array_utils.h"
 #include "files_utils.h"
 #include "stack_backtrack_logic.h"
-#include "sudoku_board.h"
 #include "moves_list.h"
+#include "puzzle_generator.h"
 
 int is_erroneous(Board* board){
     int i, j, value;
@@ -39,6 +40,9 @@ void seed(int seed) {
 }
 
 int is_winner(Board* board){
+    /* TODO: change */
+    int is_erroneous = 0;
+
     int size = (board->num_of_rows)*(board->num_of_columns);
     if(board->count_filled != size*size){
         return 0;
@@ -107,7 +111,6 @@ void print_board(Board* board){
     int a, b, c, d;
     int row, col, value;
     int separator, i;
-    int try;
     separator = 4*board->num_of_columns*board->num_of_rows + board->num_of_rows + 1;
     for(a = 0; a < board->num_of_columns; a++){ 
         
@@ -215,8 +218,7 @@ void guess(float threshold);
 void generate();
 
 /*COMMAND 9*/
-void undo(Board* board, Moves* moves){
-}    
+void undo(Board* board, Moves* moves);
 
 /*COMMAND 10*/
 void redo(Board* board, Moves* moves);

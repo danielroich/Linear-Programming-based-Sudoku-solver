@@ -2,7 +2,7 @@
 #ifndef SOFTWAREPROJ_SUDOKU_BOARD_H
 #define SOFTWAREPROJ_SUDOKU_BOARD_H
 
-int const BOARD_NULL_VALUE = 0;
+extern int const BOARD_NULL_VALUE;
 
 typedef enum _Mode {
     INIT,

@@ -2,9 +2,8 @@
 #ifndef EX3_SUDOKU_BOARD_ACTIONS_H
 #define EX3_SUDOKU_BOARD_ACTIONS_H
 
-#include "backtracking_core_logic.h"
 #include "sudoku_board.h"
-#include "puzzle_generator.h"
+
 
 int solve(Board* board, char* path);
 int edit(Board* board, char* path);

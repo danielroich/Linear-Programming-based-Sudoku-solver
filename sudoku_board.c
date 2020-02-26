@@ -2,6 +2,8 @@
 #include "2d_array_utils.h"
 #include <math.h>
 
+int const BOARD_NULL_VALUE = 0;
+
 /* all functions in this file get 0<=x,y<=row*col-1 */
 /* if is_fix == 1 value from fixed_board else from cur*/
 

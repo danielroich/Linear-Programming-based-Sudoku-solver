@@ -5,10 +5,15 @@
 #include "sudoku_board_actions.h"
 #include <stdio.h>
 
+#define EMPTY_STATE_INIT {0,0,0,NULL,0,1}
+
+
 BacktrackState prepare_empty_state(int board_size, int cur_x, int cur_y) {
-    int possible_values_size =0;
     int* possible_values = (int*)calloc(board_size, sizeof(int));
-    BacktrackState cur_state = {cur_x, cur_y, possible_values_size, possible_values, 0, 1};
+    BacktrackState cur_state = EMPTY_STATE_INIT;
+    cur_state.column=cur_y;
+    cur_state.row=cur_x;
+    cur_state.possible_values=possible_values;
     return cur_state;
 }
 
