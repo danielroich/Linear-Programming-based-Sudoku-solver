@@ -17,10 +17,6 @@ int get_num_of_parameters(Board* board) {
     {
         for (j = 0; j < board_size; j++)
         {
-            for (s = 0; s < board_size; s++)
-            {
-                possible_values[s] = 0;
-            }
             if (get_value(i,j,board,0) == BOARD_NULL_VALUE)
             {
                 printf("printing possible values for index: %d, %d\n", i,j);
@@ -149,10 +145,12 @@ int add_rows_constraints(Board* board, GRBmodel *model, int *ind, double *val, G
     int i;
     int j;
     int k;
+    int constraint_index_base = 0;
     int value_of_constraint;
     char i_char[4096];
     int val_written = 0;
     int error = 0;
+    int temp_counter;
     int board_size = board->num_of_columns * board->num_of_rows;
     int optional_occurences = 0;
     char unique_name[2048] = "b";
@@ -160,42 +158,39 @@ int add_rows_constraints(Board* board, GRBmodel *model, int *ind, double *val, G
     int chars_to_copy;
     int* possible_values = (int*)calloc(board_size, sizeof(int));
     int possible_value_size;
-     for (value_of_constraint = 1; value_of_constraint <= board_size; value_of_constraint++){
+     for (value_of_constraint = 0; value_of_constraint < board_size; value_of_constraint++){
+        counter = 0;
         for (i = 0; i < board_size; i++){
             optional_occurences=0;
             for (j = 0; j < board_size; j++){
 
                 possible_value_size = get_possible_values(board,i,j, possible_values);
+                
+                printf("adding row value constraint to index %d,%d for number %d\n", i,j, value_of_constraint + 1);
+                temp_counter = counter;
 
-                if (possible_value_size == -1 || possible_values[value_of_constraint-1] == 0);
-                    continue;
-
-                printf("adding row value constraint to index %d,%d for number %d\n", i,j, value_of_constraint);
-
-                for (k = 0; k < possible_value_size; k++)
+                for (k = 0; k < board_size; k++)
                 {
-                    if (possible_values[value_of_constraint-1] == 1 && val_written == 0)
+                    if (possible_values[k] == 1)
                     {
-                        printf("marked 1 to index %d in ind array for gurobi\n", counter);
-                        val_written = 1;
-                        ++optional_occurences;
-                        ind[k] = counter;
-                        val[k] = 1;
+                        if (k - temp_counter == value_of_constraint)
+                        {
+                            printf("marked 1 to index %d in ind array for gurobi\n", counter);
+                            ++optional_occurences;
+                            ind[k] = counter;
+                            val[k] = 1;
+                        }
+                        ++counter;
                     }   
-                    counter++;
                 }
-
-                val_written = 0;
-            }     
-
+   
             if(optional_occurences == 0)
                 continue;
 
             /* generate unique name by concatinating i value to the unique name string */
-            chars_to_copy = (int)((ceil(log10(i))+1)*sizeof(char));
+            chars_to_copy = i != 0 ? (int)((ceil(log10(i))+1)*sizeof(char)) : 1;
             sprintf(i_char, "%d",chars_to_copy);
             strcat(unique_name,i_char);
-            printf("unique name is: %s and i_char is %s\n", unique_name, i_char);
 
             error = GRBaddconstr(model, optional_occurences, ind, val, GRB_EQUAL, 1, unique_name);
             if (error) {
@@ -211,7 +206,8 @@ int add_rows_constraints(Board* board, GRBmodel *model, int *ind, double *val, G
 
             }       
         }
-    }  
+    } 
+     } 
     return 1;
 }
 
