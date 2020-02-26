@@ -91,6 +91,7 @@ int parse_command(char* command, Board* board, Moves* moves){
 
         succeeded = set_value_user(y-1,x-1,z,board);
         if(succeeded == 1){
+            clean_nexts(moves);
             add_new_move(moves,board);
         }
         return 5;
@@ -178,7 +179,13 @@ int parse_command(char* command, Board* board, Moves* moves){
 
     /*COMMAND 15*/
     if(strcmp(token,"autofill")==0 && board->mode == SOLVE){
-        return 15;
+        succeeded = autofill(board);
+        if(succeeded){
+            clean_nexts(moves);
+            add_new_move(moves,board);
+            return 15;
+        }
+        return 0;
     }
 
     /*COMMAND 16*/

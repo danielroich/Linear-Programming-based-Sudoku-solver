@@ -18,7 +18,7 @@ int save(Board* board, char* path);
 void hint(int x, int y, Board* board);
 
 int number_solutions(Board* board);
-
+int autofill(Board* board);
 void restart(Board* board);
 void exit_game(Board* board);
 

@@ -224,7 +224,7 @@ int number_solutions(Board* board) {
     int number;
     /*If the board is erroneous it is an error.
     if(is_erroneous_board){
-        printf("the number of solutions is: %d \n",number);
+        printf("Error:");
         return 0;
     }*/
     number = stack_based_back_track(board);
@@ -233,8 +233,31 @@ int number_solutions(Board* board) {
 }
 
 /*COMMAND 15*/
-int autofill(){
-    return 0;
+int autofill(Board* board){
+    int i, j, value;
+    int size = (board->num_of_rows)*(board->num_of_columns);
+    int ** autofill_values = create_2d_array(size);
+    if(is_erroneous_board(board)){
+        printf("Error: erroneous boards can't be autofill \n");
+        return 0;
+    }   
+    for (i=0; i<size; i++){
+        for (j=0; j<size; j++){
+            if(board->cur_board[i][j]==BOARD_NULL_VALUE){
+                value = single_possible_value(i,j,board);
+                autofill_values[i][j]=value;
+            }
+        }
+    }
+    for (i=0; i<size; i++){
+        for (j=0; j<size; j++){
+            if(autofill_values[i][j]!=0){
+                set_value_without_check(i,j,autofill_values[i][j],board);
+            }
+        }
+    }
+    free_2d_array(autofill_values,size);
+    return 1;
 }
 
 /*COMMAND 16*/

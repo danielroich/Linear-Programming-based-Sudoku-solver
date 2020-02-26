@@ -171,3 +171,21 @@ void print_diff(Board* before, Board* after){
         }
     }
 }
+
+int single_possible_value(int row, int col, Board* board){
+    int i,value;
+    int count = 0;
+    int size = board->num_of_columns * board->num_of_rows;
+    for(i = 1; i<=size; i++){
+        if(is_legal(row,col,i,board,0)){
+            count++;
+            value = i;
+        }
+        if(count>1)
+            break;
+    }
+    if(count != 1){
+        return 0;
+    }
+    return value;
+}
