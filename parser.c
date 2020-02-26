@@ -20,7 +20,6 @@ int parse_command(char* command, Board* board, Moves* moves){
     }*/
 
     token = strtok(command," \t\r\n");
-    
     if(token == NULL){return 0;}
 
     /*COMMAND 1*/ 
@@ -102,7 +101,8 @@ int parse_command(char* command, Board* board, Moves* moves){
     }
 
     /*COMMAND 6 TODO*/
-    if(strcmp(token, "validate") == 0 && board->mode != INIT && !filled){
+    if(strcmp(token, "validate") == 0){
+        /*  && board->mode != INIT && !filled */
         validate_board(board);
         return 6;
     }

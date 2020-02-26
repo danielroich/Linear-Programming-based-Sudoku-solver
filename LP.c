@@ -10,14 +10,59 @@ int get_num_of_parameters(Board* board) {
     int i;
     int j;
     int counter = 0;
-    int* possible_values = (int*)calloc(board->num_of_columns * board->num_of_rows, sizeof(int));
-    for (i = 0; i < board->num_of_rows; i++)
+    int board_size = board->num_of_columns * board->num_of_rows;
+    int* possible_values = (int*)calloc(board_size, sizeof(int));
+    for (i = 0; i < board_size; i++)
     {
-        for (j = 0; j < board->num_of_columns; j++)
+        for (j = 0; j < board_size; j++)
         {
-            if (get_value(i,j,board,0) != BOARD_NULL_VALUE)
+            if (get_value(i,j,board,0) == BOARD_NULL_VALUE)
             {
+                printf("index: %d, %d and counter before is: %d\n", i,j,counter);
                 counter += get_possible_values(board,i,j,possible_values);
+                printf("the val of counter now is: %d\n", counter);
+            }   
+        }
+    }
+    return counter;
+}
+
+void print_results(Board* board, double* sol) {
+    int i;
+    int j;
+    int k;
+    int s;
+    int temp_counter = 0;
+    int counter = 0;
+    int chosen_posbbile_values_index = 0;
+    int board_size = board->num_of_columns * board->num_of_rows;
+    int* possible_values = (int*)calloc(board_size, sizeof(int));
+    for (i = 0; i < board_size; i++)
+    {
+        for (j = 0; j < board_size; j++)
+        {
+            if (get_value(i,j,board,0) == BOARD_NULL_VALUE)
+            {
+                temp_counter= counter;
+                counter += get_possible_values(board,i,j,possible_values);
+                for (k = temp_counter; k < counter; k++)
+                {
+                    if (sol[k+temp_counter] == 1)
+                    {
+                        chosen_posbbile_values_index = k-temp_counter;
+                        for (s = 0; s < board_size; s++)
+                        {
+                            if(chosen_posbbile_values_index == 0 && possible_values[s] == 1) {
+                                printf("for cell %d,%d the value chosen is: %d \n",i,j,s);
+                            }
+
+                            --chosen_posbbile_values_index;
+                        }
+                        
+                    }
+                    
+                }
+                
             }   
         }
     }
@@ -33,11 +78,12 @@ int add_single_value_per_cell_constraints(Board* board, GRBmodel *model, int *in
     char unique_name[2048] = "a";
     int counter = 0;
     int chars_to_copy;
-    int* possible_values = (int*)calloc(board->num_of_columns * board->num_of_rows, sizeof(int));
+    int board_size = board->num_of_columns * board->num_of_rows;
+    int* possible_values = (int*)calloc(board_size, sizeof(int));
     int possible_value_size;
-    for (i = 0; i < board->num_of_rows; i++)
+    for (i = 0; i < board_size; i++)
     {
-        for (j = 0; j < board->num_of_columns; j++)
+        for (j = 0; j < board_size; j++)
         {
             possible_value_size = get_possible_values(board,i,j, possible_values);
 
@@ -55,6 +101,7 @@ int add_single_value_per_cell_constraints(Board* board, GRBmodel *model, int *in
             chars_to_copy = (int)((ceil(log10(i))+1)*sizeof(char));
             sprintf(i_char, "%d",chars_to_copy);
             strcat(unique_name,i_char);
+            printf("unique name is: %s and i_char is %s\n", unique_name, i_char);
 
             error = GRBaddconstr(model, possible_value_size, ind, val, GRB_EQUAL,1, unique_name);
             if (error) {
@@ -305,6 +352,7 @@ int add_square_constraints(Board* board, GRBmodel *model, int *ind, double *val,
 int validate(Board* board) {
     int i;
     int num_of_params = get_num_of_parameters(board);
+    printf("number of params is: %d\n", num_of_params);
     int board_size = board->num_of_columns * board->num_of_rows;
     GRBenv   *env   = NULL;
     GRBmodel *model = NULL;
@@ -371,14 +419,15 @@ int validate(Board* board) {
 	  return -1;
   }
 
-
+ 
   add_single_value_per_cell_constraints(board,model,ind,val, env);
-
+    /*
   add_rows_constraints(board,model,ind,val, env);
 
   add_column_constraints(board,model,ind,val, env);
 
   add_square_constraints(board,model,ind,val, env);
+  */
 
   /* Optimize model - need to call this before calculation */
   error = GRBoptimize(model);
@@ -423,6 +472,7 @@ int validate(Board* board) {
   /* solution found */
   if (optimstatus == GRB_OPTIMAL) {
     printf("Optimal objective: %.4e\n", objval);
+
     printf("  x=%.2f, y=%.2f, z=%.2f\n", sol[0], sol[1], sol[2]);
   }
   /* no solution found */

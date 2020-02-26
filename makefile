@@ -19,7 +19,7 @@ backtracking_core_logic.o: backtracking_core_logic.c backtracking_core_logic.h s
 	$(CC) $(COMP_FLAG) -c $*.c
 parser.o: parser.c parser.h sudoku_board_actions.h moves_list.h
 	$(CC) $(COMP_FLAG) -c $*.c
-sudoku_board_actions.o: sudoku_board_actions.c sudoku_board_actions.h puzzle_generator.h 2d_array_utils.h backtracking_core_logic.h stack_backtrack_logic.h files_utils.h
+sudoku_board_actions.o: sudoku_board_actions.c sudoku_board_actions.h puzzle_generator.h 2d_array_utils.h backtracking_core_logic.h stack_backtrack_logic.h files_utils.h LP.h
 	$(CC) $(COMP_FLAG) -c $*.c
 puzzle_generator.o: puzzle_generator.c puzzle_generator.h 2d_array_utils.h sudoku_board.h backtracking_core_logic.h
 	$(CC) $(COMP_FLAG) -c $*.c
