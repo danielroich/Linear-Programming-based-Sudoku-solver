@@ -13,12 +13,6 @@ int parse_command(char* command, Board* board, Moves* moves){
     int succeeded;
     int filled = is_winner(board); /*TODO*/
 
-    /* TODO: Remove, only for compilation 
-    if (moves->Board_state->count_filled == 1)
-    {
-        return -1;
-    }*/
-
     token = strtok(command," \t\r\n");
     if(token == NULL){return 0;}
 
@@ -31,6 +25,7 @@ int parse_command(char* command, Board* board, Moves* moves){
         succeeded = solve(board,token);
         if(succeeded){
             clean_list(moves);
+            add_new_move(moves,board);
             return 1;
         }
         return 0;
@@ -45,6 +40,7 @@ int parse_command(char* command, Board* board, Moves* moves){
         succeeded = edit(board,token);
         if(succeeded){
             clean_list(moves);
+            add_new_move(moves,board);
             return 2;
         }
         return 0;
@@ -119,11 +115,21 @@ int parse_command(char* command, Board* board, Moves* moves){
 
     /*COMMAND 9*/
     if(strcmp(token,"undo")==0 && board->mode != INIT){
+        succeeded = undo(board,moves);
+        if (!succeeded){
+            printf("Error: There are no moves to undo\n");
+            return 0;
+        }
         return 9;
     }
 
     /*COMMAND 10*/
     if(strcmp(token,"redo")==0 && board->mode != INIT){
+        succeeded = redo(board,moves);
+        if (!succeeded){
+            printf("Error: There are no moves to redo\n");
+            return 0;
+        }
         return 10;
     }
 

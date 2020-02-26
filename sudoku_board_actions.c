@@ -144,7 +144,7 @@ int set_value_user(int x, int y, int value, Board* board){
 }
 
 /*COMMAND 6*/
-/* TODO: change to validate with ILP*/ 
+/* TODO: validate with ILP*/ 
 void validate_board(Board* board){
     int **cur_board_copy;
     int valid_board = 0;
@@ -175,10 +175,24 @@ void guess(float threshold);
 void generate();
 
 /*COMMAND 9*/
-void undo(Board* board, Moves* moves);
+int undo(Board* board, Moves* moves){
+    if(!curr_to_prev(moves)){
+        return 0;
+    }
+    print_diff(board,moves->Board_state);
+    copy_board(moves->Board_state,board);
+    return 1;
+}
 
 /*COMMAND 10*/
-void redo(Board* board, Moves* moves);
+int redo(Board* board, Moves* moves){
+    if(!curr_to_next(moves)){
+        return 0;
+    }
+    print_diff(board,moves->Board_state);
+    copy_board(moves->Board_state,board);
+    return 1;
+}
 
 /*COMMAND 11*/
 int save(Board* board, char* path){
@@ -188,7 +202,7 @@ int save(Board* board, char* path){
 }
 
 /*COMMAND 12*/
-/* TODO: hint with ILP + check range of x,y*/
+/* TODO: hint with ILP + check range of x,y! */
 void hint(int x, int y, Board* board){
     int value = board->solved_board[x-1][y-1];
     printf("Hint: set cell to %d\n",value);
@@ -201,9 +215,14 @@ void guess_hint();
 /*COMMAND 14*/
 int number_solutions(Board* board) {
     int number;
+    /*If the board is erroneous it is an error.
+    if(is_erroneous_board){
+        printf("the number of solutions is: %d \n",number);
+        return 0;
+    }*/
     number = stack_based_back_track(board);
     printf("the number of solutions is: %d \n",number);
-    return 0;
+    return 1;
 }
 
 /*COMMAND 15*/

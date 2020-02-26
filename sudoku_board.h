@@ -32,5 +32,6 @@ void free_board(Board* board);
 int is_erroneous_cell(Board* board,int row, int col);
 int is_erroneous_board(Board* board);
 int is_filled(Board* board);
+void print_diff(Board* before, Board* after);
 
 #endif 

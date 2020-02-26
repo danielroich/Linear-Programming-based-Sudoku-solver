@@ -65,12 +65,14 @@ int curr_to_prev(Moves* moves){
 
 void add_new_move(Moves* moves, Board* board){
     Moves* new_node =(Moves*)malloc(sizeof(Moves));
-    Board* node_board = (Board*) malloc((sizeof(Board)));
-    if(new_node==NULL || node_board==NULL){
+    
+    if(new_node==NULL){
         printf("Error: malloc has failed\n");
         /*TODO: free game*/
     }
 
+    new_node->Board_state = (Board*) malloc((sizeof(Board)));
+    create_empty_board(new_node->Board_state,board->num_of_rows,board->num_of_columns);
     copy_board(board,new_node->Board_state);
     new_node->next=NULL;
 
@@ -82,6 +84,5 @@ void add_new_move(Moves* moves, Board* board){
         new_node->prev=moves;
     }
     moves=new_node;
-
 }
 
