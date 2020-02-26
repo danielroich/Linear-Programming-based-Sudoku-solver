@@ -3,7 +3,7 @@
 #define EX3_SUDOKU_BOARD_ACTIONS_H
 
 #include "sudoku_board.h"
-
+#include "moves.h"
 
 int solve(Board* board, char* path);
 int edit(Board* board, char* path);

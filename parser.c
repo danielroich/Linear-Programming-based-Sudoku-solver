@@ -1,5 +1,4 @@
 #include "parser.h"
-#include "moves_list.h"
 #include "sudoku_board_actions.h"
 #include <string.h>
 #include <stdio.h>
@@ -32,7 +31,7 @@ int parse_command(char* command, Board* board, Moves* moves){
             return 0;}
         succeeded = solve(board,token);
         if(succeeded){
-            clean_list(&moves);
+            clean_list(moves);
             return 1;
         }
         return 0;
@@ -46,7 +45,7 @@ int parse_command(char* command, Board* board, Moves* moves){
         }
         succeeded = edit(board,token);
         if(succeeded){
-            clean_list(&moves);
+            clean_list(moves);
             return 2;
         }
         return 0;
@@ -133,7 +132,8 @@ int parse_command(char* command, Board* board, Moves* moves){
         token = (strtok(NULL, " \t\r\n"));
         if(token == NULL){
             printf("Error: invalid command\n");
-            return 0;}
+            return 0;
+        }
         succeeded = save(board,token);
         if(!succeeded)
             return 0;

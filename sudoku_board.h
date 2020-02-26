@@ -26,5 +26,7 @@ int get_value(int x, int y, Board* board, int is_fix);
 int erase_value(int x, int y, Board* board);
 int create_empty_board(Board* board, int rows, int columns);
 int is_legal(int x, int y, int value, Board* board, int is_fix);
+void copy_board(Board* from_board,Board* to_board);
+void free_board(Board* board);
 
 #endif 

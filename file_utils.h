@@ -1,5 +1,5 @@
-#ifndef SOFTWAREPROJ_FILES_UTILS_H
-#define SOFTWAREPROJ_FILES_UTILS_H
+#ifndef SOFTWAREPROJ_FILE_UTILS_H
+#define SOFTWAREPROJ_FILE_UTILS_H
 
 #include "sudoku_board.h"
 

@@ -85,3 +85,22 @@ int is_legal(int x, int y, int value, Board* board, int is_fix){
         return 0;
     return 1;
 }
+
+void copy_board(Board* from_board,Board* to_board){
+    int size = from_board->num_of_columns * from_board->num_of_rows;
+    to_board->num_of_columns = from_board->num_of_columns;
+    to_board->num_of_rows = from_board->num_of_rows;
+    to_board->mode = from_board->mode;
+    to_board->mark_errors = from_board->mark_errors; 
+    copy_board_values(to_board->cur_board,from_board->cur_board,size);
+    copy_board_values(to_board->fixed_board,from_board->fixed_board,size);
+    copy_board_values(to_board->solved_board,from_board->solved_board,size);
+}
+
+void free_board(Board* board){
+    int size = (board->num_of_rows)*(board->num_of_columns);
+    free_2d_array(board->solved_board,size);
+    free_2d_array(board->fixed_board,size);
+    free_2d_array(board->cur_board,size);
+    free(board);
+}

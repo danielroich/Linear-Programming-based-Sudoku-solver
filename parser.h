@@ -3,7 +3,7 @@
 #define EX3_PARSER_H
 
 #include "sudoku_board.h"
-#include "moves_list.h"
+#include "moves.h"
 
 int parse_command(char* command, Board* board, Moves* moves);
 

@@ -4,9 +4,8 @@
 #include "backtracking_core_logic.h"
 #include "puzzle_generator.h"
 #include "2d_array_utils.h"
-#include "files_utils.h"
+#include "file_utils.h"
 #include "stack_backtrack_logic.h"
-#include "moves_list.h"
 #include "puzzle_generator.h"
 
 int is_erroneous(Board* board){
@@ -30,7 +29,6 @@ int is_filled(Board* board){
     int size = (board->num_of_rows)*(board->num_of_columns);
     if(board->count_filled == size*size){
         return 1;
-        /*From this point, all commands except exit and restart are considered invalid.*/
     }
     return 0;
 }
@@ -55,12 +53,8 @@ int is_winner(Board* board){
 /*COMMAND 17*/
 /* free memo and exit*/
 void exit_game(Board* board){
-    int size = (board->num_of_rows)*(board->num_of_columns);
     printf("Exiting...\n");
-    free_2d_array(board->solved_board,size);
-    free_2d_array(board->fixed_board,size);
-    free_2d_array(board->cur_board,size);
-    free(board);
+    free_board(board);
     exit(0);
 }
 

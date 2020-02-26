@@ -1,6 +1,5 @@
 #include "parser.h"
 #include "sudoku_board_actions.h"
-#include "moves_list.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -11,7 +10,7 @@ int main(int argc, char *argv[]) {
     int seed_num;
     char* command = (char*) malloc((sizeof(char)*1024));
     Board* board = (Board*) malloc((sizeof(Board)));
-    Moves* moves = {0};
+    Moves* moves;
 
     if(command==NULL){
         printf("Error: malloc has failed\n");
