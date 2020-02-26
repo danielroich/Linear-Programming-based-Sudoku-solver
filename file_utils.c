@@ -21,12 +21,16 @@ int write_file_from_board (Board* board,const char* path){
                 fprintf(fptr,"%d. ",board->fixed_board[i][j]);
             }
             else{
-                if(board->cur_board[i][j] != BOARD_NULL_VALUE){
+                if(board->cur_board[i][j] != BOARD_NULL_VALUE && board->mode == SOLVE){
                     fprintf(fptr,"%d ",board->cur_board[i][j]);
                 }
                 else
                 {
-                    fprintf(fptr,"0 ");
+                    if(board->cur_board[i][j] != BOARD_NULL_VALUE && board->mode == EDIT){
+                        fprintf(fptr,"%d. ",board->cur_board[i][j]);
+                    }
+                    else
+                        fprintf(fptr,"0 ");
                 } 
             }
         }

@@ -197,6 +197,13 @@ int redo(Board* board, Moves* moves){
 /*COMMAND 11*/
 int save(Board* board, char* path){
     int succeeded;
+    if(is_erroneous_board(board)){
+        printf("Error: erroneous boards can't be saved \n");
+        return 0;
+    }
+    /*if(!validate_board(board)){
+        return 0;
+    } TODO */
     succeeded = write_file_from_board(board,path);
     return succeeded;
 }
@@ -226,7 +233,9 @@ int number_solutions(Board* board) {
 }
 
 /*COMMAND 15*/
-void autofill();
+int autofill(){
+    return 0;
+}
 
 /*COMMAND 16*/
 void reset();
