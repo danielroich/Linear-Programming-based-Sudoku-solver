@@ -20,9 +20,8 @@ void hint(int x, int y, Board* board);
 int number_solutions(Board* board);
 int autofill(Board* board);
 void reset(Curr_move move, Board* board);
-void exit_game(Board* board);
+void exit_game(Board* board, Curr_move move);
 
-void restart(Board* board);
 void seed(int seed);
 int is_winner(Board* board);
 

@@ -17,10 +17,10 @@ int is_winner(Board* board){
 
 /*COMMAND 17*/
 /* free memo and exit*/
-void exit_game(Board* board){
+void exit_game(Board* board, Curr_move move){
     printf("Exiting...\n");
     free_board(board);
-    /*TODO: free moves*/
+    clean_list(move);
     exit(0);
 }
 
@@ -30,9 +30,8 @@ int solve(Board* board, char* path){
     succeeded = read_file_to_board(board,path,1);
     if(succeeded == 0){
         printf("Error: invalid file\n");
-        board->mode = INIT;
         return 0;
-        /*dont have to clean board still in INIT mode*/
+        /*board->mode = INIT; or stay ? dont have to clean board still in INIT mode*/
     }
     else{
         board->mode=SOLVE;
@@ -50,9 +49,8 @@ int edit(Board* board, char* path) {
         succeeded = read_file_to_board(board,path,0);
         if(succeeded == 0){
             printf("Error: invalid file\n");
-            board->mode = INIT;
             return 0;
-            /*dont have to clean board still in INIT mode*/
+        /*board->mode = INIT; or stay ? dont have to clean board still in INIT mode*/
         }
     }
     board->mode = EDIT; 
@@ -264,43 +262,6 @@ void reset(Curr_move move, Board* board){
         back_to_first_move(move);
         copy_board((*move)->Board_state,board);
     }
-}
-
-/* TODO: not an action! use in the start?
-set BOARD_NULL_VALUE to cur/solved/fixed and count_filled = 0
-call generate_puzzle with user new fixed */
-void restart(Board* board){
-    int fixed, i, j;
-    int size = (board->num_of_rows)*(board->num_of_columns);
-    int max_fill = size*size-1;
-    int count_scan;
-    printf("Please enter the number of cells to fill [0-%d]:\n",max_fill);
-
-    count_scan = scanf("%d",&fixed);
-    if(feof(stdin)){exit_game(board);}
-    if(count_scan == 0){printf("Error: not a number\n");exit_game(board);}
-    /*if(count_scan < 0){printf("Error: scanf has failed\n");exit(0);}*/
-
-    while(fixed<0 || fixed>max_fill){ /*assume the user enters a single valid integer*/
-        printf("Error: invalid number of cells to fill (should be between 0 and %d)\n",max_fill);
-        printf("Please enter the number of cells to fill [0-%d]:\n",max_fill);
-        count_scan = scanf("%d",&fixed);
-        if(feof(stdin)){exit_game(board);}
-        if(count_scan == 0){printf("Error: not a number\n");exit_game(board);}
-        /*if(count_scan < 0){printf("Error: scanf has failed\n");exit(0);}*/
-    }
-
-    /*null values board*/
-    for(i=0; i<size; i++){
-        for(j=0; j<size; j++){
-            board->cur_board[i][j]=BOARD_NULL_VALUE;
-            board->solved_board[i][j]=BOARD_NULL_VALUE;
-            board->fixed_board[i][j]=BOARD_NULL_VALUE;
-            board->count_filled = 0;
-        }
-    }
-    generate_puzzle(board, fixed);
-    print_board(board);
 }
 
 void seed(int seed) {

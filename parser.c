@@ -206,7 +206,7 @@ int parse_command(char* command, Board* board, Curr_move move){
     /*COMMAND 17*/
     if(strcmp(token, "exit") == 0){
         free(command);
-        exit_game(board);
+        exit_game(board, move);
         return 17;
     }
 

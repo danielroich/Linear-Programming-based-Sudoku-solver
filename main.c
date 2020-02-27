@@ -11,15 +11,8 @@ int main(int argc, char *argv[]) {
     char* command = (char*) malloc((sizeof(char)*1024));
     Board* board = (Board*) malloc((sizeof(Board)));
     Curr_move move = (Move**)malloc(sizeof(Move*));
-    *move = NULL; /*TODO?*/
 
-    if(command==NULL){
-        printf("Error: malloc has failed\n");
-        free(board);
-        free(command);
-        exit(0);
-    }
-    if(board==NULL) {
+    if(command==NULL || board==NULL || move==NULL){
         printf("Error: malloc has failed\n");
         free(board);
         free(command);
@@ -33,16 +26,16 @@ int main(int argc, char *argv[]) {
 
         seed_num = atoi(argv[1]);
     }
-
     seed(seed_num);
-    create_empty_board(board,2,4);
-    restart(board);
+
+    printf("Welcome to sudoku! please load board to start.\n");
+    *move = NULL; /*TODO?*/
 
     while(fgets(command,1024,stdin) && !feof(stdin)){
         parse_command(command, board, move);
     }
 
     free(command);
-    exit_game(board);
+    exit_game(board,move);
     return 0;
 }
