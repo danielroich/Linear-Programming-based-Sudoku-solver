@@ -467,29 +467,27 @@ int validate(Board* board) {
 	  return -1;
   }
 
-  /* get the objective -- the optimal result of the function */
-  error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
-  if (error) {
-	  printf("ERROR %d GRBgettdblattr(): %s\n", error, GRBgeterrormsg(env));
-	  return -1;
-  }
-
-  /* get the solution - the assignment to each variable */
-  error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, num_of_params, sol);
-  if (error) {
-	  printf("ERROR %d GRBgetdblattrarray(): %s\n", error, GRBgeterrormsg(env));
-	  return -1;
-  }
-
-  /* print results */
-  printf("\nOptimization complete\n");
-  
-  /* solution found */
   if (optimstatus == GRB_OPTIMAL) {
-    printf("Optimal objective: %.4e\n", objval);
-    
-    print_results(board,sol,num_of_params);
+
+       /* print results */
+        printf("\nOptimization complete\n");
+
+        error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
+        if (error) {
+            printf("ERROR %d GRBgettdblattr(): %s\n", error, GRBgeterrormsg(env));
+            return -1;
+        }
+        
+        /* get the solution - the assignment to each variable */
+        error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, num_of_params, sol);
+        if (error) {
+            printf("ERROR %d GRBgetdblattrarray(): %s\n", error, GRBgeterrormsg(env));
+            return -1;
+        }
+
+        print_results(board,sol,num_of_params);
   }
+
   /* no solution found */
   else if (optimstatus == GRB_INF_OR_UNBD) {
     printf("Model is infeasible or unbounded\n");

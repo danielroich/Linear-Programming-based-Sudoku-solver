@@ -152,10 +152,10 @@ void validate_board(Board* board){
     int size = board->num_of_rows * board->num_of_columns;
     cur_board_copy = create_2d_array(size);
     copy_board_values(cur_board_copy, board->cur_board, size);
-    
+    /*
     valid_board = validate(board);
     
-
+    */
     copy_board_values(board->cur_board, cur_board_copy, size);
     free_2d_array(cur_board_copy, size);
 
