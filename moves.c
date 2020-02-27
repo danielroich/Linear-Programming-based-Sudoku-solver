@@ -2,69 +2,71 @@
 #include "stdio.h"
 #include "stdlib.h"
 
-void free_node(Moves* node){
-    free_board(node->Board_state);
+
+void free_node(Move* node){
+    if(node->Board_state != NULL)
+        free_board(node->Board_state);
     free(node->next);
     free(node->prev);
     free(node);
 }
 
-/* for moves: solve, edit */
-void clean_list(Moves* moves){
-    Moves* node = moves;
-    back_to_first_move(node);
-    while(node){
-        Moves* next = node->next;
-        free_node(node);
-        node = next;
-    }
-}
-
-/* for moves: set, autofill, generate, guess */
-void clean_nexts(Moves* moves){
-    Moves* node = moves;
-    if(node){
-        node=node->next;
-    }
-    while(node){
-        Moves* next = node->next;
-        free_node(node);
-        node = next;
-    }
-}
-
 /* for move: reset */
-void back_to_first_move(Moves* moves){
-    if(moves){
-        while(moves->prev)
+void back_to_first_move(Curr_move move){
+    if(move && (*move)){
+        while((*move)->prev)
         {
-            moves = moves->prev;
+            (*move) = (*move)->prev;
         }
     }
 }
 
 /* for move: redo*/
-int curr_to_next(Moves* moves){
-    if(moves  && (moves->next))
+int curr_to_next(Curr_move move){
+    if(move && (*move) && (*move)->next)
     {
-        moves = moves->next;
+        (*move) = (*move)->next;
         return 1;
     }
     return 0;
 }
 
 /* for move: undo*/
-int curr_to_prev(Moves* moves){
-    if(moves && (moves->prev))
-        {
-            moves = moves->prev;
-            return 1;
-        }
+int curr_to_prev(Curr_move move){
+    if(move && (*move) && (*move)->prev)
+    {
+        (*move) = (*move)->prev;
+        return 1;
+    }
     return 0;
 }
 
-void add_new_move(Moves* moves, Board* board){
-    Moves* new_node =(Moves*)malloc(sizeof(Moves));
+/* for moves: solve, edit */
+void clean_list(Curr_move move){
+    back_to_first_move(move);
+    clean_nexts(move);
+    if(move && *move)
+        free_node(*move);
+}
+
+/* for moves: set, autofill, generate, guess */
+void clean_nexts(Curr_move move){
+    Move* next_node;
+    Curr_move next_move;
+    if(move && *move){
+        next_move = &((*move)->next);
+        if(next_move){
+            while(*next_move){
+                next_node = (*next_move)->next;
+                free_node((*next_move));
+                (*next_move) = next_node;
+            }
+        } 
+    }      
+}
+
+void add_new_move(Curr_move move, Board* board){
+    Move* new_node =(Move*)malloc(sizeof(Move));
     
     if(new_node==NULL){
         printf("Error: malloc has failed\n");
@@ -76,13 +78,12 @@ void add_new_move(Moves* moves, Board* board){
     copy_board(board,new_node->Board_state);
     new_node->next=NULL;
 
-    if(moves == NULL){ /*emptylist*/    
+    if((*move) == NULL){ /*emptylist*/    
         new_node->prev=NULL;
     }
     else{ /*call only when moves is the last node*/
-        moves->next=new_node;
-        new_node->prev=moves;
+        (*move)->next=new_node;
+        new_node->prev=(*move);
     }
-    moves=new_node;
+    *move=new_node;
 }
-

@@ -174,22 +174,22 @@ void guess(float threshold);
 void generate();
 
 /*COMMAND 9*/
-int undo(Board* board, Moves* moves){
-    if(!curr_to_prev(moves)){
+int undo(Board* board, Curr_move move){
+    if(!curr_to_prev(move)){
         return 0;
     }
-    print_diff(board,moves->Board_state);
-    copy_board(moves->Board_state,board);
+    print_diff(board,(*move)->Board_state);
+    copy_board((*move)->Board_state,board);
     return 1;
 }
 
 /*COMMAND 10*/
-int redo(Board* board, Moves* moves){
-    if(!curr_to_next(moves)){
+int redo(Board* board, Curr_move move){
+    if(!curr_to_next(move)){
         return 0;
     }
-    print_diff(board,moves->Board_state);
-    copy_board(moves->Board_state,board);
+    print_diff(board,(*move)->Board_state);
+    copy_board((*move)->Board_state,board);
     return 1;
 }
 
@@ -260,11 +260,11 @@ int autofill(Board* board){
 }
 
 /*COMMAND 16*/
-void reset(Moves* moves, Board* board){
+void reset(Curr_move move, Board* board){
     /*first move is load in EDIT/SOLVE, therefore moves!=NULL*/
-    if(moves->prev){
-        back_to_first_move(moves);
-        copy_board(moves->Board_state,board);
+    if((*move)->prev){
+        back_to_first_move(move);
+        copy_board((*move)->Board_state,board);
     }
 }
 

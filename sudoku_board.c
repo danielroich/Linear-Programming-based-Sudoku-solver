@@ -151,7 +151,7 @@ void print_diff(Board* before, Board* after){
     int size = (before->num_of_rows)*(before->num_of_columns);
     /* mode cant change, solve/edit clean moves. therefore, same sizes*/
     if(before->mark_errors != after->mark_errors){
-        printf("mark_errors parameter cheanged from %d to %d",before->mark_errors,after->mark_errors);
+        printf("mark_errors parameter changed from %d to %d \n",before->mark_errors,after->mark_errors);
     }
     else{
         for (i=0; i<size; i++){
@@ -165,7 +165,7 @@ void print_diff(Board* before, Board* after){
                     if(after_val == BOARD_NULL_VALUE){
                         after_val = 0;
                     }
-                    printf("cell (%d,%d) changed from %d to %d",j+1,i+1,before_val,after_val);
+                    printf("cell (%d,%d) changed from %d to %d \n",j+1,i+1,before_val,after_val);
                 }
             }
         }

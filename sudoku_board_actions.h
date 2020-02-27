@@ -12,14 +12,14 @@ void print_board(Board* board);
 int set_value_user(int x, int y, int value, Board* board);
 void validate_board(Board* board);
 
-int undo(Board* board, Moves* moves);
-int redo(Board* board, Moves* moves);
+int undo(Board* board, Curr_move move);
+int redo(Board* board, Curr_move move);
 int save(Board* board, char* path);
 void hint(int x, int y, Board* board);
 
 int number_solutions(Board* board);
 int autofill(Board* board);
-void reset(Moves* moves, Board* board);
+void reset(Curr_move move, Board* board);
 void exit_game(Board* board);
 
 void restart(Board* board);

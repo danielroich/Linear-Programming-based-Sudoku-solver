@@ -7,7 +7,7 @@
 /* interpret user input and call actions
 return num op or 0 if invalid command
 if board filled can restart and exit only */
-int parse_command(char* command, Board* board, Moves* moves){
+int parse_command(char* command, Board* board, Curr_move move){
     int x,y,z;
     char* token;
     int succeeded;
@@ -24,8 +24,8 @@ int parse_command(char* command, Board* board, Moves* moves){
             return 0;}
         succeeded = solve(board,token);
         if(succeeded){
-            clean_list(moves);
-            add_new_move(moves,board);
+            clean_list(move);
+            add_new_move(move,board);
             return 1;
         }
         return 0;
@@ -39,8 +39,8 @@ int parse_command(char* command, Board* board, Moves* moves){
         }
         succeeded = edit(board,token);
         if(succeeded){
-            clean_list(moves);
-            add_new_move(moves,board);
+            clean_list(move);
+            add_new_move(move,board);
             return 2;
         }
         return 0;
@@ -58,7 +58,7 @@ int parse_command(char* command, Board* board, Moves* moves){
              return 0;       
         }
         mark_errors(board,x);
-        add_new_move(moves,board);
+        add_new_move(move,board);
         return 3;
     }
 
@@ -91,8 +91,8 @@ int parse_command(char* command, Board* board, Moves* moves){
 
         succeeded = set_value_user(y-1,x-1,z,board);
         if(succeeded == 1){
-            clean_nexts(moves);
-            add_new_move(moves,board);
+            clean_nexts(move);
+            add_new_move(move,board);
         }
         return 5;
     }
@@ -116,7 +116,7 @@ int parse_command(char* command, Board* board, Moves* moves){
 
     /*COMMAND 9*/
     if(strcmp(token,"undo")==0 && board->mode != INIT){
-        succeeded = undo(board,moves);
+        succeeded = undo(board,move);
         if (!succeeded){
             printf("Error: There are no moves to undo\n");
             return 0;
@@ -126,7 +126,7 @@ int parse_command(char* command, Board* board, Moves* moves){
 
     /*COMMAND 10*/
     if(strcmp(token,"redo")==0 && board->mode != INIT){
-        succeeded = redo(board,moves);
+        succeeded = redo(board,move);
         if (!succeeded){
             printf("Error: There are no moves to redo\n");
             return 0;
@@ -181,8 +181,8 @@ int parse_command(char* command, Board* board, Moves* moves){
     if(strcmp(token,"autofill")==0 && board->mode == SOLVE){
         succeeded = autofill(board);
         if(succeeded){
-            clean_nexts(moves);
-            add_new_move(moves,board);
+            clean_nexts(move);
+            add_new_move(move,board);
             return 15;
         }
         return 0;
@@ -190,7 +190,7 @@ int parse_command(char* command, Board* board, Moves* moves){
 
     /*COMMAND 16*/
     if(strcmp(token,"reset") ==0 && board->mode != INIT){
-        reset(moves,board);
+        reset(move,board);
         return 16;
     }
 
