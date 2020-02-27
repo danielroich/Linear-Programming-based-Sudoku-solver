@@ -60,9 +60,10 @@ int is_legal(int x, int y, int value, Board* board, int is_fix){
 
 int set_value(int x, int y, int value, Board* board,int is_fix){
     if(is_legal(x,y,value,board,is_fix)==0){
-        return 0;}     
+        return 0;} 
+    if(board->cur_board[x][y] == BOARD_NULL_VALUE)
+        board->count_filled++;    
     board->cur_board[x][y] = value;
-    board->count_filled++;
     return 1;
 }
 
@@ -77,8 +78,9 @@ int erase_value(int x, int y, Board* board) {
 }
 
 void set_value_without_check(int x, int y, int value, Board* board){
+    if(board->cur_board[x][y] == BOARD_NULL_VALUE)
+        board->count_filled++;
     board->cur_board[x][y] = value;    
-    board->count_filled++;
 }
 
 int create_empty_board(Board* board, int rows, int columns) {
@@ -88,6 +90,7 @@ int create_empty_board(Board* board, int rows, int columns) {
     board->cur_board  = create_2d_array(size);
     board->fixed_board  = create_2d_array(size);
     board->solved_board  = create_2d_array(size);
+    board->count_filled = 0;
     board->mode = INIT;
     board->mark_errors = 1; 
     return 1;
@@ -97,6 +100,7 @@ void copy_board(Board* from_board,Board* to_board){
     int size = from_board->num_of_columns * from_board->num_of_rows;
     /*assmue  allocate same sizes?*/
     to_board->mode = from_board->mode;
+    to_board->count_filled = from_board->count_filled;
     to_board->mark_errors = from_board->mark_errors; 
     copy_board_values(to_board->cur_board,from_board->cur_board,size);
     copy_board_values(to_board->fixed_board,from_board->fixed_board,size);

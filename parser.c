@@ -5,8 +5,7 @@
 #include <stdlib.h>
 
 /* interpret user input and call actions
-return num op or 0 if invalid command
-if board filled can restart and exit only */
+return num op or 0 if invalid command/error */
 int parse_command(char* command, Board* board, Curr_move move){
     int x,y,z;
     char* token;
@@ -26,6 +25,7 @@ int parse_command(char* command, Board* board, Curr_move move){
         if(succeeded){
             clean_list(move);
             add_new_move(move,board);
+            print_board(board);
             return 1;
         }
         return 0;
@@ -41,6 +41,7 @@ int parse_command(char* command, Board* board, Curr_move move){
         if(succeeded){
             clean_list(move);
             add_new_move(move,board);
+            print_board(board);
             return 2;
         }
         return 0;
@@ -93,8 +94,10 @@ int parse_command(char* command, Board* board, Curr_move move){
         if(succeeded == 1){
             clean_nexts(move);
             add_new_move(move,board);
+            print_board(board);
+            return 5;
         }
-        return 5;
+        return 0;
     }
 
     /*COMMAND 6 TODO*/
@@ -106,11 +109,13 @@ int parse_command(char* command, Board* board, Curr_move move){
 
     /*COMMAND 7 TODO*/
     if(strcmp(token,"guess")==0 && board->mode == SOLVE){
+        print_board(board); /*if success*/
         return 7;
     }
 
     /*COMMAND 8 TODO*/
     if(strcmp(token,"generate")==0 && board->mode == EDIT){
+        print_board(board); /*if success*/
         return 8;
     }
 
@@ -121,6 +126,7 @@ int parse_command(char* command, Board* board, Curr_move move){
             printf("Error: There are no moves to undo\n");
             return 0;
         }
+        print_board(board);
         return 9;
     }
 
@@ -131,6 +137,7 @@ int parse_command(char* command, Board* board, Curr_move move){
             printf("Error: There are no moves to redo\n");
             return 0;
         }
+        print_board(board);
         return 10;
     }
 
@@ -183,6 +190,7 @@ int parse_command(char* command, Board* board, Curr_move move){
         if(succeeded){
             clean_nexts(move);
             add_new_move(move,board);
+            print_board(board);
             return 15;
         }
         return 0;
@@ -191,6 +199,7 @@ int parse_command(char* command, Board* board, Curr_move move){
     /*COMMAND 16*/
     if(strcmp(token,"reset") ==0 && board->mode != INIT){
         reset(move,board);
+        print_board(board);
         return 16;
     }
 

@@ -70,6 +70,7 @@ void print_board(Board* board){
     int a, b, c, d;
     int row, col, value;
     int separator, i;
+    /*printf("count_filled %d \n",board->count_filled); del!*/ 
     separator = 4*board->num_of_columns*board->num_of_rows + board->num_of_rows + 1;
     for(a = 0; a < board->num_of_columns; a++){ 
         
@@ -85,7 +86,7 @@ void print_board(Board* board){
                 for(d = 0; d < board->num_of_columns; d++){
                     col = d + c*board->num_of_columns;
                     value = get_value(row,col,board,0);
-                    if(board->fixed_board[row][col] != BOARD_NULL_VALUE){
+                    if(board->fixed_board[row][col] != BOARD_NULL_VALUE && board->mode==SOLVE){
                         printf(" %2d.",value);
                     }
                     else{
@@ -113,6 +114,11 @@ void print_board(Board* board){
         }
     printf("\n");
 
+    if(board->mode == SOLVE && is_winner(board)){
+        printf("Puzzle solved successfully\n");
+        board->mode = INIT;
+    }
+
 }
 
 /*COMMAND 5*/
@@ -129,17 +135,9 @@ int set_value_user(int x, int y, int value, Board* board){
     }
     if(value == 0){
         erase_value(x,y,board);
-        print_board(board);
         return 1;
     }
     set_value_without_check(x,y,value,board);
-    if(board->mode == EDIT){
-       board->fixed_board[x][y] = value; 
-    }
-    print_board(board);
-    if(is_winner(board) == 1){
-        printf("Puzzle solved successfully\n");
-    }
     return 1;   
 }
 
