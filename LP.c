@@ -51,17 +51,8 @@ void print_results(Board* board, double* sol, int num_of_params) {
         {
             if (get_value(i,j,board,0) == BOARD_NULL_VALUE)
             {
-                printf("printing sol for index: %d, %d\n",i,j);
                 temp_counter= counter;
                 counter += get_possible_values(board,i,j,possible_values);
-                printf("temp_counter = %d counter = %d \n",temp_counter,counter);
-                printf("possible values are: \n");
-                for (s = 0; s < board_size; s++)
-                {
-                    if(possible_values[s] == 1)
-                        printf("%d",(s+1));
-                }
-                printf("\n");
                 for (k = temp_counter; k < counter; k++)
                 {
                     if (sol[k] == 1)
@@ -104,7 +95,6 @@ int add_single_value_per_cell_constraints(Board* board, GRBmodel *model, int *in
     {
         for (j = 0; j < board_size; j++)
         {
-            printf("adding single value constraint to index %d,%d\n", i,j);
             possible_value_size = get_possible_values(board,i,j, possible_values);
 
             if (possible_value_size == -1)
@@ -112,7 +102,6 @@ int add_single_value_per_cell_constraints(Board* board, GRBmodel *model, int *in
 
             for (k = 0; k < possible_value_size; k++)
             {
-                printf("marked 1 to index %d in ind array for gurobi\n", counter);
                 ind[k] = counter;
                 val[k] = 1;
                 counter++;
@@ -123,6 +112,7 @@ int add_single_value_per_cell_constraints(Board* board, GRBmodel *model, int *in
             sprintf(i_char, "%d",chars_to_copy);
             strcat(unique_name,i_char);
 
+            printf("adding single square constraint to gutobi with: %d values for index: %d,%d\n", possible_value_size,i,j);
             error = GRBaddconstr(model, possible_value_size, ind, val, GRB_EQUAL,1, unique_name);
             if (error) {
                 printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
@@ -150,7 +140,6 @@ int add_rows_constraints(Board* board, GRBmodel *model, int *ind, double *val, G
     char i_char[4096];
     int val_written = 0;
     int error = 0;
-    int temp_counter;
     int board_size = board->num_of_columns * board->num_of_rows;
     int optional_occurences = 0;
     char unique_name[2048] = "b";
@@ -166,24 +155,22 @@ int add_rows_constraints(Board* board, GRBmodel *model, int *ind, double *val, G
 
                 possible_value_size = get_possible_values(board,i,j, possible_values);
                 
-                printf("adding row value constraint to index %d,%d for number %d\n", i,j, value_of_constraint + 1);
-                temp_counter = counter;
-
                 for (k = 0; k < board_size; k++)
                 {
                     if (possible_values[k] == 1)
                     {
-                        if (k - temp_counter == value_of_constraint)
+                        if (k == value_of_constraint)
                         {
-                            printf("marked 1 to index %d in ind array for gurobi\n", counter);
+                            ind[optional_occurences] = counter;
+                            val[optional_occurences] = 1;
                             ++optional_occurences;
-                            ind[k] = counter;
-                            val[k] = 1;
+
                         }
                         ++counter;
                     }   
                 }
-   
+             }
+
             if(optional_occurences == 0)
                 continue;
 
@@ -192,6 +179,7 @@ int add_rows_constraints(Board* board, GRBmodel *model, int *ind, double *val, G
             sprintf(i_char, "%d",chars_to_copy);
             strcat(unique_name,i_char);
 
+            printf("adding row constraint to gutobi with: %d values for row number: %d and for checked value: %d\n", optional_occurences,i,value_of_constraint+1);
             error = GRBaddconstr(model, optional_occurences, ind, val, GRB_EQUAL, 1, unique_name);
             if (error) {
                 printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
@@ -204,9 +192,8 @@ int add_rows_constraints(Board* board, GRBmodel *model, int *ind, double *val, G
                 ind[k] = 0;
                 val[k] = 0;
 
-            }       
-        }
-    } 
+            }     
+        } 
      } 
     return 1;
 }
@@ -215,44 +202,43 @@ int add_column_constraints(Board* board, GRBmodel *model, int *ind, double *val,
     int i;
     int j;
     int k;
-    int index_to_check;
+    int value_of_constraint;
     char i_char[4096];
     int board_size = board->num_of_columns * board->num_of_rows;
     int error = 0;
     int optional_occurences = 0;
     char unique_name[2048] = "c";
     int counter = 0;
-    int val_written = 0;
     int chars_to_copy;
     int column_to_check;
     int* possible_values = (int*)calloc(board_size, sizeof(int));
     int possible_value_size;
-     for (index_to_check = 0; index_to_check < board_size; index_to_check++)
+     for (value_of_constraint = 0; value_of_constraint < board_size; value_of_constraint++)
      {
-         for (column_to_check = 0; column_to_check < board->num_of_columns; column_to_check++)
+         for (column_to_check = 0; column_to_check < board_size; column_to_check++)
          {
-            for (i = 0; i < board->num_of_rows; i++) {
+            counter = 0;
+            optional_occurences=0;
+            for (i = 0; i < board_size; i++) {
 
-                for (j = 0; j < board->num_of_columns; j++)
+                for (j = 0; j < board_size; j++)
                 {
                     possible_value_size = get_possible_values(board,i,j, possible_values);
 
-                    if (possible_value_size == -1)
-                        continue;
-
-                    for (k = 0; k < possible_value_size; k++)
-                    {
-                        if (j == column_to_check && possible_values[index_to_check] == 1 && val_written == 0)
+                    for (k = 0; k < board_size; k++)
                         {
-                            val_written = 1;
-                            ++optional_occurences;
-                            ind[k] = k + counter;
-                            val[k] = 1;
-                        }   
-                        counter++;
-                    }
+                            if (possible_values[k] == 1)
+                            {
+                                if (k == value_of_constraint && j == column_to_check)
+                                {
+                                    ind[optional_occurences] = counter;
+                                    val[optional_occurences] = 1;
+                                    ++optional_occurences;
 
-                    val_written = 0;
+                                }
+                                ++counter;
+                            }   
+                        }
                 }     
             }
 
@@ -260,10 +246,11 @@ int add_column_constraints(Board* board, GRBmodel *model, int *ind, double *val,
                     continue;
 
             /* generate unique name by concatinating i value to the unique name string */
-            chars_to_copy = (int)((ceil(log10(i))+1)*sizeof(char));
+            chars_to_copy = i != 0 ? (int)((ceil(log10(i))+1)*sizeof(char)) : 1;
             sprintf(i_char, "%d",chars_to_copy);
             strcat(unique_name,i_char);
 
+            printf("adding column constraint to gutobi with: %d values for column number: %d and for checked value: %d\n", optional_occurences,column_to_check,value_of_constraint+1);
             error = GRBaddconstr(model, optional_occurences, ind, val, GRB_EQUAL, 1, unique_name);
             if (error) {
                 printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
@@ -286,39 +273,45 @@ int add_square_constraints(Board* board, GRBmodel *model, int *ind, double *val,
     int i;
     int j;
     int k;
-    int index_to_check;
+    int square_index_to_check;
+    int value_of_constraint;
+    int possible_value_size;
     char i_char[4096];
     int board_size = board->num_of_columns * board->num_of_rows;
     int error = 0;
     int optional_occurences = 0;
     char unique_name[2048] = "d";
     int counter = 0;
-    int val_written = 0;
     int chars_to_copy;
     int value_to_check;
     int top_left_corner_row;
     int top_left_corner_col;
+    int square_index;
     int **square_num_matrix = (int**) malloc(sizeof(int*) * board->num_of_columns);
-    for (i = 0; i < board->num_of_rows; i++)
+    int* possible_values = (int*)calloc(board_size, sizeof(int));
+
+    printf("creating square index matrix for %d num of rows and %d num of cols\n", board->num_of_rows, board->num_of_columns);
+    for (i = 0; i < board->num_of_columns; i++)
     {
         square_num_matrix[i] = (int*) malloc(sizeof(int) * board->num_of_rows);
-        for (j = 0; i < board->num_of_rows; i++)
+        for (j = 0; j < board->num_of_rows; j++)
         {
             square_num_matrix[i][j] = counter;
             ++counter;
-        }     
+            printf("%d,",square_num_matrix[i][j]);
+        }  
+        printf("\n");
     }
-    counter = 0;
     
-    int* possible_values = (int*)calloc(board_size, sizeof(int));
-    int possible_value_size;
-     for (index_to_check = 0; index_to_check < board_size; index_to_check++)
+     for (value_of_constraint = 0; value_of_constraint < board_size; value_of_constraint++)
      {
-         for (value_to_check = 0; value_to_check < board->num_of_columns; value_to_check++)
+         for (square_index_to_check = 0; square_index_to_check < board_size; square_index_to_check++)
          {
-            for (i = 0; i < board->num_of_rows; i++) {
+            counter = 0;
+            optional_occurences=0;
+            for (i = 0; i < board_size; i++) {
 
-                for (j = 0; j < board->num_of_columns; j++)
+                for (j = 0; j < board_size; j++)
                 {
                     possible_value_size = get_possible_values(board,i,j, possible_values);
 
@@ -327,21 +320,21 @@ int add_square_constraints(Board* board, GRBmodel *model, int *ind, double *val,
 
                     top_left_corner_row = floor(i/board->num_of_rows)*board->num_of_rows; 
                     top_left_corner_col = floor(j/board->num_of_columns)*board->num_of_columns; 
+                    square_index = square_num_matrix[(top_left_corner_row / board->num_of_columns)][(top_left_corner_col / board->num_of_rows)];
 
-                    for (k = 0; k < possible_value_size; k++)
-                    {
-                        if (square_num_matrix[(top_left_corner_row / board->num_of_columns)][(top_left_corner_col / board->num_of_rows)]
-                         == index_to_check && possible_values[value_to_check] == 1 && val_written == 0)
-                        {
-                            val_written = 1;
-                            ++optional_occurences;
-                            ind[k] = k + counter;
-                            val[k] = 1;
-                        }   
-                        counter++;
-                    }
+                    for (k = 0; k < board_size; k++){
+                            if (possible_values[k] == 1)
+                            {
+                                if (k == value_of_constraint && square_index== square_index_to_check)
+                                {
+                                    ind[optional_occurences] = counter;
+                                    val[optional_occurences] = 1;
+                                    ++optional_occurences;
 
-                    val_written = 0;
+                                }
+                                ++counter;
+                            }   
+                        }
                 }     
             }
 
@@ -349,10 +342,11 @@ int add_square_constraints(Board* board, GRBmodel *model, int *ind, double *val,
                     continue;
 
             /* generate unique name by concatinating i value to the unique name string */
-            chars_to_copy = (int)((ceil(log10(i))+1)*sizeof(char));
+            chars_to_copy = i != 0 ? (int)((ceil(log10(i))+1)*sizeof(char)) : 1;
             sprintf(i_char, "%d",chars_to_copy);
             strcat(unique_name,i_char);
 
+            printf("adding square constraint to gutobi with: %d values for square number: %d and for checked value: %d\n", optional_occurences,square_index_to_check,value_of_constraint+1);
             error = GRBaddconstr(model, optional_occurences, ind, val, GRB_EQUAL, 1, unique_name);
             if (error) {
                 printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
@@ -445,11 +439,11 @@ int validate(Board* board) {
   add_single_value_per_cell_constraints(board,model,ind,val, env);
    
   add_rows_constraints(board,model,ind,val, env);
- /*
+
   add_column_constraints(board,model,ind,val, env);
 
   add_square_constraints(board,model,ind,val, env);
-  */
+
 
   /* Optimize model - need to call this before calculation */
   error = GRBoptimize(model);
@@ -481,7 +475,6 @@ int validate(Board* board) {
   }
 
   /* get the solution - the assignment to each variable */
-  /* 3-- number of variables, the size of "sol" should match */
   error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, num_of_params, sol);
   if (error) {
 	  printf("ERROR %d GRBgetdblattrarray(): %s\n", error, GRBgeterrormsg(env));

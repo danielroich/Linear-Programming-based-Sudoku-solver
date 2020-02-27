@@ -173,7 +173,8 @@ void print_diff(Board* before, Board* after){
 }
 
 int single_possible_value(int row, int col, Board* board){
-    int i,value;
+    /* Notice the change to 0 */
+    int i,value = 0;
     int count = 0;
     int size = board->num_of_columns * board->num_of_rows;
     for(i = 1; i<=size; i++){
