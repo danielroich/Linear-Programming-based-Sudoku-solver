@@ -2,12 +2,8 @@
 #include "stdio.h"
 #include "stdlib.h"
 
-
 void free_node(Move* node){
-    if(node->Board_state != NULL)
-        free_board(node->Board_state);
-    free(node->next);
-    free(node->prev);
+    free_board((node)->Board_state);
     free(node);
 }
 
@@ -45,35 +41,38 @@ int curr_to_prev(Curr_move move){
 void clean_list(Curr_move move){
     back_to_first_move(move);
     clean_nexts(move);
-    if(move && *move)
+    if(move && *move && (*move)->Board_state)
         free_node(*move);
+    *move = NULL;
 }
 
 /* for moves: set, autofill, generate, guess */
 void clean_nexts(Curr_move move){
-    Move* next_node;
-    Curr_move next_move;
+    Move *next_node, *next_node2;
     if(move && *move){
-        next_move = &((*move)->next);
-        if(next_move){
-            while(*next_move){
-                next_node = (*next_move)->next;
-                free_node((*next_move));
-                (*next_move) = next_node;
-            }
-        } 
-    }      
+        next_node =(*move)->next;
+        while(next_node){
+                next_node2 = (next_node)->next;
+                free_node(next_node);
+                next_node = next_node2;
+        }
+        (*move)->next = NULL;
+    } 
 }
 
 void add_new_move(Curr_move move, Board* board){
     Move* new_node =(Move*)malloc(sizeof(Move));
-    
     if(new_node==NULL){
         printf("Error: malloc has failed\n");
         /*TODO: free game*/
     }
 
     new_node->Board_state = (Board*) malloc((sizeof(Board)));
+    if(new_node==NULL){
+        printf("Error: malloc has failed\n");
+        /*TODO: free game*/
+    }
+
     create_empty_board(new_node->Board_state,board->num_of_rows,board->num_of_columns);
     copy_board(board,new_node->Board_state);
     new_node->next=NULL;
