@@ -20,6 +20,7 @@ int is_winner(Board* board){
 void exit_game(Board* board){
     printf("Exiting...\n");
     free_board(board);
+    /*TODO: free moves*/
     exit(0);
 }
 
@@ -40,7 +41,6 @@ int solve(Board* board, char* path){
 }  
 
 /*COMMAND 2*/
-/* in Edit mode we always mark errors, regardless of the value of the "mark errors", remains value*/
 int edit(Board* board, char* path) {
     if(path == NULL){
         create_empty_board(board,3,3); 
@@ -197,13 +197,14 @@ int redo(Board* board, Moves* moves){
 /*COMMAND 11*/
 int save(Board* board, char* path){
     int succeeded;
-    if(is_erroneous_board(board)){
-        printf("Error: erroneous boards can't be saved \n");
+    if(board->mode == EDIT && is_erroneous_board(board)){
+        printf("Error: in EDIT mode erroneous boards can't be saved \n");
         return 0;
     }
-    /*if(!validate_board(board)){
+    /*if(board->mode == EDIT && !validate_board(board)){
+        printf("Error: in EDIT mode boards without a solution can't be saved\n");
         return 0;
-    } TODO */
+    } TODO: validate to int-return-value */
     succeeded = write_file_from_board(board,path);
     return succeeded;
 }
@@ -222,11 +223,10 @@ void guess_hint();
 /*COMMAND 14*/
 int number_solutions(Board* board) {
     int number;
-    /*If the board is erroneous it is an error.
-    if(is_erroneous_board){
-        printf("Error:");
+    if(is_erroneous_board(board)){
+        printf("Error: erroneous board\n");
         return 0;
-    }*/
+    }
     number = stack_based_back_track(board);
     printf("the number of solutions is: %d \n",number);
     return 1;
@@ -261,8 +261,16 @@ int autofill(Board* board){
 }
 
 /*COMMAND 16*/
-void reset();
-/* set BOARD_NULL_VALUE to cur/solved/fixed and count_filled = 0
+void reset(Moves* moves, Board* board){
+    /*first move is load in EDIT/SOLVE, therefore moves!=NULL*/
+    if(moves->prev){
+        back_to_first_move(moves);
+        copy_board(moves->Board_state,board);
+    }
+}
+
+/* TODO: not an action! use in the start?
+set BOARD_NULL_VALUE to cur/solved/fixed and count_filled = 0
 call generate_puzzle with user new fixed */
 void restart(Board* board){
     int fixed, i, j;

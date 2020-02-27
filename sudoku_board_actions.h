@@ -19,9 +19,10 @@ void hint(int x, int y, Board* board);
 
 int number_solutions(Board* board);
 int autofill(Board* board);
-void restart(Board* board);
+void reset(Moves* moves, Board* board);
 void exit_game(Board* board);
 
+void restart(Board* board);
 void seed(int seed);
 int is_winner(Board* board);
 

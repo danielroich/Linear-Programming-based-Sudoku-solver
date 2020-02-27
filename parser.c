@@ -190,10 +190,7 @@ int parse_command(char* command, Board* board, Moves* moves){
 
     /*COMMAND 16*/
     if(strcmp(token,"reset") ==0 && board->mode != INIT){
-        return 16;
-    }
-    if(strcmp(token, "restart") == 0){
-        restart(board);
+        reset(moves,board);
         return 16;
     }
 
