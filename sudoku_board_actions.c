@@ -154,13 +154,12 @@ void validate_board(Board* board){
     copy_board_values(cur_board_copy, board->cur_board, size);
     /*
     valid_board = validate(board);
-    
     */
     copy_board_values(board->cur_board, cur_board_copy, size);
     free_2d_array(cur_board_copy, size);
 
     board ->count_filled= fixed;
-    if(valid_board == -1)/*not vaild*/
+    if(valid_board != 1)/*not vaild*/
         printf("Validation failed: board is unsolvable\n");
     else
         printf("Validation passed: board is solvable\n");
