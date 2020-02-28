@@ -98,7 +98,9 @@ int create_empty_board(Board* board, int rows, int columns) {
 
 void copy_board(Board* from_board,Board* to_board){
     int size = from_board->num_of_columns * from_board->num_of_rows;
-    /*assmue  allocate same sizes?*/
+    /* allocated same sizes before call func
+    to_board->num_of_columns = from_board->num_of_columns;
+    to_board->num_of_rows = from_board->num_of_rows;*/
     to_board->mode = from_board->mode;
     to_board->count_filled = from_board->count_filled;
     to_board->mark_errors = from_board->mark_errors; 

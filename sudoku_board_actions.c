@@ -27,13 +27,27 @@ void exit_game(Board* board, Curr_move move){
 /*COMMAND 1*/ 
 int solve(Board* board, char* path){
     int succeeded;
-    succeeded = read_file_to_board(board,path,1);
-    if(succeeded == 0){
+    Board* new_board = (Board*) malloc((sizeof(Board)));
+    if(new_board==NULL){
+        printf("Error: malloc has failed\n");
+        /*TODO: free game*/
+    }
+
+    succeeded = read_file_to_board(new_board,path,1);
+    if(succeeded != 1){
+        if(succeeded != -1){
+            free_board(new_board);
+        } 
+        else{ /*didnt allocate new_board*/
+            free(new_board);
+        }
         printf("Error: invalid file\n");
         return 0;
-        /*board->mode = INIT; or stay ? dont have to clean board still in INIT mode*/
     }
     else{
+        create_empty_board(board,new_board->num_of_rows,new_board->num_of_columns);
+        copy_board(new_board,board);
+        free_board(new_board);
         board->mode=SOLVE;
         return 1;
     }
@@ -46,14 +60,30 @@ int edit(Board* board, char* path) {
     }
     else{
         int succeeded;
-        succeeded = read_file_to_board(board,path,0);
-        if(succeeded == 0){
-            printf("Error: invalid file\n");
-            return 0;
-        /*board->mode = INIT; or stay ? dont have to clean board still in INIT mode*/
+        Board* new_board = (Board*) malloc((sizeof(Board)));
+        if(new_board==NULL){
+            printf("Error: malloc has failed\n");
+            /*TODO: free game*/
+        }
+
+        succeeded = read_file_to_board(new_board,path,0);
+        if(succeeded != 1){
+            if(succeeded != -1){
+                free_board(new_board);
+            } 
+            else{ /*didnt allocate new_board*/
+                free(new_board);
+            }
+                printf("Error: invalid file\n");
+        return 0;
+        }
+        else{
+            create_empty_board(board,new_board->num_of_rows,new_board->num_of_columns);
+            copy_board(new_board,board);
+            free_board(new_board);
         }
     }
-    board->mode = EDIT; 
+    board->mode=EDIT;
     return 1;
 }
 
@@ -120,7 +150,6 @@ void print_board(Board* board){
 }
 
 /*COMMAND 5*/
-/*TODO: mode edit? is winner? with/without print board?*/
 int set_value_user(int x, int y, int value, Board* board){
     int size = board->num_of_columns * board->num_of_rows;
     if(x<0 || x>=size || y<0 || y>=size || value <0 || value>size){
@@ -140,7 +169,7 @@ int set_value_user(int x, int y, int value, Board* board){
 }
 
 /*COMMAND 6*/
-/* TODO: validate with ILP*/ 
+/*
 void validate_board(Board* board){
     int **cur_board_copy;
     int valid_board = 0;
@@ -154,17 +183,20 @@ void validate_board(Board* board){
     free_2d_array(cur_board_copy, size);
 
     board ->count_filled= fixed;
-    if(valid_board != 1)/*not vaild*/
+    if(valid_board != 1)//not vaild
         printf("Validation failed: board is unsolvable\n");
     else
         printf("Validation passed: board is solvable\n");
 }
+*/
 
 /*COMMAND 7*/
+/*
 void guess(Board* board, int row, int coulmn, float threshold) {
     int value = guess_LP(board,row,coulmn, threshold);
     printf("%d, %f\n",value,threshold);
 }
+*/
 
 /*COMMAND 8*/
 /* TODO: generate with ILP*/
@@ -206,12 +238,13 @@ int save(Board* board, char* path){
 }
 
 /*COMMAND 12*/
-/* TODO: hint with ILP + check range of x,y! */
+/*
 void hint(int x, int y, Board* board){
     int value = hint_ILP(board,x,y);
-    /*int value = board->solved_board[x-1][y-1]; */
+    //int value = board->solved_board[x-1][y-1];
     printf("Hint: set cell to %d\n",value);
 }
+*/
 
 /*COMMAND 13*/
 /* TODO: hint with LP*/

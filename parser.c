@@ -125,10 +125,9 @@ int parse_command(char *command, Board *board, Curr_move move)
     }
 
     /*COMMAND 6 TODO*/
-    if (strcmp(token, "validate") == 0)
+    if (strcmp(token, "validate") == 0 && board->mode != INIT)
     {
-        /*  && board->mode != INIT && !filled */
-        validate_board(board);
+        // validate_board(board);
         return 6;
     }
 
@@ -152,7 +151,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         x = atoi(token);
 
         printf("guess for %d,%d\n", x, y);
-        guess(board, x, y, 0);
+        //guess(board, x, y, 0);
         return 7;
     }
 
@@ -223,8 +222,10 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
         y = atoi(token);
+        
+        /* TODO: check range of x,y! */
 
-        hint(y, x, board);
+        //hint(y, x, board);
         return 12;
     }
 

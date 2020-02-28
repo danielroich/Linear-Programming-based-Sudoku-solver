@@ -46,21 +46,21 @@ int read_file_to_board (Board* board, const char* path, int check_errors){
     int i,j;
     char ch;
     FILE* fptr;
-        const char* r = "r";
+    const char* r = "r";
 
-    
     fptr = fopen(path,r); 
     if(fptr ==NULL){
         fclose(fptr);
-        return 0;
+        return -1;
     }
     
     row = 0;
     col = 0;
     count = 0;
     while(!feof(fptr) && count<2){
+        count_scan = 0;
         count_scan = fscanf(fptr,"%d",&value);
-        if(count_scan != 0){
+        if(count_scan == 1){
             if(count == 0){
                 row = value;
                 count++;
@@ -73,7 +73,7 @@ int read_file_to_board (Board* board, const char* path, int check_errors){
     }
     if(count<2){
         fclose(fptr);
-        return 0;
+        return -1;
     }
     
     create_empty_board(board,row,col);
@@ -85,14 +85,16 @@ int read_file_to_board (Board* board, const char* path, int check_errors){
     j = 0;
 
     while(!feof(fptr) && i<size){
+        count_scan = 0;
         count_scan = fscanf(fptr,"%d",&value); 
+        count_char =0;
         count_dot = 0;
         if(!feof(fptr)){
             count_char = fscanf(fptr,"%c",&ch); /*sure not another int*/
-            if(count_char != 0 && ch == '.'){
+            if(count_char == 1 && ch == '.'){
                 count_dot = 1;} 
         }
-        if(count_scan != 0){
+        if(count_scan == 1){
             if(value > size || value < 0){
                 fclose(fptr);
                 return 0;
@@ -124,8 +126,13 @@ int read_file_to_board (Board* board, const char* path, int check_errors){
                     board->cur_board[i][j]=value;
                     board->count_filled++; /*?*/
             }
-            if(j!=size-1){j++;}
-            else{i++;j=0;}
+            if(j!=size-1){
+                j++;
+            }
+            else{
+                i++;
+                j=0;
+            }
         }
     }
     if(i!=size){
