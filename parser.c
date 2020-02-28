@@ -70,7 +70,7 @@ int parse_command(char *command, Board *board, Curr_move move)
     if (strcmp(token, "mark_errors") == 0)
     {
         if(board->mode != SOLVE){
-            printf("Error: command is unavailable in the current mode. available mode: SOLVE");
+            printf("Error: command is unavailable in the current mode. available mode: solve.\n");
             return 0;
         }
 
@@ -101,8 +101,18 @@ int parse_command(char *command, Board *board, Curr_move move)
     }
 
     /*COMMAND 4*/
-    if (strcmp(token, "print_board") == 0 && board->mode != INIT)
+    if (strcmp(token, "print_board") == 0)
     {
+        if(board->mode == INIT){
+            printf("Error: command is unavailable in the current mode. available modes: solve or edit.\n");
+            return 0;
+        }
+        next = (strtok(NULL, " \t\r\n"));
+        if(next != NULL)
+        {
+            printf("Error: too many parameters. correct command: print_board.\n");
+            return 0;
+        }
         print_board(board);
         return 4;
     }
