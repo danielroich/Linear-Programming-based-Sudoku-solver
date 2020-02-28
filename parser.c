@@ -9,13 +9,11 @@ return num op or 0 if invalid command/error */
 int parse_command(char *command, Board *board, Curr_move move)
 {
     int x, y, z;
-    char *token;
+    char *token, *next;
     int succeeded;
-    int filled = is_winner(board); /*TODO*/
 
     token = strtok(command, " \t\r\n");
-    if (token == NULL)
-    {
+    if (token == NULL){
         return 0;
     }
 
@@ -25,9 +23,16 @@ int parse_command(char *command, Board *board, Curr_move move)
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
-            printf("Error: invalid command\n");
+            printf("Error: not enough parameters. correct command: solve filepath.\n");
             return 0;
         }
+        next = (strtok(NULL, " \t\r\n"));
+        if(next != NULL)
+        {
+            printf("Error: too many parameters. correct command: solve filepath.\n");
+            return 0;
+        }
+
         succeeded = solve(board, token);
         if (succeeded)
         {
@@ -42,11 +47,14 @@ int parse_command(char *command, Board *board, Curr_move move)
     /*COMMAND 2*/
     if (strcmp(token, "edit") == 0)
     {
-        token = (strtok(NULL, " \t\r\n"));
-        if (token == NULL)
+        token = (strtok(NULL, " \t\r\n")); /*ok if NULL, edit create 9x9 empty*/
+        next = (strtok(NULL, " \t\r\n"));
+        if(next != NULL)
         {
-            edit(board, NULL);
+            printf("Error: too many parameters. correct command: edit or edit filepath.\n");
+            return 0;
         }
+
         succeeded = edit(board, token);
         if (succeeded)
         {
@@ -59,20 +67,34 @@ int parse_command(char *command, Board *board, Curr_move move)
     }
 
     /*COMMAND 3*/
-    if (strcmp(token, "mark_errors") == 0 && board->mode == SOLVE)
+    if (strcmp(token, "mark_errors") == 0)
     {
+        if(board->mode != SOLVE){
+            printf("Error: command is unavailable in the current mode. available mode: SOLVE");
+            return 0;
+        }
+
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
-            printf("Error: invalid command\n");
+            printf("Error: not enough parameters. correct command: mark_errors 0 or mark_errors 1.\n");
             return 0;
         }
         x = atoi(token);
-        if (x != 0 && x != 1)
+
+        next = (strtok(NULL, " \t\r\n"));
+        if(next != NULL)
         {
-            printf("Error: invalid command\n");
+            printf("Error: too many parameters. correct command: mark_errors 0 or mark_errors 1.\n");
             return 0;
         }
+
+        if (x != 0 && x != 1)
+        {
+            printf("Error: incorrect parameter. correct command: mark_errors 0 or mark_errors 1.\n");
+            return 0;
+        }
+
         mark_errors(board, x);
         add_new_move(move, board);
         return 3;
@@ -86,7 +108,7 @@ int parse_command(char *command, Board *board, Curr_move move)
     }
 
     /*COMMAND 5*/
-    if (strcmp(token, "set") == 0 && board->mode != INIT && !filled)
+    if (strcmp(token, "set") == 0 && board->mode != INIT)
     {
 
         token = (strtok(NULL, " \t\r\n"));
@@ -204,7 +226,7 @@ int parse_command(char *command, Board *board, Curr_move move)
     }
 
     /*COMMAND 12 TODO*/
-    if (strcmp(token, "hint") == 0 && board->mode == SOLVE && !filled)
+    if (strcmp(token, "hint") == 0 && board->mode == SOLVE)
     {
 
         token = (strtok(NULL, " \t\r\n"));
@@ -272,8 +294,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         return 17;
     }
 
-    /*a command that doesn't match any of the commands defined 
-    or not in right Mode*/
+    /*a command that doesn't match any of the commands defined.*/
     printf("Error: invalid command\n");
     return 0;
 }

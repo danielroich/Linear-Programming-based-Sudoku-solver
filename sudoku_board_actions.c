@@ -19,18 +19,22 @@ int is_winner(Board* board){
 /* free memo and exit*/
 void exit_game(Board* board, Curr_move move){
     printf("Exiting...\n");
-    free_board(board);
+    if(board->mark_errors == 1 || board->mark_errors == 0) /*alloceted board! create_empty_board was called*/
+        free_board(board);
+    else
+        free(board);
     clean_list(move);
     exit(0);
 }
 
 /*COMMAND 1*/ 
+/*load board from path, change mode to SOLVE*/
 int solve(Board* board, char* path){
     int succeeded;
     Board* new_board = (Board*) malloc((sizeof(Board)));
     if(new_board==NULL){
         printf("Error: malloc has failed\n");
-        /*TODO: free game*/
+        /*TODO: free game?*/
     }
 
     succeeded = read_file_to_board(new_board,path,1);
@@ -38,13 +42,14 @@ int solve(Board* board, char* path){
         if(succeeded != -1){
             free_board(new_board);
         } 
-        else{ /*didnt allocate new_board*/
+        else{ /*didnt allocate new_board boards*/
             free(new_board);
         }
         printf("Error: invalid file\n");
         return 0;
     }
     else{
+        /*TODO: free old board?*/
         create_empty_board(board,new_board->num_of_rows,new_board->num_of_columns);
         copy_board(new_board,board);
         free_board(new_board);
@@ -54,6 +59,9 @@ int solve(Board* board, char* path){
 }  
 
 /*COMMAND 2*/
+/*load board from path, change mode to EDIT 
+If no parameter is supplied, edit empty 9x9 board.
+always mark errors.*/
 int edit(Board* board, char* path) {
     if(path == NULL){
         create_empty_board(board,3,3); 
@@ -63,7 +71,7 @@ int edit(Board* board, char* path) {
         Board* new_board = (Board*) malloc((sizeof(Board)));
         if(new_board==NULL){
             printf("Error: malloc has failed\n");
-            /*TODO: free game*/
+            /*TODO: free game?*/
         }
 
         succeeded = read_file_to_board(new_board,path,0);
@@ -78,6 +86,7 @@ int edit(Board* board, char* path) {
         return 0;
         }
         else{
+            /*TODO: free old board?*/
             create_empty_board(board,new_board->num_of_rows,new_board->num_of_columns);
             copy_board(new_board,board);
             free_board(new_board);
@@ -88,17 +97,18 @@ int edit(Board* board, char* path) {
 }
 
 /*COMMAND 3*/
-/* is_mark is 1 or 0 */
+/* is_mark is 1 or 0, change mark_errors parameter */
 void mark_errors(Board* board, int is_mark){
     board->mark_errors = is_mark;
 } 
 
 /*COMMAND 4*/
+/* prints the board to the user in right format
+if mode == SOLVE check if board is winner*/
 void print_board(Board* board){
     int a, b, c, d;
     int row, col, value;
     int separator, i;
-    /*printf("count_filled %d \n",board->count_filled); del!*/ 
     separator = 4*board->num_of_columns*board->num_of_rows + board->num_of_rows + 1;
     for(a = 0; a < board->num_of_columns; a++){ 
         
@@ -109,7 +119,7 @@ void print_board(Board* board){
         
         for(b = 0; b < board->num_of_rows; b++){
             row = b + a*(board->num_of_rows);
-            printf("| "); /*space?*/
+            printf("| ");
             for(c = 0; c < board->num_of_rows; c++){
                 for(d = 0; d < board->num_of_columns; d++){
                     col = d + c*board->num_of_columns;
@@ -131,7 +141,7 @@ void print_board(Board* board){
                     } 
                 }
                 if(c != (board->num_of_rows-1))
-                    printf("| "); /*space?*/
+                    printf("| ");
             }
             printf("|\n");
         }     
@@ -144,9 +154,9 @@ void print_board(Board* board){
 
     if(board->mode == SOLVE && is_winner(board)){
         printf("Puzzle solved successfully\n");
+        /*TODO: free board? free move? or INIT agree only new boards which clean the old ones??*/
         board->mode = INIT;
     }
-
 }
 
 /*COMMAND 5*/
