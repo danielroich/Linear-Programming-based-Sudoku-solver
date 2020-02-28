@@ -1,5 +1,5 @@
 CC = gcc
-OBJS = main.o sudoku_board.o backtracking_core_logic.o sudoku_board_actions.o puzzle_generator.o 2d_array_utils.o parser.o backtrack_core.o file_utils.o LP.o moves.o stack_backtrack_logic.o stack.o
+OBJS = main.o sudoku_board.o backtracking_core_logic.o sudoku_board_actions.o puzzle_generator.o 2d_array_utils.o parser.o backtrack_core.o file_utils.o LP.o moves.o stack_backtrack_logic.o stack.o 
 EXEC = sudoku
 COMP_FLAG = -ansi -O3 -Wall -Wextra -Werror -pedantic-errors
 GUROBI_COMP = -I/usr/local/lib/gurobi563/include

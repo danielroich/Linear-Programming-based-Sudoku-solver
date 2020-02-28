@@ -16,6 +16,7 @@ int undo(Board* board, Curr_move move);
 int redo(Board* board, Curr_move move);
 int save(Board* board, char* path);
 void hint(int x, int y, Board* board);
+void guess(Board* board, int row, int coulmn, float threshold);
 
 int number_solutions(Board* board);
 int autofill(Board* board);

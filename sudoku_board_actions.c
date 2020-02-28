@@ -148,9 +148,8 @@ void validate_board(Board* board){
     int size = board->num_of_rows * board->num_of_columns;
     cur_board_copy = create_2d_array(size);
     copy_board_values(cur_board_copy, board->cur_board, size);
-    /*
-    valid_board = validate(board);
-    */
+    
+    valid_board = validate_ILP(board);
     copy_board_values(board->cur_board, cur_board_copy, size);
     free_2d_array(cur_board_copy, size);
 
@@ -162,8 +161,10 @@ void validate_board(Board* board){
 }
 
 /*COMMAND 7*/
-/* TODO: guess with LP*/
-void guess(float threshold);
+void guess(Board* board, int row, int coulmn, float threshold) {
+    int value = guess_LP(board,row,coulmn, threshold);
+    printf("%d, %f\n",value,threshold);
+}
 
 /*COMMAND 8*/
 /* TODO: generate with ILP*/
@@ -207,7 +208,8 @@ int save(Board* board, char* path){
 /*COMMAND 12*/
 /* TODO: hint with ILP + check range of x,y! */
 void hint(int x, int y, Board* board){
-    int value = board->solved_board[x-1][y-1];
+    int value = hint_ILP(board,x,y);
+    /*int value = board->solved_board[x-1][y-1]; */
     printf("Hint: set cell to %d\n",value);
 }
 
