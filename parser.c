@@ -97,7 +97,6 @@ int parse_command(char *command, Board *board, Curr_move move)
         }
 
         mark_errors(board, x);
-        add_new_move(move, board);
         return 3;
     }
 

@@ -164,11 +164,11 @@ int is_filled(Board* board){
 void print_diff(Board* before, Board* after){
     int i, j, before_val, after_val;
     int size = (before->num_of_rows)*(before->num_of_columns);
-    /* mode cant be changed without mew board and clean moves. therefore, same sizes*/
+    /* mode cant be changed without mew board and clean moves. therefore, same sizes
+    mark_errors isn't in moves list.
     if(before->mark_errors != after->mark_errors){
         printf("mark_errors parameter changed from %d to %d.\n",before->mark_errors,after->mark_errors);
-    }
-    else{
+    }*/
         for (i=0; i<size; i++){
             for (j=0; j<size; j++){
                 before_val = get_value(i,j,before,0);
@@ -184,7 +184,6 @@ void print_diff(Board* before, Board* after){
                 }
             }
         }
-    }
 }
 
 /* return 0 if no legal value or more then one legal value to cell <row,col> 
