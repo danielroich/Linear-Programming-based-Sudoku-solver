@@ -160,14 +160,25 @@ void print_board(Board* board){
 }
 
 /*COMMAND 5*/
+/* set/erase value to current board to row x and column y (0 - size-1),
+check correct range and won't updated fixed cell in solve mode */
 int set_value_user(int x, int y, int value, Board* board){
-    int size = board->num_of_columns * board->num_of_rows;
-    if(x<0 || x>=size || y<0 || y>=size || value <0 || value>size){
-        printf("Error: out of range\n");
+    int size = board->num_of_columns * board->num_of_rows; 
+    if(y<0 || y>=size){
+        printf("Error: first parameter out of range. legal range for column: %d - %d .\n",1,size);
         return 0;
     }
+    if(x<0 || x>=size) {
+        printf("Error: second parameter out of range. legal range for row: %d - %d .\n",1,size);
+        return 0;
+    }
+    if(value <0 || value>size){
+        printf("Error: third parameter out of range. legal range for value: %d - %d .\n",0,size);
+        return 0;
+    }
+
     if((board->fixed_board)[x][y] != BOARD_NULL_VALUE && board->mode == SOLVE){
-        printf("Error: cell is fixed\n");
+        printf("Error: cell is fixed, can't be updated.\n");
         return 0;
     }
     if(value == 0){
@@ -213,6 +224,8 @@ void guess(Board* board, int row, int coulmn, float threshold) {
 void generate();
 
 /*COMMAND 9*/
+/* Undo a previous move done by the user
+update the board and print the changes*/ 
 int undo(Board* board, Curr_move move){
     if(!curr_to_prev(move)){
         return 0;
@@ -223,6 +236,8 @@ int undo(Board* board, Curr_move move){
 }
 
 /*COMMAND 10*/
+/* Redo a move previously undone by the user
+update the board and print the changes */
 int redo(Board* board, Curr_move move){
     if(!curr_to_next(move)){
         return 0;
@@ -233,14 +248,15 @@ int redo(Board* board, Curr_move move){
 }
 
 /*COMMAND 11*/
+/* Saves the current game board to path */
 int save(Board* board, char* path){
     int succeeded;
     if(board->mode == EDIT && is_erroneous_board(board)){
-        printf("Error: in EDIT mode erroneous boards can't be saved \n");
+        printf("Error: in edit mode, erroneous boards can't be saved.\n");
         return 0;
     }
     /*if(board->mode == EDIT && !validate_board(board)){
-        printf("Error: in EDIT mode boards without a solution can't be saved\n");
+        printf("Error: in edit mode, boards without a solution can't be saved.\n");
         return 0;
     } TODO: validate to int-return-value */
     succeeded = write_file_from_board(board,path);

@@ -11,6 +11,7 @@ int parse_command(char *command, Board *board, Curr_move move)
     int x, y, z;
     char *token, *next;
     int succeeded;
+    int size = board->num_of_columns * board->num_of_rows; 
 
     token = strtok(command, " \t\r\n");
     if (token == NULL){
@@ -118,13 +119,17 @@ int parse_command(char *command, Board *board, Curr_move move)
     }
 
     /*COMMAND 5*/
-    if (strcmp(token, "set") == 0 && board->mode != INIT)
+    if (strcmp(token, "set") == 0)
     {
+        if(board->mode == INIT){
+            printf("Error: command is unavailable in the current mode. available modes: solve or edit.\n");
+            return 0;
+        }
 
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
-            printf("Error: invalid command\n");
+            printf("Error: not enough parameters. correct command: set column row value.\n");
             return 0;
         }
         x = atoi(token);
@@ -132,7 +137,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
-            printf("Error: invalid command\n");
+            printf("Error: not enough parameters. correct command: set column row value.\n");
             return 0;
         }
         y = atoi(token);
@@ -140,10 +145,17 @@ int parse_command(char *command, Board *board, Curr_move move)
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
-            printf("Error: invalid command\n");
+            printf("Error: not enough parameters. correct command: set column row value.\n");
             return 0;
         }
         z = atoi(token);
+        
+        next = (strtok(NULL, " \t\r\n"));
+        if(next != NULL)
+        {
+            printf("Error: too many parameters. correct command: set column row value.\n");
+            return 0;
+        }
 
         succeeded = set_value_user(y - 1, x - 1, z, board);
         if (succeeded == 1)
@@ -157,15 +169,59 @@ int parse_command(char *command, Board *board, Curr_move move)
     }
 
     /*COMMAND 6 TODO*/
-    if (strcmp(token, "validate") == 0 && board->mode != INIT)
+    if (strcmp(token, "validate") == 0)
     {
-        // validate_board(board);
+        if(board->mode == INIT){
+            printf("Error: command is unavailable in the current mode. available modes: solve or edit.\n");
+            return 0;
+        }
+
+        next = (strtok(NULL, " \t\r\n"));
+        if(next != NULL)
+        {
+            printf("Error: too many parameters. correct command: validate.\n");
+            return 0;
+        }
+
+        if(is_erroneous_board(board)){
+            printf("Error: erroneous boards can't be validate.\n");
+            return 0;
+        }
+        /*TODO: is_erroneous_board in validate_board ?
+        validate_board(board);*/
         return 6;
     }
 
     /*COMMAND 7 TODO*/
-    if (strcmp(token, "guess") == 0 && board->mode == SOLVE)
+    if (strcmp(token, "guess") == 0)
     {
+        if(board->mode != SOLVE){
+            printf("Error: command is unavailable in the current mode. available mode: solve.\n");
+            return 0;
+        }
+
+        /*TODO: only threshold as input!
+        token = (strtok(NULL, " \t\r\n"));
+        if (token == NULL)
+        {
+            printf("Error: not enough parameters. correct command: guess threshold.\n");
+            return 0;
+        }
+        x = atoi(token);
+
+        next = (strtok(NULL, " \t\r\n"));
+        if(next != NULL)
+        {
+            printf("Error: too many parameters. correct command: guess threshold.\n");
+            return 0;
+        }
+        */
+        if(is_erroneous_board(board)){
+            printf("Error: erroneous boards can't use guess.\n");
+            return 0;
+        }
+
+
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
@@ -188,19 +244,36 @@ int parse_command(char *command, Board *board, Curr_move move)
     }
 
     /*COMMAND 8 TODO*/
-    if (strcmp(token, "generate") == 0 && board->mode == EDIT)
+    if (strcmp(token, "generate") == 0 )
     {
+        if(board->mode != EDIT){
+            printf("Error: command is unavailable in the current mode. available mode: edit.\n");
+            return 0;
+        }
+
         print_board(board); /*if success*/
         return 8;
     }
 
     /*COMMAND 9*/
-    if (strcmp(token, "undo") == 0 && board->mode != INIT)
+    if (strcmp(token, "undo") == 0)
     {
+        if(board->mode == INIT){
+            printf("Error: command is unavailable in the current mode. available modes: solve or edit.\n");
+            return 0;
+        }
+
+        next = (strtok(NULL, " \t\r\n"));
+        if(next != NULL)
+        {
+            printf("Error: too many parameters. correct command: undo.\n");
+            return 0;
+        }
+
         succeeded = undo(board, move);
         if (!succeeded)
         {
-            printf("Error: There are no moves to undo\n");
+            printf("Error: there are no moves to undo.\n");
             return 0;
         }
         print_board(board);
@@ -208,12 +281,24 @@ int parse_command(char *command, Board *board, Curr_move move)
     }
 
     /*COMMAND 10*/
-    if (strcmp(token, "redo") == 0 && board->mode != INIT)
+    if (strcmp(token, "redo") == 0)
     {
+        if(board->mode == INIT){
+            printf("Error: command is unavailable in the current mode. available modes: solve or edit.\n");
+            return 0;
+        }
+
+        next = (strtok(NULL, " \t\r\n"));
+        if(next != NULL)
+        {
+            printf("Error: too many parameters. correct command: redo.\n");
+            return 0;
+        }
+
         succeeded = redo(board, move);
         if (!succeeded)
         {
-            printf("Error: There are no moves to redo\n");
+            printf("Error: there are no moves to redo.\n");
             return 0;
         }
         print_board(board);
@@ -221,14 +306,27 @@ int parse_command(char *command, Board *board, Curr_move move)
     }
 
     /*COMMAND 11*/
-    if (strcmp(token, "save") == 0 && board->mode != INIT)
+    if (strcmp(token, "save") == 0)
     {
+        if(board->mode == INIT){
+            printf("Error: command is unavailable in the current mode. available modes: solve or edit.\n");
+            return 0;
+        }
+
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
-            printf("Error: invalid command\n");
+            printf("Error: not enough parameters. correct command: save filepath.\n");
             return 0;
         }
+
+        next = (strtok(NULL, " \t\r\n"));
+        if(next != NULL)
+        {
+            printf("Error: too many parameters. correct command: save filepath.\n");
+            return 0;
+        }
+
         succeeded = save(board, token);
         if (!succeeded)
             return 0;
@@ -236,13 +334,17 @@ int parse_command(char *command, Board *board, Curr_move move)
     }
 
     /*COMMAND 12 TODO*/
-    if (strcmp(token, "hint") == 0 && board->mode == SOLVE)
+    if (strcmp(token, "hint") == 0)
     {
+        if(board->mode != SOLVE){
+            printf("Error: command is unavailable in the current mode. available mode: solve.\n");
+            return 0;
+        }
 
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
-            printf("Error: invalid command\n");
+            printf("Error: not enough parameters. correct command: hint column row.\n");
             return 0;
         }
         x = atoi(token);
@@ -250,12 +352,26 @@ int parse_command(char *command, Board *board, Curr_move move)
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
-            printf("Error: invalid command\n");
+            printf("Error: not enough parameters. correct command: hint column row.\n");
             return 0;
         }
         y = atoi(token);
         
-        /* TODO: check range of x,y! */
+        next = (strtok(NULL, " \t\r\n"));
+        if(next != NULL)
+        {
+            printf("Error: too many parameters. correct command: hint column row.\n");
+            return 0;
+        }
+
+        if(x<1 || x>size){
+            printf("Error: first parameter out of range. legal range for column: %d - %d .\n",1,size);
+            return 0;
+        }
+        if(y<1 || y>size) {
+            printf("Error: second parameter out of range. legal range for row: %d - %d .\n",1,size);
+            return 0;
+        }
 
         //hint(y, x, board);
         return 12;
