@@ -373,26 +373,109 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
 
+        if(board->fixed_board[y-1][x-1]!=BOARD_NULL_VALUE){
+            printf("Error: cell (%d,%d) is fixed.\n",y,x);
+            return 0;
+        }
+        if(board->cur_board[y-1][x-1]!=BOARD_NULL_VALUE){
+            printf("Error: cell (%d,%d) already contains a value.\n",y,x);
+            return 0;
+        }
+
         //hint(y, x, board);
         return 12;
     }
 
     /*COMMAND 13 TODO*/
-    if (strcmp(token, "guess_hint") == 0 && board->mode == SOLVE)
+    if (strcmp(token, "guess_hint") == 0)
     {
+        if(board->mode != SOLVE){
+            printf("Error: command is unavailable in the current mode. available mode: solve.\n");
+            return 0;
+        }
+
+        token = (strtok(NULL, " \t\r\n"));
+        if (token == NULL)
+        {
+            printf("Error: not enough parameters. correct command: guess_hint column row.\n");
+            return 0;
+        }
+        x = atoi(token);
+
+        token = (strtok(NULL, " \t\r\n"));
+        if (token == NULL)
+        {
+            printf("Error: not enough parameters. correct command: guess_hint column row.\n");
+            return 0;
+        }
+        y = atoi(token);
+        
+        next = (strtok(NULL, " \t\r\n"));
+        if(next != NULL)
+        {
+            printf("Error: too many parameters. correct command: guess_hint column row.\n");
+            return 0;
+        }
+
+        if(x<1 || x>size){
+            printf("Error: first parameter out of range. legal range for column: %d - %d.\n",1,size);
+            return 0;
+        }
+        if(y<1 || y>size) {
+            printf("Error: second parameter out of range. legal range for row: %d - %d.\n",1,size);
+            return 0;
+        }
+
+        if(is_erroneous_board(board)){
+            printf("Error: erroneous boards can't use guess_hint.\n");
+            return 0;
+        }
+
+        if(board->fixed_board[y-1][x-1]!=BOARD_NULL_VALUE){
+            printf("Error: cell (%d,%d) is fixed.\n",y,x);
+            return 0;
+        }
+
+        if(board->cur_board[y-1][x-1]!=BOARD_NULL_VALUE){
+            printf("Error: cell (%d,%d) already contains a value.\n",y,x);
+            return 0;
+        }
+    
+        /* TODO: call func, x col, y row (1-size). is_erroneous_board inside?*/
+
         return 13;
     }
 
     /*COMMAND 14*/
-    if (strcmp(token, "num_solutions") == 0 && board->mode != INIT)
+    if (strcmp(token, "num_solutions") == 0)
     {
+         if(board->mode == INIT){
+            printf("Error: command is unavailable in the current mode. available modes: solve or edit.\n");
+            return 0;
+        }
+        next = (strtok(NULL, " \t\r\n"));
+        if(next != NULL)
+        {
+            printf("Error: too many parameters. correct command: num_solutions.\n");
+            return 0;
+        }
         number_solutions(board);
         return 14;
     }
 
     /*COMMAND 15*/
-    if (strcmp(token, "autofill") == 0 && board->mode == SOLVE)
+    if (strcmp(token, "autofill") == 0)
     {
+        if(board->mode != SOLVE){
+            printf("Error: command is unavailable in the current mode. available mode: solve.\n");
+            return 0;
+        }
+        next = (strtok(NULL, " \t\r\n"));
+        if(next != NULL)
+        {
+            printf("Error: too many parameters. correct command: autofill.\n");
+            return 0;
+        }
         succeeded = autofill(board);
         if (succeeded)
         {
@@ -405,8 +488,18 @@ int parse_command(char *command, Board *board, Curr_move move)
     }
 
     /*COMMAND 16*/
-    if (strcmp(token, "reset") == 0 && board->mode != INIT)
+    if (strcmp(token, "reset") == 0)
     {
+        if(board->mode == INIT){
+            printf("Error: command is unavailable in the current mode. available modes: solve or edit.\n");
+            return 0;
+        }
+        next = (strtok(NULL, " \t\r\n"));
+        if(next != NULL)
+        {
+            printf("Error: too many parameters. correct command: reset.\n");
+            return 0;
+        }
         reset(move, board);
         print_board(board);
         return 16;
@@ -415,12 +508,18 @@ int parse_command(char *command, Board *board, Curr_move move)
     /*COMMAND 17*/
     if (strcmp(token, "exit") == 0)
     {
+        next = (strtok(NULL, " \t\r\n"));
+        if(next != NULL)
+        {
+            printf("Error: too many parameters. correct command: exit.\n");
+            return 0;
+        }
         free(command);
         exit_game(board, move);
         return 17;
     }
 
     /*a command that doesn't match any of the commands defined.*/
-    printf("Error: invalid command\n");
+    printf("Error: invalid command.\n");
     return 0;
 }

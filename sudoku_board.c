@@ -7,7 +7,7 @@
 int const BOARD_NULL_VALUE = 0;
 
 /* all functions in this file get 0<=x,y<=row*col-1 */
-/* if is_fix == 1 value from fixed_board else from cur*/
+/* if is_fix == 1 value from fixed_board ==0 from current*/
 
 int get_value(int x, int y, Board* board, int is_fix){
     if(is_fix==0){
@@ -27,7 +27,7 @@ int value_in_row(int row, int value, Board* board, int is_fix){
     return 0;
 }
 
-/* return 1 if value was found in col*/
+/* return 1 if value was found in column*/
 int value_in_col(int col, int value, Board* board,int is_fix){
     int i;
     int size = (board->num_of_rows)*(board->num_of_columns);
@@ -52,12 +52,14 @@ int value_in_square(int row, int col, int value, Board* board,int is_fix){
     return 0;
 }
 
+/* return 1 if value is legal in <x,y>*/
 int is_legal(int x, int y, int value, Board* board, int is_fix){
     if((value_in_row(x,value,board,is_fix) || value_in_col(y,value,board,is_fix) || value_in_square(x,y,value,board,is_fix) ))
         return 0;
     return 1;
 }
 
+/* set legal value to <x,y>*/
 int set_value(int x, int y, int value, Board* board,int is_fix){
     if(is_legal(x,y,value,board,is_fix)==0){
         return 0;} 
@@ -67,6 +69,7 @@ int set_value(int x, int y, int value, Board* board,int is_fix){
     return 1;
 }
 
+/* set BOARD_NULL_VALUE TO <x,y>*/
 int erase_value(int x, int y, Board* board) {
 
     if (board->cur_board[x][y] != BOARD_NULL_VALUE) {
@@ -77,12 +80,14 @@ int erase_value(int x, int y, Board* board) {
     return 1;
 }
 
+/* set value to <x,y> without legal check*/
 void set_value_without_check(int x, int y, int value, Board* board){
     if(board->cur_board[x][y] == BOARD_NULL_VALUE)
         board->count_filled++;
     board->cur_board[x][y] = value;    
 }
 
+/* allocate boards with size, initialize board parameters*/
 int create_empty_board(Board* board, int rows, int columns) {
     int size = rows * columns;
     board->num_of_columns = columns;
@@ -96,11 +101,10 @@ int create_empty_board(Board* board, int rows, int columns) {
     return 1;
 }
 
+/* copy from_board to to_board parameters and values*/ 
 void copy_board(Board* from_board,Board* to_board){
     int size = from_board->num_of_columns * from_board->num_of_rows;
-    /* allocated same sizes before call func
-    to_board->num_of_columns = from_board->num_of_columns;
-    to_board->num_of_rows = from_board->num_of_rows;*/
+    /* allocated same sizes before call this func!*/
     to_board->mode = from_board->mode;
     to_board->count_filled = from_board->count_filled;
     to_board->mark_errors = from_board->mark_errors; 
@@ -109,6 +113,7 @@ void copy_board(Board* from_board,Board* to_board){
     copy_board_values(to_board->solved_board,from_board->solved_board,size);
 }
 
+/* free memo of 2d_arrays and board*/
 void free_board(Board* board){
     int size = (board->num_of_rows)*(board->num_of_columns);
     free_2d_array(board->solved_board,size);
@@ -117,6 +122,7 @@ void free_board(Board* board){
     free(board);
 }
 
+/* check is cell <row,col> is erroneous*/
 int is_erroneous_cell(Board* board,int row, int col){
     int successed;
     int value;
@@ -132,6 +138,7 @@ int is_erroneous_cell(Board* board,int row, int col){
     return 0;
 }
 
+/* check if board has erroneous_cell*/
 int is_erroneous_board(Board* board){
     int i, j;
     int size = (board->num_of_rows)*(board->num_of_columns);
@@ -144,6 +151,7 @@ int is_erroneous_board(Board* board){
     return 0;
 }
 
+/* check if board has size*size filled cells*/
 int is_filled(Board* board){
     int size = (board->num_of_rows)*(board->num_of_columns);
     if(board->count_filled == size*size){
@@ -152,12 +160,13 @@ int is_filled(Board* board){
     return 0;
 }
 
+/* print the differences between before and after boards*/
 void print_diff(Board* before, Board* after){
     int i, j, before_val, after_val;
     int size = (before->num_of_rows)*(before->num_of_columns);
-    /* mode cant change, solve/edit clean moves. therefore, same sizes*/
+    /* mode cant be changed without mew board and clean moves. therefore, same sizes*/
     if(before->mark_errors != after->mark_errors){
-        printf("mark_errors parameter changed from %d to %d \n",before->mark_errors,after->mark_errors);
+        printf("mark_errors parameter changed from %d to %d.\n",before->mark_errors,after->mark_errors);
     }
     else{
         for (i=0; i<size; i++){
@@ -171,15 +180,17 @@ void print_diff(Board* before, Board* after){
                     if(after_val == BOARD_NULL_VALUE){
                         after_val = 0;
                     }
-                    printf("cell (%d,%d) changed from %d to %d \n",j+1,i+1,before_val,after_val);
+                    printf("cell (%d,%d) changed from %d to %d.\n",j+1,i+1,before_val,after_val);
                 }
             }
         }
     }
 }
 
+/* return 0 if no legal value or more then one legal value to cell <row,col> 
+or the value if he's the only one.*/
 int single_possible_value(int row, int col, Board* board){
-    /* Notice the change to 0 */
+    /* notice the change to 0 */
     int i,value = 0;
     int count = 0;
     int size = board->num_of_columns * board->num_of_rows;
@@ -195,4 +206,11 @@ int single_possible_value(int row, int col, Board* board){
         return 0;
     }
     return value;
+}
+
+/* check if the board is winner. if it's filled and don't have errors*/
+int is_winner(Board* board){
+    if(is_filled(board) && is_erroneous_board(board)==0)
+        return 1;
+    return 0;
 }

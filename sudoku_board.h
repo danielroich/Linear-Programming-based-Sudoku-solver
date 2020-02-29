@@ -34,5 +34,6 @@ int is_erroneous_board(Board* board);
 int is_filled(Board* board);
 void print_diff(Board* before, Board* after);
 int single_possible_value(int row, int col, Board* board);
+int is_winner(Board* board);
 
 #endif 

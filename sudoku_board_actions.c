@@ -9,12 +9,6 @@
 #include "puzzle_generator.h"
 #include "LP.h"
 
-int is_winner(Board* board){
-    if(is_filled(board) && is_erroneous_board(board)==0)
-        return 1;
-    return 0;
-}
-
 /*COMMAND 17*/
 /* free memo and exit*/
 void exit_game(Board* board, Curr_move move){
@@ -280,7 +274,7 @@ void guess_hint();
 int number_solutions(Board* board) {
     int number;
     if(is_erroneous_board(board)){
-        printf("Error: erroneous board\n");
+        printf("Error: erroneous boards can't use number_solutions.\n");
         return 0;
     }
     number = stack_based_back_track(board);
@@ -289,12 +283,13 @@ int number_solutions(Board* board) {
 }
 
 /*COMMAND 15*/
+/* If a cell <X,Y> has a single legal value, fill it with the value and notify the user*/
 int autofill(Board* board){
     int i, j, value;
     int size = (board->num_of_rows)*(board->num_of_columns);
     int ** autofill_values = create_2d_array(size);
     if(is_erroneous_board(board)){
-        printf("Error: erroneous boards can't be autofill \n");
+        printf("Error: erroneous boards can't be autofill.\n");
         return 0;
     }   
     for (i=0; i<size; i++){
@@ -309,6 +304,7 @@ int autofill(Board* board){
         for (j=0; j<size; j++){
             if(autofill_values[i][j]!=0){
                 set_value_without_check(i,j,autofill_values[i][j],board);
+                printf("cell (%d,%d) autofilled to %d.\n",j+1,i+1,autofill_values[i][j]);
             }
         }
     }
@@ -317,6 +313,7 @@ int autofill(Board* board){
 }
 
 /*COMMAND 16*/
+/*Undo all moves, reverting the board to its original loaded state.*/
 void reset(Curr_move move, Board* board){
     /*first move is load in EDIT/SOLVE, therefore moves!=NULL*/
     if((*move)->prev){

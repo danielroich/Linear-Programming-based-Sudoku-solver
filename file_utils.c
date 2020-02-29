@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* write current board to path in file format
+mark if fixed. if in edit mode all is fixed.*/
 int write_file_from_board (Board* board,const char* path){
     int i,j,size;
     FILE* fptr;
@@ -40,6 +42,10 @@ int write_file_from_board (Board* board,const char* path){
     return 0;
 }
 
+/* write vaild file to Board
+return -1 if didn't create_empty_board
+return 0 if not vaild file:
+correct format, enough values, correct range, fixed cells are legal*/
 int read_file_to_board (Board* board, const char* path, int check_errors){
     int row,col,size;
     int value,count,count_scan,count_dot,count_char;
@@ -124,7 +130,7 @@ int read_file_to_board (Board* board, const char* path, int check_errors){
             }
             else{
                     board->cur_board[i][j]=value;
-                    board->count_filled++; /*?*/
+                    board->count_filled++; 
             }
             if(j!=size-1){
                 j++;

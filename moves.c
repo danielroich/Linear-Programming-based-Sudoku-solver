@@ -2,12 +2,14 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+/* free board and node*/
 void free_node(Move* node){
     free_board((node)->Board_state);
     free(node);
 }
 
-/* for move: reset */
+/* for move: reset
+change current move to the first node*/
 void back_to_first_move(Curr_move move){
     if(move && (*move)){
         while((*move)->prev)
@@ -17,7 +19,8 @@ void back_to_first_move(Curr_move move){
     }
 }
 
-/* for move: redo*/
+/* for move: redo
+change current pointer to the next node*/
 int curr_to_next(Curr_move move){
     if(move && (*move) && (*move)->next)
     {
@@ -27,7 +30,8 @@ int curr_to_next(Curr_move move){
     return 0;
 }
 
-/* for move: undo*/
+/* for move: undo
+change current pointer to the next node*/
 int curr_to_prev(Curr_move move){
     if(move && (*move) && (*move)->prev)
     {
@@ -37,7 +41,8 @@ int curr_to_prev(Curr_move move){
     return 0;
 }
 
-/* for moves: solve, edit */
+/* for moves: solve, edit 
+free all list of moves*/
 void clean_list(Curr_move move){
     back_to_first_move(move);
     clean_nexts(move);
@@ -46,7 +51,8 @@ void clean_list(Curr_move move){
     *move = NULL;
 }
 
-/* for moves: set, autofill, generate, guess */
+/* for moves: set, autofill, generate, guess 
+free all next nodes of the current move*/
 void clean_nexts(Curr_move move){
     Move *next_node, *next_node2;
     if(move && *move){
@@ -60,6 +66,8 @@ void clean_nexts(Curr_move move){
     } 
 }
 
+/* for moves: solve, edit, mark_errors, set, autofill, guess, generate
+add new move to the end of the list*/
 void add_new_move(Curr_move move, Board* board){
     Move* new_node =(Move*)malloc(sizeof(Move));
     if(new_node==NULL){

@@ -24,6 +24,5 @@ void reset(Curr_move move, Board* board);
 void exit_game(Board* board, Curr_move move);
 
 void seed(int seed);
-int is_winner(Board* board);
 
 #endif
