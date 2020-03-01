@@ -4,6 +4,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void print_error_mode(const char* ava_modes){
+    printf("Error: command is unavailable in the current mode. available mode: %s.\n",ava_modes);
+}
+
+void print_error_not_enough(const char* correct){
+    printf("Error: not enough parameters. correct command: %s.\n",correct);
+}
+
+void print_error_too_many(const char* correct){
+    printf("Error: too many parameters. correct command: %s.\n",correct);
+}
+
 /* interpret user input and call actions
 return num op or 0 if invalid command/error */
 int parse_command(char *command, Board *board, Curr_move move)
@@ -24,13 +36,13 @@ int parse_command(char *command, Board *board, Curr_move move)
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
-            printf("Error: not enough parameters. correct command: solve filepath.\n");
+            print_error_not_enough("solve filepath");
             return 0;
         }
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
         {
-            printf("Error: too many parameters. correct command: solve filepath.\n");
+            print_error_too_many("solve filepath");
             return 0;
         }
 
@@ -52,7 +64,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
         {
-            printf("Error: too many parameters. correct command: edit or edit filepath.\n");
+            print_error_too_many("edit or edit filepath");
             return 0;
         }
 
@@ -71,14 +83,14 @@ int parse_command(char *command, Board *board, Curr_move move)
     if (strcmp(token, "mark_errors") == 0)
     {
         if(board->mode != SOLVE){
-            printf("Error: command is unavailable in the current mode. available mode: solve.\n");
+            print_error_mode("solve");
             return 0;
         }
 
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
-            printf("Error: not enough parameters. correct command: mark_errors 0 or mark_errors 1.\n");
+            print_error_not_enough("mark_errors 0 or mark_errors 1");
             return 0;
         }
         x = atoi(token);
@@ -86,7 +98,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
         {
-            printf("Error: too many parameters. correct command: mark_errors 0 or mark_errors 1.\n");
+            print_error_too_many("mark_errors 0 or mark_errors 1");
             return 0;
         }
 
@@ -104,13 +116,13 @@ int parse_command(char *command, Board *board, Curr_move move)
     if (strcmp(token, "print_board") == 0)
     {
         if(board->mode == INIT){
-            printf("Error: command is unavailable in the current mode. available modes: solve or edit.\n");
+            print_error_mode("solve or edit");
             return 0;
         }
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
         {
-            printf("Error: too many parameters. correct command: print_board.\n");
+            print_error_too_many("print_board");
             return 0;
         }
         print_board(board);
@@ -121,14 +133,14 @@ int parse_command(char *command, Board *board, Curr_move move)
     if (strcmp(token, "set") == 0)
     {
         if(board->mode == INIT){
-            printf("Error: command is unavailable in the current mode. available modes: solve or edit.\n");
+            print_error_mode("solve or edit");
             return 0;
         }
 
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
-            printf("Error: not enough parameters. correct command: set column row value.\n");
+            print_error_not_enough("set column row value");
             return 0;
         }
         x = atoi(token);
@@ -136,7 +148,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
-            printf("Error: not enough parameters. correct command: set column row value.\n");
+            print_error_not_enough("set column row value");
             return 0;
         }
         y = atoi(token);
@@ -144,7 +156,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
-            printf("Error: not enough parameters. correct command: set column row value.\n");
+            print_error_not_enough("set column row value");
             return 0;
         }
         z = atoi(token);
@@ -152,7 +164,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
         {
-            printf("Error: too many parameters. correct command: set column row value.\n");
+            print_error_too_many("set column row value");
             return 0;
         }
 
@@ -171,14 +183,14 @@ int parse_command(char *command, Board *board, Curr_move move)
     if (strcmp(token, "validate") == 0)
     {
         if(board->mode == INIT){
-            printf("Error: command is unavailable in the current mode. available modes: solve or edit.\n");
+            print_error_mode("solve or edit");
             return 0;
         }
 
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
         {
-            printf("Error: too many parameters. correct command: validate.\n");
+            print_error_too_many("validate");
             return 0;
         }
 
@@ -195,15 +207,15 @@ int parse_command(char *command, Board *board, Curr_move move)
     if (strcmp(token, "guess") == 0)
     {
         if(board->mode != SOLVE){
-            printf("Error: command is unavailable in the current mode. available mode: solve.\n");
+            print_error_mode("solve");
             return 0;
         }
-
+        
         /*TODO: only threshold as input!
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
-            printf("Error: not enough parameters. correct command: guess threshold.\n");
+            print_error_not_enough("guess threshold");
             return 0;
         }
         x = atoi(token);
@@ -211,7 +223,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
         {
-            printf("Error: too many parameters. correct command: guess threshold.\n");
+            print_error_too_many("guess threshold");
             return 0;
         }
         */
@@ -239,6 +251,16 @@ int parse_command(char *command, Board *board, Curr_move move)
 
         printf("guess for %d,%d\n", x, y);
         //guess(board, x, y, 0);
+
+        /*succeeded = guess();
+        if (succeeded == 1)
+        {
+            clean_nexts(move);
+            add_new_move(move, board);
+            print_board(board);
+            return 7;
+        }*/
+
         return 7;
     }
 
@@ -246,11 +268,26 @@ int parse_command(char *command, Board *board, Curr_move move)
     if (strcmp(token, "generate") == 0 )
     {
         if(board->mode != EDIT){
-            printf("Error: command is unavailable in the current mode. available mode: edit.\n");
+            print_error_mode("edit");
             return 0;
         }
 
-        print_board(board); /*if success*/
+        next = (strtok(NULL, " \t\r\n"));
+        if(next != NULL)
+        {
+            print_error_too_many("generate");
+            return 0;
+        }
+
+        /*succeeded = generate();
+        if (succeeded == 1)
+        {
+            clean_nexts(move);
+            add_new_move(move, board);
+            print_board(board);
+            return 8;
+        }*/
+
         return 8;
     }
 
@@ -258,14 +295,14 @@ int parse_command(char *command, Board *board, Curr_move move)
     if (strcmp(token, "undo") == 0)
     {
         if(board->mode == INIT){
-            printf("Error: command is unavailable in the current mode. available modes: solve or edit.\n");
+            print_error_mode("solve or edit");
             return 0;
         }
 
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
         {
-            printf("Error: too many parameters. correct command: undo.\n");
+            print_error_too_many("undo");
             return 0;
         }
 
@@ -283,14 +320,14 @@ int parse_command(char *command, Board *board, Curr_move move)
     if (strcmp(token, "redo") == 0)
     {
         if(board->mode == INIT){
-            printf("Error: command is unavailable in the current mode. available modes: solve or edit.\n");
+            print_error_mode("solve or edit");
             return 0;
         }
 
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
         {
-            printf("Error: too many parameters. correct command: redo.\n");
+            print_error_too_many("redo");
             return 0;
         }
 
@@ -308,21 +345,21 @@ int parse_command(char *command, Board *board, Curr_move move)
     if (strcmp(token, "save") == 0)
     {
         if(board->mode == INIT){
-            printf("Error: command is unavailable in the current mode. available modes: solve or edit.\n");
+            print_error_mode("solve or edit");
             return 0;
         }
 
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
-            printf("Error: not enough parameters. correct command: save filepath.\n");
+            print_error_not_enough("save filepath");
             return 0;
         }
 
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
         {
-            printf("Error: too many parameters. correct command: save filepath.\n");
+            print_error_too_many("save filepath");
             return 0;
         }
 
@@ -336,14 +373,14 @@ int parse_command(char *command, Board *board, Curr_move move)
     if (strcmp(token, "hint") == 0)
     {
         if(board->mode != SOLVE){
-            printf("Error: command is unavailable in the current mode. available mode: solve.\n");
+            print_error_mode("solve");
             return 0;
         }
 
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
-            printf("Error: not enough parameters. correct command: hint column row.\n");
+            print_error_not_enough("hint column row");
             return 0;
         }
         x = atoi(token);
@@ -351,7 +388,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
-            printf("Error: not enough parameters. correct command: hint column row.\n");
+            print_error_not_enough("hint column row");
             return 0;
         }
         y = atoi(token);
@@ -359,7 +396,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
         {
-            printf("Error: too many parameters. correct command: hint column row.\n");
+            print_error_too_many("hint column row");
             return 0;
         }
 
@@ -389,14 +426,14 @@ int parse_command(char *command, Board *board, Curr_move move)
     if (strcmp(token, "guess_hint") == 0)
     {
         if(board->mode != SOLVE){
-            printf("Error: command is unavailable in the current mode. available mode: solve.\n");
+            print_error_mode("solve");
             return 0;
         }
 
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
-            printf("Error: not enough parameters. correct command: guess_hint column row.\n");
+            print_error_not_enough("guess_hint column row");
             return 0;
         }
         x = atoi(token);
@@ -404,7 +441,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
-            printf("Error: not enough parameters. correct command: guess_hint column row.\n");
+            print_error_not_enough("guess_hint column row");
             return 0;
         }
         y = atoi(token);
@@ -412,7 +449,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
         {
-            printf("Error: too many parameters. correct command: guess_hint column row.\n");
+            print_error_too_many("guess_hint column row");
             return 0;
         }
 
@@ -449,13 +486,13 @@ int parse_command(char *command, Board *board, Curr_move move)
     if (strcmp(token, "num_solutions") == 0)
     {
          if(board->mode == INIT){
-            printf("Error: command is unavailable in the current mode. available modes: solve or edit.\n");
+            print_error_mode("solve or edit");
             return 0;
         }
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
         {
-            printf("Error: too many parameters. correct command: num_solutions.\n");
+            print_error_too_many("num_solutions");
             return 0;
         }
         number_solutions(board);
@@ -466,13 +503,13 @@ int parse_command(char *command, Board *board, Curr_move move)
     if (strcmp(token, "autofill") == 0)
     {
         if(board->mode != SOLVE){
-            printf("Error: command is unavailable in the current mode. available mode: solve.\n");
+            print_error_mode("solve");
             return 0;
         }
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
         {
-            printf("Error: too many parameters. correct command: autofill.\n");
+            print_error_too_many("autofill");
             return 0;
         }
         succeeded = autofill(board);
@@ -490,13 +527,13 @@ int parse_command(char *command, Board *board, Curr_move move)
     if (strcmp(token, "reset") == 0)
     {
         if(board->mode == INIT){
-            printf("Error: command is unavailable in the current mode. available modes: solve or edit.\n");
+            print_error_mode("solve or edit");
             return 0;
         }
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
         {
-            printf("Error: too many parameters. correct command: reset.\n");
+            print_error_too_many("reset");
             return 0;
         }
         reset(move, board);
@@ -510,7 +547,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
         {
-            printf("Error: too many parameters. correct command: exit.\n");
+            print_error_too_many("exit");
             return 0;
         }
         free(command);
