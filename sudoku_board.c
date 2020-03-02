@@ -115,10 +115,14 @@ void copy_board(Board* from_board,Board* to_board){
 
 /* free memo of 2d_arrays and board*/
 void free_board(Board* board){
-    int size = (board->num_of_rows)*(board->num_of_columns);
-    free_2d_array(board->solved_board,size);
-    free_2d_array(board->fixed_board,size);
-    free_2d_array(board->cur_board,size);
+    /*TODO: if correct?*/
+    if(board->mark_errors == 1 || board->mark_errors == 0) /*alloceted board! create_empty_board was called*/
+    {
+        int size = (board->num_of_rows)*(board->num_of_columns);
+        free_2d_array(board->solved_board,size);
+        free_2d_array(board->fixed_board,size);
+        free_2d_array(board->cur_board,size);
+    }
     free(board);
 }
 
@@ -209,7 +213,14 @@ int single_possible_value(int row, int col, Board* board){
 
 /* check if the board is winner. if it's filled and don't have errors*/
 int is_winner(Board* board){
-    if(is_filled(board) && is_erroneous_board(board)==0)
-        return 1;
+    if(is_filled(board)){
+        if(is_erroneous_board(board)==0){
+            return 1;
+        }
+        else{
+            printf("solution is erroneous.\n");
+            return 0;
+        }
+    }
     return 0;
 }

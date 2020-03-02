@@ -13,10 +13,7 @@
 /* free memo and exit*/
 void exit_game(Board* board, Curr_move move){
     printf("Exiting...\n");
-    if(board->mark_errors == 1 || board->mark_errors == 0) /*alloceted board! create_empty_board was called*/
-        free_board(board);
-    else
-        free(board);
+    free_board(board);
     clean_list(move);
     exit(0);
 }
@@ -27,8 +24,8 @@ int solve(Board* board, char* path){
     int succeeded;
     Board* new_board = (Board*) malloc((sizeof(Board)));
     if(new_board==NULL){
-        printf("Error: malloc has failed\n");
-        /*TODO: free game?*/
+        printf("Error: malloc has failed.\n");
+        exit(0);
     }
 
     succeeded = read_file_to_board(new_board,path,1);
@@ -39,11 +36,16 @@ int solve(Board* board, char* path){
         else{ /*didnt allocate new_board boards*/
             free(new_board);
         }
-        printf("Error: invalid file\n");
+        printf("Error: invalid file.\n");
         return 0;
     }
     else{
-        /*TODO: free old board?*/
+        free_board(board);
+        board = (Board*) malloc((sizeof(Board)));
+        if(new_board==NULL){
+            printf("Error: malloc has failed.\n");
+            exit(0);
+        }
         create_empty_board(board,new_board->num_of_rows,new_board->num_of_columns);
         copy_board(new_board,board);
         free_board(new_board);
@@ -64,8 +66,8 @@ int edit(Board* board, char* path) {
         int succeeded;
         Board* new_board = (Board*) malloc((sizeof(Board)));
         if(new_board==NULL){
-            printf("Error: malloc has failed\n");
-            /*TODO: free game?*/
+            printf("Error: malloc has failed.\n");
+            exit(0);
         }
 
         succeeded = read_file_to_board(new_board,path,0);
@@ -76,11 +78,16 @@ int edit(Board* board, char* path) {
             else{ /*didnt allocate new_board*/
                 free(new_board);
             }
-                printf("Error: invalid file\n");
-        return 0;
+            printf("Error: invalid file.\n");
+            return 0;
         }
         else{
-            /*TODO: free old board?*/
+            free_board(board);
+            board = (Board*) malloc((sizeof(Board)));
+            if(new_board==NULL){
+                printf("Error: malloc has failed.\n");
+                exit(0);
+            }
             create_empty_board(board,new_board->num_of_rows,new_board->num_of_columns);
             copy_board(new_board,board);
             free_board(new_board);
@@ -147,8 +154,8 @@ void print_board(Board* board){
     printf("\n");
 
     if(board->mode == SOLVE && is_winner(board)){
-        printf("Puzzle solved successfully\n");
-        /*TODO: free board? free move? or INIT agree only new boards which clean the old ones??*/
+        printf("Puzzle solved successfully!\n");
+        /*TODO: free board? free move? or INIT agree only new boards which clean the old ones?*/
         board->mode = INIT;
     }
 }

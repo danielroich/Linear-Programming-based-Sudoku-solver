@@ -71,14 +71,14 @@ add new move to the end of the list*/
 void add_new_move(Curr_move move, Board* board){
     Move* new_node =(Move*)malloc(sizeof(Move));
     if(new_node==NULL){
-        printf("Error: malloc has failed\n");
-        /*TODO: free game*/
+        printf("Error: malloc has failed.\n");
+        exit(0);
     }
 
     new_node->Board_state = (Board*) malloc((sizeof(Board)));
     if(new_node==NULL){
-        printf("Error: malloc has failed\n");
-        /*TODO: free game*/
+        printf("Error: malloc has failed.\n");
+        exit(0);
     }
 
     create_empty_board(new_node->Board_state,board->num_of_rows,board->num_of_columns);
