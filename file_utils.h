@@ -1,3 +1,5 @@
+/* read and write from and to files */
+
 #ifndef SOFTWAREPROJ_FILE_UTILS_H
 #define SOFTWAREPROJ_FILE_UTILS_H
 

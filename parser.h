@@ -1,3 +1,5 @@
+/* parse user command and call function from actions accordingly
+check if available mode ,not enough/too many/vaild parameters*/
 
 #ifndef EX3_PARSER_H
 #define EX3_PARSER_H

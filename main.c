@@ -52,6 +52,7 @@ int main(int argc, char *argv[]) {
         }
         else
             parse_command(command, board, move);
+        printf("please enter command.\n");
     }
 
     free(command);

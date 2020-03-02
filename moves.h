@@ -1,3 +1,6 @@
+/* typedef moves list.
+functions: add move, clean and pointer changes*/ 
+
 #ifndef MOVES_H
 #define MOVES_H
 

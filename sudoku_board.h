@@ -1,4 +1,8 @@
 
+/* typedef board struct.
+boards basic functions, memory (create, free, copy)
+erroneous check, winner check*/
+
 #ifndef SOFTWAREPROJ_SUDOKU_BOARD_H
 #define SOFTWAREPROJ_SUDOKU_BOARD_H
 
