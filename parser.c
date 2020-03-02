@@ -556,6 +556,6 @@ int parse_command(char *command, Board *board, Curr_move move)
     }
 
     /*a command that doesn't match any of the commands defined.*/
-    printf("Error: invalid command.\n");
+    printf("Error: no such command exists.\n");
     return 0;
 }
