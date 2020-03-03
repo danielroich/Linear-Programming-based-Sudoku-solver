@@ -120,7 +120,7 @@ void print_board(Board* board){
         
         for(b = 0; b < board->num_of_rows; b++){
             row = b + a*(board->num_of_rows);
-            printf("| ");
+            printf("|");
             for(c = 0; c < board->num_of_rows; c++){
                 for(d = 0; d < board->num_of_columns; d++){
                     col = d + c*board->num_of_columns;
@@ -142,7 +142,7 @@ void print_board(Board* board){
                     } 
                 }
                 if(c != (board->num_of_rows-1))
-                    printf("| ");
+                    printf("|");
             }
             printf("|\n");
         }     
