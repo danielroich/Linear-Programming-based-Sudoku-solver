@@ -8,6 +8,8 @@
 #include "stack_backtrack_logic.h"
 #include "puzzle_generator.h"
 #include "LP.h"
+#include "optional_cell_values.h"
+
 
 /*COMMAND 17*/
 /* free memo and exit*/
@@ -275,7 +277,12 @@ void hint(int x, int y, Board* board){
 
 /*COMMAND 13*/
 /* TODO: hint with LP*/
-void guess_hint();
+void guess_hint(Board* board, int row, int column) {
+    OptionalCellValues* cell_values = get_values_for_cell(board,row,column);
+    printf("%d", cell_values->column);
+    free_cell_values(cell_values);
+}
+
 
 /*COMMAND 14*/
 int number_solutions(Board* board) {

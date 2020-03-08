@@ -1,19 +1,23 @@
 #include "parser.h"
 #include "sudoku_board_actions.h"
+#include "optional_cell_values.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-void print_error_mode(const char* ava_modes){
-    printf("Error: command is unavailable in the current mode. available mode: %s.\n",ava_modes);
+void print_error_mode(const char *ava_modes)
+{
+    printf("Error: command is unavailable in the current mode. available mode: %s.\n", ava_modes);
 }
 
-void print_error_not_enough(const char* correct){
-    printf("Error: not enough parameters. correct command: %s.\n",correct);
+void print_error_not_enough(const char *correct)
+{
+    printf("Error: not enough parameters. correct command: %s.\n", correct);
 }
 
-void print_error_too_many(const char* correct){
-    printf("Error: too many parameters. correct command: %s.\n",correct);
+void print_error_too_many(const char *correct)
+{
+    printf("Error: too many parameters. correct command: %s.\n", correct);
 }
 
 /* interpret user input and call actions
@@ -23,10 +27,11 @@ int parse_command(char *command, Board *board, Curr_move move)
     int x, y, z;
     char *token, *next;
     int succeeded;
-    int size = board->num_of_columns * board->num_of_rows; 
+    int size = board->num_of_columns * board->num_of_rows;
 
     token = strtok(command, " \t\r\n");
-    if (token == NULL){
+    if (token == NULL)
+    {
         return 0;
     }
 
@@ -40,7 +45,7 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
         next = (strtok(NULL, " \t\r\n"));
-        if(next != NULL)
+        if (next != NULL)
         {
             print_error_too_many("solve filepath");
             return 0;
@@ -62,7 +67,7 @@ int parse_command(char *command, Board *board, Curr_move move)
     {
         token = (strtok(NULL, " \t\r\n")); /*ok if NULL, edit create 9x9 empty*/
         next = (strtok(NULL, " \t\r\n"));
-        if(next != NULL)
+        if (next != NULL)
         {
             print_error_too_many("edit or edit filepath");
             return 0;
@@ -82,7 +87,8 @@ int parse_command(char *command, Board *board, Curr_move move)
     /*COMMAND 3*/
     if (strcmp(token, "mark_errors") == 0)
     {
-        if(board->mode != SOLVE){
+        if (board->mode != SOLVE)
+        {
             print_error_mode("solve");
             return 0;
         }
@@ -96,7 +102,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         x = atoi(token);
 
         next = (strtok(NULL, " \t\r\n"));
-        if(next != NULL)
+        if (next != NULL)
         {
             print_error_too_many("mark_errors 0 or mark_errors 1");
             return 0;
@@ -115,12 +121,13 @@ int parse_command(char *command, Board *board, Curr_move move)
     /*COMMAND 4*/
     if (strcmp(token, "print_board") == 0)
     {
-        if(board->mode == INIT){
+        if (board->mode == INIT)
+        {
             print_error_mode("solve or edit");
             return 0;
         }
         next = (strtok(NULL, " \t\r\n"));
-        if(next != NULL)
+        if (next != NULL)
         {
             print_error_too_many("print_board");
             return 0;
@@ -132,7 +139,8 @@ int parse_command(char *command, Board *board, Curr_move move)
     /*COMMAND 5*/
     if (strcmp(token, "set") == 0)
     {
-        if(board->mode == INIT){
+        if (board->mode == INIT)
+        {
             print_error_mode("solve or edit");
             return 0;
         }
@@ -160,9 +168,9 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
         z = atoi(token);
-        
+
         next = (strtok(NULL, " \t\r\n"));
-        if(next != NULL)
+        if (next != NULL)
         {
             print_error_too_many("set column row value");
             return 0;
@@ -182,19 +190,21 @@ int parse_command(char *command, Board *board, Curr_move move)
     /*COMMAND 6 TODO*/
     if (strcmp(token, "validate") == 0)
     {
-        if(board->mode == INIT){
+        if (board->mode == INIT)
+        {
             print_error_mode("solve or edit");
             return 0;
         }
 
         next = (strtok(NULL, " \t\r\n"));
-        if(next != NULL)
+        if (next != NULL)
         {
             print_error_too_many("validate");
             return 0;
         }
 
-        if(is_erroneous_board(board)){
+        if (is_erroneous_board(board))
+        {
             printf("Error: erroneous boards can't be validate.\n");
             return 0;
         }
@@ -206,11 +216,12 @@ int parse_command(char *command, Board *board, Curr_move move)
     /*COMMAND 7 TODO*/
     if (strcmp(token, "guess") == 0)
     {
-        if(board->mode != SOLVE){
+        if (board->mode != SOLVE)
+        {
             print_error_mode("solve");
             return 0;
         }
-        
+
         /*TODO: only threshold as input!
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
@@ -227,11 +238,11 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
         */
-        if(is_erroneous_board(board)){
+        if (is_erroneous_board(board))
+        {
             printf("Error: erroneous boards can't use guess.\n");
             return 0;
         }
-
 
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
@@ -250,7 +261,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         x = atoi(token);
 
         printf("guess for %d,%d\n", x, y);
-        //guess(board, x, y, 0);
+        /*guess(board, x, y, 0); */
 
         /*succeeded = guess();
         if (succeeded == 1)
@@ -265,15 +276,16 @@ int parse_command(char *command, Board *board, Curr_move move)
     }
 
     /*COMMAND 8 TODO*/
-    if (strcmp(token, "generate") == 0 )
+    if (strcmp(token, "generate") == 0)
     {
-        if(board->mode != EDIT){
+        if (board->mode != EDIT)
+        {
             print_error_mode("edit");
             return 0;
         }
 
         next = (strtok(NULL, " \t\r\n"));
-        if(next != NULL)
+        if (next != NULL)
         {
             print_error_too_many("generate");
             return 0;
@@ -294,13 +306,14 @@ int parse_command(char *command, Board *board, Curr_move move)
     /*COMMAND 9*/
     if (strcmp(token, "undo") == 0)
     {
-        if(board->mode == INIT){
+        if (board->mode == INIT)
+        {
             print_error_mode("solve or edit");
             return 0;
         }
 
         next = (strtok(NULL, " \t\r\n"));
-        if(next != NULL)
+        if (next != NULL)
         {
             print_error_too_many("undo");
             return 0;
@@ -319,13 +332,14 @@ int parse_command(char *command, Board *board, Curr_move move)
     /*COMMAND 10*/
     if (strcmp(token, "redo") == 0)
     {
-        if(board->mode == INIT){
+        if (board->mode == INIT)
+        {
             print_error_mode("solve or edit");
             return 0;
         }
 
         next = (strtok(NULL, " \t\r\n"));
-        if(next != NULL)
+        if (next != NULL)
         {
             print_error_too_many("redo");
             return 0;
@@ -344,7 +358,8 @@ int parse_command(char *command, Board *board, Curr_move move)
     /*COMMAND 11*/
     if (strcmp(token, "save") == 0)
     {
-        if(board->mode == INIT){
+        if (board->mode == INIT)
+        {
             print_error_mode("solve or edit");
             return 0;
         }
@@ -357,7 +372,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         }
 
         next = (strtok(NULL, " \t\r\n"));
-        if(next != NULL)
+        if (next != NULL)
         {
             print_error_too_many("save filepath");
             return 0;
@@ -372,7 +387,8 @@ int parse_command(char *command, Board *board, Curr_move move)
     /*COMMAND 12 TODO*/
     if (strcmp(token, "hint") == 0)
     {
-        if(board->mode != SOLVE){
+        if (board->mode != SOLVE)
+        {
             print_error_mode("solve");
             return 0;
         }
@@ -392,40 +408,45 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
         y = atoi(token);
-        
+
         next = (strtok(NULL, " \t\r\n"));
-        if(next != NULL)
+        if (next != NULL)
         {
             print_error_too_many("hint column row");
             return 0;
         }
 
-        if(x<1 || x>size){
-            printf("Error: first parameter out of range. legal range for column: %d - %d .\n",1,size);
+        if (x < 1 || x > size)
+        {
+            printf("Error: first parameter out of range. legal range for column: %d - %d .\n", 1, size);
             return 0;
         }
-        if(y<1 || y>size) {
-            printf("Error: second parameter out of range. legal range for row: %d - %d .\n",1,size);
-            return 0;
-        }
-
-        if(board->fixed_board[y-1][x-1]!=BOARD_NULL_VALUE){
-            printf("Error: cell (%d,%d) is fixed.\n",y,x);
-            return 0;
-        }
-        if(board->cur_board[y-1][x-1]!=BOARD_NULL_VALUE){
-            printf("Error: cell (%d,%d) already contains a value.\n",y,x);
+        if (y < 1 || y > size)
+        {
+            printf("Error: second parameter out of range. legal range for row: %d - %d .\n", 1, size);
             return 0;
         }
 
-        //hint(y, x, board);
+        if (board->fixed_board[y - 1][x - 1] != BOARD_NULL_VALUE)
+        {
+            printf("Error: cell (%d,%d) is fixed.\n", y, x);
+            return 0;
+        }
+        if (board->cur_board[y - 1][x - 1] != BOARD_NULL_VALUE)
+        {
+            printf("Error: cell (%d,%d) already contains a value.\n", y, x);
+            return 0;
+        }
+
+        /*hint(y, x, board); */
         return 12;
     }
 
     /*COMMAND 13 TODO*/
     if (strcmp(token, "guess_hint") == 0)
     {
-        if(board->mode != SOLVE){
+        if (board->mode != SOLVE)
+        {
             print_error_mode("solve");
             return 0;
         }
@@ -445,38 +466,44 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
         y = atoi(token);
-        
+
         next = (strtok(NULL, " \t\r\n"));
-        if(next != NULL)
+        if (next != NULL)
         {
             print_error_too_many("guess_hint column row");
             return 0;
         }
 
-        if(x<1 || x>size){
-            printf("Error: first parameter out of range. legal range for column: %d - %d.\n",1,size);
+        if (x < 1 || x > size)
+        {
+            printf("Error: first parameter out of range. legal range for column: %d - %d.\n", 1, size);
             return 0;
         }
-        if(y<1 || y>size) {
-            printf("Error: second parameter out of range. legal range for row: %d - %d.\n",1,size);
+        if (y < 1 || y > size)
+        {
+            printf("Error: second parameter out of range. legal range for row: %d - %d.\n", 1, size);
             return 0;
         }
 
-        if(is_erroneous_board(board)){
+        if (is_erroneous_board(board))
+        {
             printf("Error: erroneous boards can't use guess_hint.\n");
             return 0;
         }
 
-        if(board->fixed_board[y-1][x-1]!=BOARD_NULL_VALUE){
-            printf("Error: cell (%d,%d) is fixed.\n",y,x);
+        if (board->fixed_board[y - 1][x - 1] != BOARD_NULL_VALUE)
+        {
+            printf("Error: cell (%d,%d) is fixed.\n", y, x);
             return 0;
         }
 
-        if(board->cur_board[y-1][x-1]!=BOARD_NULL_VALUE){
-            printf("Error: cell (%d,%d) already contains a value.\n",y,x);
+        if (board->cur_board[y - 1][x - 1] != BOARD_NULL_VALUE)
+        {
+            printf("Error: cell (%d,%d) already contains a value.\n", y, x);
             return 0;
         }
-    
+
+        guess_hint(board,y,x);
         /* TODO: call func, x col, y row (1-size). is_erroneous_board inside?*/
 
         return 13;
@@ -485,12 +512,13 @@ int parse_command(char *command, Board *board, Curr_move move)
     /*COMMAND 14*/
     if (strcmp(token, "num_solutions") == 0)
     {
-         if(board->mode == INIT){
+        if (board->mode == INIT)
+        {
             print_error_mode("solve or edit");
             return 0;
         }
         next = (strtok(NULL, " \t\r\n"));
-        if(next != NULL)
+        if (next != NULL)
         {
             print_error_too_many("num_solutions");
             return 0;
@@ -502,12 +530,13 @@ int parse_command(char *command, Board *board, Curr_move move)
     /*COMMAND 15*/
     if (strcmp(token, "autofill") == 0)
     {
-        if(board->mode != SOLVE){
+        if (board->mode != SOLVE)
+        {
             print_error_mode("solve");
             return 0;
         }
         next = (strtok(NULL, " \t\r\n"));
-        if(next != NULL)
+        if (next != NULL)
         {
             print_error_too_many("autofill");
             return 0;
@@ -526,12 +555,13 @@ int parse_command(char *command, Board *board, Curr_move move)
     /*COMMAND 16*/
     if (strcmp(token, "reset") == 0)
     {
-        if(board->mode == INIT){
+        if (board->mode == INIT)
+        {
             print_error_mode("solve or edit");
             return 0;
         }
         next = (strtok(NULL, " \t\r\n"));
-        if(next != NULL)
+        if (next != NULL)
         {
             print_error_too_many("reset");
             return 0;
@@ -545,7 +575,7 @@ int parse_command(char *command, Board *board, Curr_move move)
     if (strcmp(token, "exit") == 0)
     {
         next = (strtok(NULL, " \t\r\n"));
-        if(next != NULL)
+        if (next != NULL)
         {
             print_error_too_many("exit");
             return 0;
