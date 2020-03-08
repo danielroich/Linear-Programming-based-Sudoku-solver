@@ -28,6 +28,7 @@ int parse_command(char *command, Board *board, Curr_move move)
     char *token, *next;
     int succeeded;
     int size = board->num_of_columns * board->num_of_rows;
+    int i = 0;
 
     token = strtok(command, " \t\r\n");
     if (token == NULL)
@@ -284,21 +285,43 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
 
+        token = (strtok(NULL, " \t\r\n"));
+        if (token == NULL)
+        {
+            print_error_not_enough("generate fill keep");
+            return 0;
+        }
+        x = atoi(token);
+
+        token = (strtok(NULL, " \t\r\n"));
+        if (token == NULL)
+        {
+            print_error_not_enough("generate fill keep");
+            return 0;
+        }
+        y = atoi(token);
+
         next = (strtok(NULL, " \t\r\n"));
         if (next != NULL)
         {
-            print_error_too_many("generate");
+            print_error_too_many("generate fill keep");
             return 0;
         }
 
-        /*succeeded = generate();
+        do{
+            succeeded = generate(board, x, y);
+            i++;
+        } while(i<1000 && succeeded==0);
+        if(succeeded==0){
+            printf("Error: in the puzzle generator.");
+        }
         if (succeeded == 1)
         {
             clean_nexts(move);
             add_new_move(move, board);
             print_board(board);
             return 8;
-        }*/
+        }
 
         return 8;
     }
@@ -503,7 +526,7 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
 
-        guess_hint(board,y,x);
+        guess_hint(board, y, x); 
         /* TODO: call func, x col, y row (1-size). is_erroneous_board inside?*/
 
         return 13;

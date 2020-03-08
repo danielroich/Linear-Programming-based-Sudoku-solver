@@ -203,7 +203,7 @@ int single_possible_value(int row, int col, Board* board){
             value = i;
         }
         if(count>1)
-            break;
+            return -1;
     }
     if(count != 1){
         return 0;

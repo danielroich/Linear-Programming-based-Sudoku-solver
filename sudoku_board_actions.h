@@ -12,7 +12,7 @@ void mark_errors(Board* board, int is_mark);
 void print_board(Board* board);
 int set_value_user(int x, int y, int value, Board* board);
 void validate_board(Board* board);
-
+int generate(Board* board, int fill, int keep);
 int undo(Board* board, Curr_move move);
 int redo(Board* board, Curr_move move);
 int save(Board* board, char* path);
