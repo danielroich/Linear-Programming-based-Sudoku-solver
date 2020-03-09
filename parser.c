@@ -443,7 +443,7 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
 
-        /*hint(y, x, board); */
+        hint(y-1, x-1, board);
         return 12;
     }
 

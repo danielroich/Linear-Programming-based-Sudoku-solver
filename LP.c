@@ -343,6 +343,7 @@ void createBounds(double *lb, double *ub, int num_of_params)
 int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
 {
     int i;
+    int status;
     int board_size = board->num_of_columns * board->num_of_rows;
     GRBenv *env = NULL;
     GRBmodel *model = NULL;
@@ -370,7 +371,7 @@ int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
 
         /* coefficients - for x,y,z (cells 0,1,2 in "obj")
         maximize x+y+z+k.. */
-        obj[i] = rand() % (2 * board_size);
+        obj[i] = 1;
     }
 
     /* Create environment - log file is mip1.log */
@@ -395,15 +396,15 @@ int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
         printf("ERROR %d GRBnewmodel(): %s\n", error, GRBgeterrormsg(env));
         return -1;
     }
+    
 
-    /*
     error = GRBaddvars(model, num_of_params, 0, NULL, NULL, NULL, obj, lb, ub, vtype, NULL);
     if (error)
     {
         printf("ERROR %d GRBaddvars(): %s\n", error, GRBgeterrormsg(env));
         return -1;
     }
-    */
+    
 
     /* Change objective sense to maximization */
     error = GRBsetintattr(model, GRB_INT_ATTR_MODELSENSE, GRB_MAXIMIZE);
@@ -482,7 +483,11 @@ int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
     GRBfreemodel(model);
     GRBfreeenv(env);
 
-    return optimstatus == GRB_OPTIMAL ? 1 : 0;
+    status =  optimstatus == GRB_OPTIMAL ? 1 : 0;
+    printf("optimization try completed, result: %d\n", status);
+
+    return status;
+
 }
 
 OptionalCellValues *get_possible_values_from_sol(Board *board, double *sol, int row, int column, int threshold)
@@ -643,12 +648,14 @@ void fill_board(Board *board, int is_integer, float threshold)
     }
 }
 
-OptionalCellValues* get_value_for_cell(Board* board, int row, int column,int is_integer){
+OptionalCellValues *get_value_for_cell(Board *board, int row, int column, int is_integer)
+{
     int i;
     int board_size = board->num_of_columns * board->num_of_rows;
     int status;
     int chosen_num;
     int num_of_params = get_num_of_parameters(board);
+    OptionalCellValues* cell_values;
     double *sol = (double *)malloc(num_of_params * sizeof(double));
     status = run_LP(board, sol, num_of_params, 1);
     if (status != 1)
@@ -657,7 +664,6 @@ OptionalCellValues* get_value_for_cell(Board* board, int row, int column,int is_
     }
 
     return get_possible_values_from_sol(board, sol, row, column, 0.1);
-
 }
 
 int validate_ILP(Board *board)
