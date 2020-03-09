@@ -181,7 +181,7 @@ int check_only_digits(const char* path){
     while ((ch=getc(fptr))!=EOF)
      {
         ch1= (unsigned char) ch;  
-        if((ch1 < '0' || ch1 > '9') && ch1 != ' ' && ch1 != '\n' && ch1!='\t' && ch1!='.'){
+        if((ch1 < '0' || ch1 > '9') && ch1 != ' ' && ch1 != '\n' && ch1!='\t' && ch1!='\r' && ch1!='.'){
             fclose(fptr);
             return -1;
         }

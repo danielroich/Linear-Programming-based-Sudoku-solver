@@ -450,7 +450,7 @@ int autofill(Board *board)
     {
         for (j = 0; j < size; j++)
         {
-            if (autofill_values[i][j] != 0)
+            if (autofill_values[i][j] > 0)
             {
                 set_value_without_check(i, j, autofill_values[i][j], board);
                 printf("cell (%d,%d) autofilled to %d.\n", j + 1, i + 1, autofill_values[i][j]);
