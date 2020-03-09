@@ -15,7 +15,7 @@ int write_file_from_board (Board* board,const char* path){
     
     fptr = fopen(path,w); 
     if(fptr ==NULL){
-        printf("Error: invalid file\n");
+        printf("Error: invalid file.\n");
         return 0;
     }   
     size = board->num_of_rows*board->num_of_columns;
@@ -60,7 +60,6 @@ int read_file_to_board(Board* board, const char* path, int check_errors){
 
     fptr = fopen(path,r); 
     if(fptr ==NULL){
-        fclose(fptr);
         return -1;
     }
     
@@ -176,7 +175,6 @@ int check_only_digits(const char* path){
     fptr = fopen(path,r); 
     /*called if opened ok, but to make sure:*/
     if(fptr ==NULL){
-        fclose(fptr);
         return -1;
     }
 
