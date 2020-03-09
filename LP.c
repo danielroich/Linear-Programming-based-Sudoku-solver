@@ -643,21 +643,21 @@ void fill_board(Board *board, int is_integer, float threshold)
     }
 }
 
-OptionalCellValues *get_values_for_cell(Board *board, int row, int column)
-{
+OptionalCellValues* get_value_for_cell(Board* board, int row, int column,int is_integer){
+    int i;
     int board_size = board->num_of_columns * board->num_of_rows;
     int status;
-    OptionalCellValues *cell_values;
+    int chosen_num;
     int num_of_params = get_num_of_parameters(board);
     double *sol = (double *)malloc(num_of_params * sizeof(double));
     status = run_LP(board, sol, num_of_params, 1);
     if (status != 1)
     {
-        return cell_values;
+        return 0;
     }
 
-    print_gurobi_results(board, sol, 0.01);
-    return get_possible_values_from_sol(board, sol, row, column, 0);
+    return get_possible_values_from_sol(board, sol, row, column, 0.1);
+
 }
 
 int validate_ILP(Board *board)

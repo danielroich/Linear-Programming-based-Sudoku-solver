@@ -260,55 +260,66 @@ void guess(Board *board, float threshold)
 /*COMMAND 8*/
 /* randomly filling fill empty cells with legal values,
 running ILP to solve the board, and then clearing all but keep random cells.*/
-int generate(Board* board, int fill, int keep){
+int generate(Board *board, int fill, int keep)
+{
     int size = board->num_of_columns * board->num_of_rows;
-    int empty = size*size - board->count_filled;
+    int empty = size * size - board->count_filled;
     int rand_val, rand_row, rand_col, set;
     int count = 0;
-    Board* old_board; 
+    Board *old_board;
 
-    if(fill < 0 || fill > empty){
-        printf("Error: first parameter out of range. legal range: %d - %d.\n",0,empty);
+    if (fill < 0 || fill > empty)
+    {
+        printf("Error: first parameter out of range. legal range: %d - %d.\n", 0, empty);
         return -1;
     }
-    if(keep <= 0 || keep > size*size){
-        printf("Error: second parameter out of range. legal range: %d - %d.\n",1,size*size);
+    if (keep <= 0 || keep > size * size)
+    {
+        printf("Error: second parameter out of range. legal range: %d - %d.\n", 1, size * size);
         return -1;
     }
 
-    old_board = (Board*) malloc((sizeof(Board)));
-    if(old_board==NULL){
+    old_board = (Board *)malloc((sizeof(Board)));
+    if (old_board == NULL)
+    {
         printf("Error: malloc has failed.\n");
         exit(0);
     }
-    create_empty_board(old_board,board->num_of_rows,board->num_of_columns);
-    copy_board(board,old_board);
+    create_empty_board(old_board, board->num_of_rows, board->num_of_columns);
+    copy_board(board, old_board);
 
-    while(count < fill){
-        rand_row = (rand() % (size)); 
+    while (count < fill)
+    {
+        rand_row = (rand() % (size));
         rand_col = (rand() % (size));
-        if(board->cur_board[rand_row][rand_col] == BOARD_NULL_VALUE){
+        if (board->cur_board[rand_row][rand_col] == BOARD_NULL_VALUE)
+        {
             rand_val = (rand() % (size)) + 1;
             set = set_value(rand_row, rand_col, rand_val, board, 0);
-            if(set!=0){
+            if (set != 0)
+            {
                 count++;
             }
-            else{
-                if(single_possible_value(rand_row, rand_col, board)==0){ /*0 legal values for cell*/
-                    copy_board(old_board,board);
+            else
+            {
+                if (single_possible_value(rand_row, rand_col, board) == 0)
+                { /*0 legal values for cell*/
+                    copy_board(old_board, board);
                     free_board(old_board);
                     return 0;
                 }
             }
         }
-    }    
+    }
     /* TODO: ILP sol 
-    if fail copy from old + free old + return 0*/ 
-    while(board->count_filled > keep){
-        rand_row = (rand() % (size)); 
+    if fail copy from old + free old + return 0*/
+    while (board->count_filled > keep)
+    {
+        rand_row = (rand() % (size));
         rand_col = (rand() % (size));
-        if(board->cur_board[rand_row][rand_col] != BOARD_NULL_VALUE){
-            erase_value(rand_row,rand_col,board);
+        if (board->cur_board[rand_row][rand_col] != BOARD_NULL_VALUE)
+        {
+            erase_value(rand_row, rand_col, board);
         }
     }
     free_board(old_board);
@@ -362,13 +373,13 @@ int save(Board *board, char *path)
 }
 
 /*COMMAND 12*/
-/*
-void hint(int x, int y, Board* board){
-    int value = hint_ILP(board,x,y);
-    //int value = board->solved_board[x-1][y-1];
-    printf("Hint: set cell to %d\n",value);
+
+void hint(int x, int y, Board *board)
+{
+    OptionalCellValues* cell_values;
+    cell_values = get_value_for_cell(board, x, y, 1);
+    printf("Hint: set cell to %d\n", cell_values->chosen_value);
 }
-*/
 
 /*COMMAND 13*/
 /* TODO: hint with LP*/
@@ -376,12 +387,12 @@ void guess_hint(Board *board, int row, int column)
 {
     int i;
     int board_size = board->num_of_columns * board->num_of_rows;
-    OptionalCellValues *cell_values = get_values_for_cell(board, row, column);
+    OptionalCellValues *cell_values = get_value_for_cell(board, row, column, 1);
     for (i = 0; i < board_size; i++)
     {
-        printf("the value %d has %d prob of appearing\n", i+1, cell_values->possible_values[i].propability);
+        printf("the value %d has %d prob of appearing\n", i + 1, cell_values->possible_values[i].propability);
     }
-    
+
     free_cell_values(cell_values);
 }
 
@@ -422,11 +433,14 @@ int autofill(Board *board)
             }
         }
     }
-    for (i=0; i<size; i++){
-        for (j=0; j<size; j++){
-            if(autofill_values[i][j]!=0){
-                set_value_without_check(i,j,autofill_values[i][j],board);
-                printf("cell (%d,%d) autofilled to %d.\n",j+1,i+1,autofill_values[i][j]);
+    for (i = 0; i < size; i++)
+    {
+        for (j = 0; j < size; j++)
+        {
+            if (autofill_values[i][j] != 0)
+            {
+                set_value_without_check(i, j, autofill_values[i][j], board);
+                printf("cell (%d,%d) autofilled to %d.\n", j + 1, i + 1, autofill_values[i][j]);
             }
         }
     }
