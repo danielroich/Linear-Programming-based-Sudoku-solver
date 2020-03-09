@@ -230,7 +230,7 @@ int set_value_user(int x, int y, int value, Board *board)
 
 /*COMMAND 6*/
 
-void validate_board(Board *board)
+int validate_board(Board *board)
 {
     int **cur_board_copy;
     int valid_board = 0;
@@ -244,10 +244,14 @@ void validate_board(Board *board)
     free_2d_array(cur_board_copy, size);
 
     board->count_filled = fixed;
-    if (valid_board != 1)
+    if (valid_board != 1){
         printf("Validation failed: board is unsolvable\n");
-    else
+        return 0;
+    }
+    else{
         printf("Validation passed: board is solvable\n");
+        return 1;
+    }     
 }
 
 /*COMMAND 7*/
@@ -364,10 +368,10 @@ int save(Board *board, char *path)
         printf("Error: in edit mode, erroneous boards can't be saved.\n");
         return 0;
     }
-    /*if(board->mode == EDIT && !validate_board(board)){
+    if(board->mode == EDIT && !validate_board(board)){
         printf("Error: in edit mode, boards without a solution can't be saved.\n");
         return 0;
-    } TODO: validate to int-return-value */
+    } 
     succeeded = write_file_from_board(board, path);
     return succeeded;
 }

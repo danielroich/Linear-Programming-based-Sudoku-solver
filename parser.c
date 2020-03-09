@@ -188,7 +188,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         return 0;
     }
 
-    /*COMMAND 6 TODO*/
+    /*COMMAND 6*/
     if (strcmp(token, "validate") == 0)
     {
         if (board->mode == INIT)
@@ -209,12 +209,12 @@ int parse_command(char *command, Board *board, Curr_move move)
             printf("Error: erroneous boards can't be validate.\n");
             return 0;
         }
-        /*TODO: is_erroneous_board in validate_board ? */
+
         validate_board(board);
         return 6;
     }
 
-    /*COMMAND 7 TODO*/
+    /*COMMAND 7*/
     if (strcmp(token, "guess") == 0)
     {
         if (board->mode != SOLVE)
@@ -245,20 +245,21 @@ int parse_command(char *command, Board *board, Curr_move move)
         }
 
         guess(board, x); 
-
-        /*succeeded = guess();
+    
+        /* TODO:
+        succeeded =
         if (succeeded == 1)
         {
             clean_nexts(move);
             add_new_move(move, board);
             print_board(board);
             return 7;
-        }*/
-
-        return 7;
+        }
+        */
+       return 0;
     }
 
-    /*COMMAND 8 TODO*/
+    /*COMMAND 8*/
     if (strcmp(token, "generate") == 0)
     {
         if (board->mode != EDIT)
@@ -389,7 +390,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         return 11;
     }
 
-    /*COMMAND 12 TODO*/
+    /*COMMAND 12*/
     if (strcmp(token, "hint") == 0)
     {
         if (board->mode != SOLVE)
@@ -423,12 +424,18 @@ int parse_command(char *command, Board *board, Curr_move move)
 
         if (x < 1 || x > size)
         {
-            printf("Error: first parameter out of range. legal range for column: %d - %d .\n", 1, size);
+            printf("Error: first parameter out of range. legal range for column: %d - %d.\n", 1, size);
             return 0;
         }
         if (y < 1 || y > size)
         {
-            printf("Error: second parameter out of range. legal range for row: %d - %d .\n", 1, size);
+            printf("Error: second parameter out of range. legal range for row: %d - %d.\n", 1, size);
+            return 0;
+        }
+
+        if (is_erroneous_board(board))
+        {
+            printf("Error: erroneous boards can't use hint.\n");
             return 0;
         }
 
@@ -447,7 +454,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         return 12;
     }
 
-    /*COMMAND 13 TODO*/
+    /*COMMAND 13*/
     if (strcmp(token, "guess_hint") == 0)
     {
         if (board->mode != SOLVE)
@@ -509,8 +516,6 @@ int parse_command(char *command, Board *board, Curr_move move)
         }
 
         guess_hint(board,y-1,x-1);
-        /* TODO: call func, x col, y row (1-size). is_erroneous_board inside?*/
-
         return 13;
     }
 
