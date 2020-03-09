@@ -229,20 +229,15 @@ int generate(Board* board, int fill, int keep){
     int size = board->num_of_columns * board->num_of_rows;
     int empty = size*size - board->count_filled;
     int rand_val, rand_row, rand_col, set;
-    int clear;
     int count = 0;
     Board* old_board; 
 
-    if(fill < 0){
-        printf("Error: first parameter out of range. legal range: %d - %d .\n",0,empty);
+    if(fill < 0 || fill > empty){
+        printf("Error: first parameter out of range. legal range: %d - %d.\n",0,empty);
         return -1;
     }
     if(keep <= 0 || keep > size*size){
-        printf("Error: second parameter out of range. legal range: %d - %d .\n",1,size*size);
-        return -1;
-    }
-    if(fill > empty){
-        printf("Error: board does not contain %d empty cells. empty cells: %d.", fill, empty);
+        printf("Error: second parameter out of range. legal range: %d - %d.\n",1,size*size);
         return -1;
     }
 
@@ -255,8 +250,8 @@ int generate(Board* board, int fill, int keep){
     copy_board(board,old_board);
 
     while(count < fill){
-        rand_row = (rand() % (board->num_of_rows)); 
-        rand_col = (rand() % (board->num_of_columns));
+        rand_row = (rand() % (size)); 
+        rand_col = (rand() % (size));
         if(board->cur_board[rand_row][rand_col] == BOARD_NULL_VALUE){
             rand_val = (rand() % (size)) + 1;
             set = set_value(rand_row, rand_col, rand_val, board, 0);
@@ -272,14 +267,14 @@ int generate(Board* board, int fill, int keep){
             }
         }
     }    
-    /* ILP sol 
+    /* TODO: ILP sol 
     if fail copy from old + free old + return 0*/ 
-    count = 0;
-    clear = size*size - keep; 
-    while(count < clear){
-        rand_row = (rand() % (board->num_of_rows)); 
-        rand_col = (rand() % (board->num_of_columns));
-        erase_value(rand_row,rand_col,board);
+    while(board->count_filled > keep){
+        rand_row = (rand() % (size)); 
+        rand_col = (rand() % (size));
+        if(board->cur_board[rand_row][rand_col] != BOARD_NULL_VALUE){
+            erase_value(rand_row,rand_col,board);
+        }
     }
     free_board(old_board);
     return 1;

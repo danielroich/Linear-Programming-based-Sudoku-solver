@@ -313,7 +313,7 @@ int parse_command(char *command, Board *board, Curr_move move)
             i++;
         } while(i<1000 && succeeded==0);
         if(succeeded==0){
-            printf("Error: in the puzzle generator.");
+            printf("Error: in the puzzle generator.\n");
         }
         if (succeeded == 1)
         {
