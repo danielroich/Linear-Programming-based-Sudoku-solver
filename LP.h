@@ -6,7 +6,6 @@
 #include "optional_cell_values.h"
 
 int validate_ILP(Board* board);
-int hint_ILP(Board *board, int row, int column);
 OptionalCellValues* get_values_for_cell(Board* board, int row, int column);
 void fill_board(Board* board, int is_integer, float threshold);
 
