@@ -371,7 +371,6 @@ void hint(int x, int y, Board* board){
 */
 
 /*COMMAND 13*/
-<<<<<<< Updated upstream
 /* TODO: hint with LP*/
 void guess_hint(Board *board, int row, int column)
 {
@@ -385,15 +384,6 @@ void guess_hint(Board *board, int row, int column)
     
     free_cell_values(cell_values);
 }
-=======
-/* TODO: hint with LP 
-void guess_hint(Board* board, int row, int column) {
-    OptionalCellValues* cell_values = get_values_for_cell(board,row,column);
-    printf("%d", cell_values->column);
-    free_cell_values(cell_values);
-}
-*/
->>>>>>> Stashed changes
 
 /*COMMAND 14*/
 int number_solutions(Board *board)
