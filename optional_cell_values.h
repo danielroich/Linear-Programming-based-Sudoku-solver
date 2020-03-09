@@ -8,6 +8,7 @@ typedef struct _optional_cell_values_H {
     int row;
     int column;
     PossibleValue* possible_values;
+    int chosen_value;
 
 } OptionalCellValues;
 

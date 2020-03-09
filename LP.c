@@ -4,6 +4,9 @@
 #include "LP.h"
 #include "gurobi_c.h"
 #include "backtrack_core.h"
+#include <time.h>
+#include <limits.h>
+#include "2d_array_utils.h"
 #include <math.h>
 
 int get_num_of_parameters(Board *board)
@@ -314,6 +317,29 @@ int add_square_constraints(Board *board, GRBmodel *model, int *ind, double *val,
     return 1;
 }
 
+int update_constraints(Board *board, GRBmodel *model, int *ind, double *val, GRBenv *env)
+{
+    add_single_value_per_cell_constraints(board, model, ind, val, env);
+
+    add_rows_constraints(board, model, ind, val, env);
+
+    add_column_constraints(board, model, ind, val, env);
+
+    add_square_constraints(board, model, ind, val, env);
+
+    return 1;
+}
+
+void createBounds(double *lb, double *ub, int num_of_params)
+{
+    int i;
+    for (i = 0; i < num_of_params; i++)
+    {
+        lb[i] = 0.0;
+        ub[i] = 1.0;
+    }
+}
+
 int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
 {
     int i;
@@ -325,8 +351,12 @@ int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
     double *val = (double *)malloc(board_size * sizeof(double));
     double *obj = (double *)malloc(num_of_params * sizeof(double));
     char *vtype = (char *)malloc(num_of_params * sizeof(char));
+    double *lb = (double *)malloc(num_of_params * sizeof(double));
+    double *ub = (double *)malloc(num_of_params * sizeof(double));
     int optimstatus;
     double objval;
+
+    createBounds(lb, ub, num_of_params);
 
     /* Add variables */
     for (i = 0; i < num_of_params; i++)
@@ -340,11 +370,11 @@ int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
 
         /* coefficients - for x,y,z (cells 0,1,2 in "obj")
         maximize x+y+z+k.. */
-        obj[i] = 1;
+        obj[i] = rand() % (2 * board_size);
     }
 
     /* Create environment - log file is mip1.log */
-    error = GRBloadenv(&env, "mip1.log");
+    error = GRBloadenv(&env, "mip1");
     if (error)
     {
         printf("ERROR %d GRBloadenv(): %s\n", error, GRBgeterrormsg(env));
@@ -359,20 +389,21 @@ int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
     }
 
     /* Create an empty model named "mip1" */
-    error = GRBnewmodel(env, &model, "mip1", 0, NULL, NULL, NULL, vtype, NULL);
+    error = GRBnewmodel(env, &model, "mip1", num_of_params, obj, lb, ub, vtype, NULL);
     if (error)
     {
         printf("ERROR %d GRBnewmodel(): %s\n", error, GRBgeterrormsg(env));
         return -1;
     }
 
-    /* add variables to model */
-    error = GRBaddvars(model, num_of_params, 0, NULL, NULL, NULL, obj, NULL, NULL, vtype, NULL);
+    /*
+    error = GRBaddvars(model, num_of_params, 0, NULL, NULL, NULL, obj, lb, ub, vtype, NULL);
     if (error)
     {
         printf("ERROR %d GRBaddvars(): %s\n", error, GRBgeterrormsg(env));
         return -1;
     }
+    */
 
     /* Change objective sense to maximization */
     error = GRBsetintattr(model, GRB_INT_ATTR_MODELSENSE, GRB_MAXIMIZE);
@@ -391,13 +422,7 @@ int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
         return -1;
     }
 
-    add_single_value_per_cell_constraints(board, model, ind, val, env);
-
-    add_rows_constraints(board, model, ind, val, env);
-
-    add_column_constraints(board, model, ind, val, env);
-
-    add_square_constraints(board, model, ind, val, env);
+    update_constraints(board, model, ind, val, env);
 
     /* Optimize model - need to call this before calculation */
     error = GRBoptimize(model);
@@ -426,10 +451,6 @@ int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
 
     if (optimstatus == GRB_OPTIMAL)
     {
-
-        /* print results */
-        printf("\nOptimization complete\n");
-
         error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
         if (error)
         {
@@ -464,54 +485,6 @@ int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
     return optimstatus == GRB_OPTIMAL ? 1 : 0;
 }
 
-int get_result_by_index(Board *board, double *sol, int row, int column)
-{
-    int i;
-    int j;
-    int k;
-    int s;
-    int temp_counter = 0;
-    int counter = 0;
-    int chosen_posbbile_values_index = 0;
-    int board_size = board->num_of_columns * board->num_of_rows;
-    int *possible_values = (int *)calloc(board_size, sizeof(int));
-    for (i = 0; i < board_size; i++)
-    {
-        for (j = 0; j < board_size; j++)
-        {
-            if (get_value(i, j, board, 0) == BOARD_NULL_VALUE)
-            {
-                temp_counter = counter;
-                counter += get_possible_values(board, i, j, possible_values);
-                for (k = temp_counter; k < counter; k++)
-                {
-                    if (sol[k] > 0)
-                    {
-
-                        chosen_posbbile_values_index = k - temp_counter;
-                        for (s = 0; s < board_size; s++)
-                        {
-                            if (possible_values[s] == 1)
-                            {
-                                if (chosen_posbbile_values_index == 0)
-                                {
-                                    if (i == row && j == column)
-                                    {
-                                        return s + 1;
-                                    }
-                                }
-                                --chosen_posbbile_values_index;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return 0;
-}
-
 OptionalCellValues *get_possible_values_from_sol(Board *board, double *sol, int row, int column, int threshold)
 {
     int i;
@@ -525,7 +498,7 @@ OptionalCellValues *get_possible_values_from_sol(Board *board, double *sol, int 
     int board_size = board->num_of_columns * board->num_of_rows;
     cell_values->column = column;
     cell_values->row = row;
-    cell_values->possible_values = (PossibleValue *)calloc(sizeof(PossibleValue) * board_size);
+    cell_values->possible_values = (PossibleValue *)calloc(sizeof(PossibleValue), board_size);
     int *possible_values = (int *)calloc(board_size, sizeof(int));
     for (i = 0; i < board_size; i++)
     {
@@ -548,7 +521,6 @@ OptionalCellValues *get_possible_values_from_sol(Board *board, double *sol, int 
                                 {
                                     cell_values->possible_values[s].value = s + 1;
                                     cell_values->possible_values[s].propability = sol[k];
-                                    printf("for index: %d,%d the value %d has prob of: %f\n", i, j, s + 1, sol[k]);
                                 }
                                 --chosen_posbbile_values_index;
                             }
@@ -562,14 +534,53 @@ OptionalCellValues *get_possible_values_from_sol(Board *board, double *sol, int 
     return cell_values;
 }
 
-void prob_based_decide_result(OptionalCellValues *cell_values, float threshold) {
+int prob_based_decide_result(PossibleValue *cell_values, float threshold, int n)
+{
+    int i;
+    /* construct a sum array from given probabilities */
+    int prob_sum[n];
+    memset(prob_sum, 0, sizeof prob_sum);
 
+    /* prob_sum[i] holds sum of all probability[j] for 0 <= j <=i */
+    prob_sum[0] = cell_values[0].propability * 100;
+    for (i = 1; i < n; i++)
+        prob_sum[i] = prob_sum[i - 1] + (cell_values[i].propability * 100);
+
+    int r = (rand() % 100) + 1;
+
+    /* based on the comparison result, return corresponding
+	 element from the input array */
+    if (r <= prob_sum[0]) // handle 0'th index separately
+        return cell_values[0].value;
+
+    for (i = 1; i < n; i++)
+    {
+        if (r > prob_sum[i - 1] && r <= prob_sum[i])
+        {
+            return cell_values[i].value;
+        }
+    }
+
+    return BOARD_NULL_VALUE;
 }
 
-void fill_results(Board *board, double *sol, float threshold)
+void print_cell_results(OptionalCellValues *cell_values, int size)
+{
+    int k;
+    for (k = 0; k < size; k++)
+    {
+        if (cell_values->possible_values[k].propability > 0)
+        {
+            printf("value %d for index %d,%d has prob of %d\n", k + 1, cell_values->row, cell_values->column, cell_values->possible_values[k].propability);
+        }
+    }
+}
+
+void print_gurobi_results(Board *board, double *sol, float threshold)
 {
     int i;
     int j;
+    int chosen_val;
     int board_size = board->num_of_columns * board->num_of_rows;
     OptionalCellValues *cell_values;
     for (i = 0; i < board_size; i++)
@@ -577,64 +588,84 @@ void fill_results(Board *board, double *sol, float threshold)
         for (j = 0; j < board_size; j++)
         {
             cell_values = get_possible_values_from_sol(board, sol, i, j, threshold);
+            print_cell_results(cell_values, board_size);
         }
     }
 }
 
-int hint_ILP(Board *board, int row, int column)
+void fill_results_to_board(Board *board, double *sol, float threshold)
+{
+    int i;
+    int j;
+    int chosen_val;
+    int set_successful;
+    int board_size = board->num_of_columns * board->num_of_rows;
+    OptionalCellValues ***cell_values = create_3d_possible_values_array(board_size);
+    for (i = 0; i < board_size; i++)
+    {
+        for (j = 0; j < board_size; j++)
+        {
+            cell_values[i][j] = get_possible_values_from_sol(board, sol, i, j, threshold);
+            print_cell_results(cell_values[i][j], board_size);
+            chosen_val = prob_based_decide_result(cell_values[i][j]->possible_values, threshold, board_size);
+
+            if (chosen_val != BOARD_NULL_VALUE)
+            {
+                printf("for cell %d,%d chosen val is: %d\n", i, j, chosen_val);
+                cell_values[i][j]->chosen_value = chosen_val;
+            }
+        }
+    }
+
+    for (i = 0; i < board_size; i++)
+    {
+        for (j = 0; j < board_size; j++)
+        {
+            if (cell_values[i][j]->chosen_value != BOARD_NULL_VALUE)
+            {
+                printf("setting to index %d,%d val: %d\n", i, j, cell_values[i][j]->chosen_value);
+                set_value(i, j, cell_values[i][j]->chosen_value, board, 0);
+            }
+        }
+    }
+}
+
+void fill_board(Board *board, int is_integer, float threshold)
 {
     int status;
     int num_of_params = get_num_of_parameters(board);
     double *sol = (double *)malloc(num_of_params * sizeof(double));
     status = run_LP(board, sol, num_of_params, 1);
 
-    if (status != 1)
+    if (status == 1)
     {
-        return BOARD_NULL_VALUE;
+        fill_results_to_board(board, sol, threshold);
     }
-
-    return get_result_by_index(board, sol, row, column);
-}
-
-int guess_LP(Board *board, int row, int column, float threshold)
-{
-    int status;
-    int i;
-    int num_of_params = get_num_of_parameters(board);
-    double *sol = (double *)malloc(num_of_params * sizeof(double));
-    status = run_LP(board, sol, num_of_params, 0);
-
-    if (status != 1)
-    {
-        return BOARD_NULL_VALUE;
-    }
-
-    fill_and_print_results(board, sol, threshold);
-
-    return get_result_by_index(board, sol, row, column);
 }
 
 OptionalCellValues *get_values_for_cell(Board *board, int row, int column)
 {
     int board_size = board->num_of_columns * board->num_of_rows;
     int status;
-    int i;
     OptionalCellValues *cell_values;
     int num_of_params = get_num_of_parameters(board);
     double *sol = (double *)malloc(num_of_params * sizeof(double));
-    status = run_LP(board, sol, num_of_params, 0);
-
+    status = run_LP(board, sol, num_of_params, 1);
     if (status != 1)
     {
         return cell_values;
     }
 
+    print_gurobi_results(board, sol, 0.01);
     return get_possible_values_from_sol(board, sol, row, column, 0);
 }
 
 int validate_ILP(Board *board)
 {
+    int result;
     int num_of_params = get_num_of_parameters(board);
     double *sol = (double *)malloc(num_of_params * sizeof(double));
-    return run_LP(board, sol, num_of_params, 1);
+    result = run_LP(board, sol, num_of_params, 1);
+    print_gurobi_results(board, sol, 0.01);
+    return result;
 }

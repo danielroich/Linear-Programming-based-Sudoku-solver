@@ -209,8 +209,8 @@ int parse_command(char *command, Board *board, Curr_move move)
             printf("Error: erroneous boards can't be validate.\n");
             return 0;
         }
-        /*TODO: is_erroneous_board in validate_board ?
-        validate_board(board);*/
+        /*TODO: is_erroneous_board in validate_board ? */
+        validate_board(board);
         return 6;
     }
 
@@ -223,14 +223,13 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
 
-        /*TODO: only threshold as input!
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
         {
             print_error_not_enough("guess threshold");
             return 0;
         }
-        x = atoi(token);
+        x = atof(token);
 
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
@@ -238,31 +237,14 @@ int parse_command(char *command, Board *board, Curr_move move)
             print_error_too_many("guess threshold");
             return 0;
         }
-        */
+        
         if (is_erroneous_board(board))
         {
             printf("Error: erroneous boards can't use guess.\n");
             return 0;
         }
 
-        token = (strtok(NULL, " \t\r\n"));
-        if (token == NULL)
-        {
-            printf("Error: invalid command\n");
-            return 0;
-        }
-        y = atoi(token);
-
-        token = (strtok(NULL, " \t\r\n"));
-        if (token == NULL)
-        {
-            printf("Error: invalid command\n");
-            return 0;
-        }
-        x = atoi(token);
-
-        printf("guess for %d,%d\n", x, y);
-        /*guess(board, x, y, 0); */
+        guess(board, x); 
 
         /*succeeded = guess();
         if (succeeded == 1)
@@ -526,7 +508,7 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
 
-        guess_hint(board, y, x); 
+        guess_hint(board,y-1,x-1);
         /* TODO: call func, x col, y row (1-size). is_erroneous_board inside?*/
 
         return 13;

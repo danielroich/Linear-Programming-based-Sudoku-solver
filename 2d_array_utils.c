@@ -1,5 +1,6 @@
 #include "stdio.h"
 #include "stdlib.h"
+#include "optional_cell_values.h"
 
 void copy_board_values(int** to, int** from, int size) {
     int i;
@@ -32,6 +33,28 @@ int**  create_2d_array(int size) {
 
     for (i=0; i<size; i++) {
         array[i] = (int *) calloc(size, sizeof(int));
+
+        if(array[i] == NULL) {
+            printf("Error: create_2d_array has failed\n");
+            exit(0);
+        }
+    }
+
+    return array;
+}
+
+OptionalCellValues *** create_3d_possible_values_array(int size) {
+    int i;
+    OptionalCellValues *** array;
+    array = (OptionalCellValues ***)malloc(size * sizeof(OptionalCellValues**));
+
+    if (array == NULL) {
+        printf("Error: create_2d_array has failed\n");
+        exit(0);
+    }
+
+    for (i=0; i<size; i++) {
+        array[i] = (OptionalCellValues **) calloc(size, sizeof(OptionalCellValues*));
 
         if(array[i] == NULL) {
             printf("Error: create_2d_array has failed\n");
