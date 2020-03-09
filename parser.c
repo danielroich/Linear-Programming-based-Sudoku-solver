@@ -508,8 +508,13 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
 
+<<<<<<< Updated upstream
         guess_hint(board,y-1,x-1);
         /* TODO: call func, x col, y row (1-size). is_erroneous_board inside?*/
+=======
+        /*guess_hint(board, y, x); 
+         TODO: call func, x col, y row (1-size). is_erroneous_board inside?*/
+>>>>>>> Stashed changes
 
         return 13;
     }
