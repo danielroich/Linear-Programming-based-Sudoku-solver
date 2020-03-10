@@ -299,7 +299,6 @@ int add_square_constraints(Board *board, GRBmodel *model, int *ind, double *val,
             {
                 ind[k] = gurobi_indexes_for_constraint[k];
                 val[k] = 1;
-
             }
             add_vectors_to_constraints(model, num_of_idexes_for_constraint, ind, val, env);
         }
@@ -491,20 +490,22 @@ OptionalCellValues get_possible_values_from_sol(Board *board, double *sol, int r
     int board_size = board->num_of_columns * board->num_of_rows;
     cell_values.column = column;
     cell_values.row = row;
-    cell_values.propabilities = (int *)calloc(sizeof(int), board_size);
+    cell_values.propabilities = (float *)calloc(sizeof(float), board_size);
     int *gurobi_relevant_indexes = (int *)calloc(sizeof(int), board_size);
-
     num_of_indexes = get_vars_by_cell(vars, row, column, board_size, possible_values_size, gurobi_relevant_indexes);
 
     for (i = 0; i < num_of_indexes; i++)
     {
+        if(sol[gurobi_relevant_indexes[i]] < threshold)
+            continue;
+            
         cell_values.propabilities[vars[gurobi_relevant_indexes[i]].possible_value - 1] = sol[gurobi_relevant_indexes[i]];
     }
 
     return cell_values;
 }
 
-int prob_based_decide_result(int *cell_probs, float threshold, int n)
+int prob_based_decide_result(float *cell_probs, float threshold, int n)
 {
     int i;
     /* construct a sum array from given probabilities */
@@ -541,7 +542,7 @@ void print_cell_results(OptionalCellValues cell_values, int size)
     {
         if (cell_values.propabilities[k] > 0)
         {
-            printf("value %d for index %d,%d has prob of %d\n", k + 1, cell_values.row, cell_values.column, cell_values.propabilities[k]);
+            printf("value %d for index %d,%d has prob of %f\n", k + 1, cell_values.row, cell_values.column, cell_values.propabilities[k]);
         }
     }
 }
@@ -577,12 +578,10 @@ void fill_results_to_board(Board *board, double *sol, float threshold, gurobi_va
         for (j = 0; j < board_size; j++)
         {
             cell_values[i][j] = get_possible_values_from_sol(board, sol, i, j, threshold, vars, num_of_params);
-            print_cell_results(cell_values[i][j], board_size);
             chosen_val = prob_based_decide_result(cell_values[i][j].propabilities, threshold, board_size);
 
             if (chosen_val != BOARD_NULL_VALUE)
             {
-                printf("for cell %d,%d chosen val is: %d\n", i, j, chosen_val);
                 cell_values[i][j].chosen_value = chosen_val;
             }
             else
@@ -598,7 +597,6 @@ void fill_results_to_board(Board *board, double *sol, float threshold, gurobi_va
         {
             if (cell_values[i][j].chosen_value != BOARD_NULL_VALUE)
             {
-                printf("setting to index %d,%d val: %d\n", i, j, cell_values[i][j].chosen_value);
                 set_value(i, j, cell_values[i][j].chosen_value, board, 0);
             }
         }
@@ -614,9 +612,6 @@ void fill_board(Board *board, int is_integer, float threshold)
     int num_of_params = get_num_of_parameters(board);
     vars = initilize_gurobi_vars(num_of_params, board);
     sol = run_LP(board, is_integer, vars, num_of_params);
-    printf("the sol is: \n");
-
-    print_gurobi_results(board, sol, threshold, vars, num_of_params);
 
     if (sol != NULL)
     {
@@ -641,7 +636,7 @@ OptionalCellValues get_value_for_cell(Board *board, int row, int column, int is_
         return cell_values;
     }
 
-    return get_possible_values_from_sol(board, sol, row, column, 0.1, vars, num_of_params);
+    return get_possible_values_from_sol(board, sol, row, column, 0, vars, num_of_params);
 }
 
 int validate_ILP(Board *board)

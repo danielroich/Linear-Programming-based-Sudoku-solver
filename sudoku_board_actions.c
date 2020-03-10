@@ -413,7 +413,7 @@ void guess_hint(Board *board, int row, int column)
     for (i = 0; i < board_size; i++)
     {
         if (cell_values.propabilities[i] > 0)
-            printf("Hint: set cell to %d with prob of %d\n", i+1, cell_values.propabilities[i]);
+            printf("Hint: set cell to %d with prob of %f\n", i+1, cell_values.propabilities[i]);
     }
 }
 

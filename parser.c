@@ -25,6 +25,7 @@ return num op or 0 if invalid command/error */
 int parse_command(char *command, Board *board, Curr_move move)
 {
     int x, y, z;
+    float threshold;
     char *token, *next;
     int succeeded;
     int size = board->num_of_columns * board->num_of_rows;
@@ -229,7 +230,7 @@ int parse_command(char *command, Board *board, Curr_move move)
             print_error_not_enough("guess threshold");
             return 0;
         }
-        x = atof(token);
+        threshold = atof(token);
 
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
@@ -244,7 +245,7 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
 
-        guess(board, x); 
+        guess(board, threshold); 
     
         /* TODO:
         succeeded =

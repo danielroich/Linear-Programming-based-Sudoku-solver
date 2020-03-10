@@ -5,7 +5,7 @@
 typedef struct _optional_cell_values_H {
     int row;
     int column;
-    int* propabilities;
+    float* propabilities;
     int chosen_value;
 
 } OptionalCellValues;
