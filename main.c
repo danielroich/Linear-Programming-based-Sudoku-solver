@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
     printf("Welcome to sudoku! please load board to start.\n");
     *move = NULL;
     board->mode = INIT;
+    board->mark_errors = 2;
 
     while (fgets(command, 256, stdin) && !feof(stdin))
     {

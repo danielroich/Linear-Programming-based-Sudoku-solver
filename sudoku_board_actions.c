@@ -25,7 +25,12 @@ void exit_game(Board *board, Curr_move move)
 int solve(Board *board, char *path)
 {
     int succeeded;
+    int mark_error = 1;
     Board *new_board = (Board *)malloc((sizeof(Board)));
+
+    if(board->mark_errors == 0){
+            mark_error = 0;
+    }
     if (new_board == NULL)
     {
         printf("Error: malloc has failed.\n");
@@ -50,7 +55,7 @@ int solve(Board *board, char *path)
     {
         free_board(board);
         board = (Board *)malloc((sizeof(Board)));
-        if (new_board == NULL)
+        if (board == NULL)
         {
             printf("Error: malloc has failed.\n");
             exit(0);
@@ -59,6 +64,7 @@ int solve(Board *board, char *path)
         copy_board(new_board, board);
         free_board(new_board);
         board->mode = SOLVE;
+        board->mark_errors = mark_error;
         return 1;
     }
 }
@@ -69,6 +75,10 @@ If no parameter is supplied, edit empty 9x9 board.
 always mark errors.*/
 int edit(Board *board, char *path)
 {
+    int mark_error = 1;
+    if(board->mark_errors == 0){
+            mark_error = 0;
+    }
     if (path == NULL)
     {
         create_empty_board(board, 3, 3);
@@ -112,6 +122,7 @@ int edit(Board *board, char *path)
         }
     }
     board->mode = EDIT;
+    board->mark_errors = mark_error;
     return 1;
 }
 
