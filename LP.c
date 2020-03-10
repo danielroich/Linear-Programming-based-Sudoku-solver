@@ -120,7 +120,7 @@ int get_vars_by_column(gurobi_var *vars, int column, int bord_size, int num_of_p
     return k;
 }
 
-int get_vars_by_square(gurobi_var *vars, int square_index_to_check, Board *board, int num_of_params, int *gurobi_indexes, int value_in_square)
+int get_vars_by_square(gurobi_var *vars, int square_index_to_check, Board *board, int num_of_params, int *gurobi_indexes, int value_in_square, int **square_num_matrix)
 {
     int i;
     int j;
@@ -128,26 +128,15 @@ int get_vars_by_square(gurobi_var *vars, int square_index_to_check, Board *board
     int top_left_corner_row;
     int top_left_corner_col;
     int board_size = board->num_of_columns * board->num_of_rows;
-    int **square_num_matrix = (int **)malloc(sizeof(int *) * board->num_of_columns);
     int counter;
     int square_index;
-
-    for (i = 0; i < board->num_of_columns; i++)
-    {
-        square_num_matrix[i] = (int *)malloc(sizeof(int) * board->num_of_rows);
-        for (j = 0; j < board->num_of_rows; j++)
-        {
-            square_num_matrix[i][j] = counter;
-            ++counter;
-        }
-    }
 
     for (i = 0; i < num_of_params; i++)
     {
         top_left_corner_row = floor(vars[i].row / board->num_of_rows) * board->num_of_rows;
         top_left_corner_col = floor(vars[i].column / board->num_of_columns) * board->num_of_columns;
-        square_index = square_num_matrix[(top_left_corner_row / board->num_of_columns)]
-                                        [(top_left_corner_col / board->num_of_rows)];
+        square_index = square_num_matrix[(top_left_corner_row / board->num_of_rows)]
+                                        [(top_left_corner_col / board->num_of_columns)];
 
         if (square_index == square_index_to_check && vars[i].possible_value == value_in_square)
         {
@@ -228,6 +217,7 @@ int add_rows_constraints(Board *board, GRBmodel *model, int *ind, double *val, G
     {
         for (i = 0; i < board_size; i++)
         {
+
             num_of_idexes_for_constraint = get_vars_by_row(vars, i, board_size, num_of_params,
                                                            gurobi_indexes_for_constraint, value_of_constraint + 1);
 
@@ -260,6 +250,7 @@ int add_column_constraints(Board *board, GRBmodel *model, int *ind, double *val,
         {
             num_of_idexes_for_constraint = get_vars_by_column(vars, i, board_size, num_of_params,
                                                               gurobi_indexes_for_constraint, value_of_constraint + 1);
+
             for (k = 0; k < num_of_idexes_for_constraint; k++)
             {
                 ind[k] = gurobi_indexes_for_constraint[k];
@@ -276,25 +267,40 @@ int add_square_constraints(Board *board, GRBmodel *model, int *ind, double *val,
                            gurobi_var *vars, int num_of_params)
 {
     int k;
+    int i;
+    int j;
+    int counter = 0;
     int square_index_to_check;
     int value_of_constraint;
     int board_size = board->num_of_columns * board->num_of_rows;
     int num_of_idexes_for_constraint;
     int *gurobi_indexes_for_constraint = (int *)calloc(sizeof(int), board_size);
+    int **square_num_matrix = (int **)malloc(sizeof(int *) * board->num_of_columns);
+
+    printf("creating square matrix helper\n");
+    for (i = 0; i < board->num_of_columns; i++)
+    {
+        square_num_matrix[i] = (int *)malloc(sizeof(int) * board->num_of_rows);
+        for (j = 0; j < board->num_of_rows; j++)
+        {
+            square_num_matrix[i][j] = counter;
+            ++counter;
+        }
+    }
 
     for (value_of_constraint = 0; value_of_constraint < board_size; value_of_constraint++)
     {
         for (square_index_to_check = 0; square_index_to_check < board_size; square_index_to_check++)
         {
             num_of_idexes_for_constraint = get_vars_by_square(vars, square_index_to_check, board, num_of_params,
-                                                              gurobi_indexes_for_constraint, value_of_constraint);
+                                                              gurobi_indexes_for_constraint, value_of_constraint + 1, square_num_matrix);
 
             for (k = 0; k < num_of_idexes_for_constraint; k++)
             {
                 ind[k] = gurobi_indexes_for_constraint[k];
                 val[k] = 1;
-            }
 
+            }
             add_vectors_to_constraints(model, num_of_idexes_for_constraint, ind, val, env);
         }
     }
@@ -579,7 +585,8 @@ void fill_results_to_board(Board *board, double *sol, float threshold, gurobi_va
                 printf("for cell %d,%d chosen val is: %d\n", i, j, chosen_val);
                 cell_values[i][j].chosen_value = chosen_val;
             }
-            else {
+            else
+            {
                 cell_values[i][j].chosen_value = BOARD_NULL_VALUE;
             }
         }
@@ -603,9 +610,13 @@ void fill_board(Board *board, int is_integer, float threshold)
     int status;
     double *sol;
     gurobi_var *vars;
+    int i;
     int num_of_params = get_num_of_parameters(board);
     vars = initilize_gurobi_vars(num_of_params, board);
     sol = run_LP(board, is_integer, vars, num_of_params);
+    printf("the sol is: \n");
+
+    print_gurobi_results(board, sol, threshold, vars, num_of_params);
 
     if (sol != NULL)
     {

@@ -269,7 +269,7 @@ int validate_board(Board *board)
 
 void guess(Board *board, float threshold)
 {
-    fill_board(board, 1, threshold);
+    fill_board(board, 0, threshold);
 }
 
 /*COMMAND 8*/
@@ -409,7 +409,7 @@ void guess_hint(Board *board, int row, int column)
     int i;
     OptionalCellValues cell_values;
     int board_size = board->num_of_columns * board->num_of_rows;
-    cell_values = get_value_for_cell(board, row, column, 1);
+    cell_values = get_value_for_cell(board, row, column, 0);
     for (i = 0; i < board_size; i++)
     {
         if (cell_values.propabilities[i] > 0)
