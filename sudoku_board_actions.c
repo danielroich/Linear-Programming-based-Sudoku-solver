@@ -258,7 +258,7 @@ int validate_board(Board *board)
 
 void guess(Board *board, float threshold)
 {
-    fill_board(board, 0, threshold);
+    fill_board(board, 1, threshold);
 }
 
 /*COMMAND 8*/
@@ -381,16 +381,14 @@ int save(Board *board, char *path)
 void hint(int x, int y, Board *board)
 {
     int i;
-    OptionalCellValues *cell_values;
+    OptionalCellValues cell_values;
     int board_size = board->num_of_columns * board->num_of_rows;
     cell_values = get_value_for_cell(board, x, y, 1);
     for (i = 0; i < board_size; i++)
     {
-        if (cell_values->possible_values[i].propability == 1)
+        if (cell_values.propabilities[i] == 1)
             printf("Hint: set cell to %d\n", i+1);
     }
-
-    free_cell_values(cell_values);
 }
 
 /*COMMAND 13*/
@@ -398,15 +396,14 @@ void hint(int x, int y, Board *board)
 void guess_hint(Board *board, int row, int column)
 {
     int i;
-    OptionalCellValues *cell_values;
+    OptionalCellValues cell_values;
     int board_size = board->num_of_columns * board->num_of_rows;
     cell_values = get_value_for_cell(board, row, column, 1);
     for (i = 0; i < board_size; i++)
     {
-        if (cell_values->possible_values[i].propability > 0)
-            printf("Hint: set cell to %d with prob of %d\n", i+1, cell_values->possible_values[i].propability);
+        if (cell_values.propabilities[i] > 0)
+            printf("Hint: set cell to %d with prob of %d\n", i+1, cell_values.propabilities[i]);
     }
-    free_cell_values(cell_values);
 }
 
 /*COMMAND 14*/

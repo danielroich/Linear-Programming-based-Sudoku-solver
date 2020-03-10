@@ -1,5 +1,5 @@
 CC = gcc
-OBJS = main.o sudoku_board.o backtracking_core_logic.o optional_cell_values.o sudoku_board_actions.o puzzle_generator.o 2d_array_utils.o parser.o backtrack_core.o file_utils.o LP.o moves.o stack_backtrack_logic.o stack.o 
+OBJS = main.o sudoku_board.o backtracking_core_logic.o sudoku_board_actions.o puzzle_generator.o 2d_array_utils.o parser.o backtrack_core.o file_utils.o LP.o moves.o stack_backtrack_logic.o stack.o 
 EXEC = sudoku
 COMP_FLAG = -ansi -O3 -Wall -Wextra -Werror -pedantic-errors
 GUROBI_COMP = -I/usr/local/lib/gurobi563/include
@@ -13,8 +13,6 @@ sudoku_board.o: sudoku_board.c sudoku_board.h 2d_array_utils.h
 	$(CC) $(COMP_FLAG) -c $*.c
 file_utils.o: file_utils.c file_utils.h sudoku_board.h
 	$(CC) $(COMP_FLAG) -c $*.c
-optional_cell_values.o: optional_cell_values.c optional_cell_values.h possible_value.h
-	$(CC) $(COMP_FLAG) -c $*.c
 2d_array_utils.o: 2d_array_utils.c 2d_array_utils.h optional_cell_values.h
 	$(CC) $(COMP_FLAG) -c $*.c
 backtracking_core_logic.o: backtracking_core_logic.c backtracking_core_logic.h sudoku_board.h 2d_array_utils.h
@@ -27,7 +25,7 @@ puzzle_generator.o: puzzle_generator.c puzzle_generator.h 2d_array_utils.h sudok
 	$(CC) $(COMP_FLAG) -c $*.c
 backtrack_core.o: backtrack_core.c backtrack_core.h sudoku_board_actions.h sudoku_board.h 2d_array_utils.h
 	$(CC) $(COMP_FLAG) -c $*.c
-LP.o: LP.c LP.h sudoku_board.h backtrack_core.h
+LP.o: LP.c LP.h sudoku_board.h backtrack_core.h gurobi_variable.h
 	$(CC) $(COMP_FLAGS) $(GUROBI_COMP) -c $*.c
 moves.o: moves.c moves.h sudoku_board.h
 	$(CC) $(COMP_FLAG) -c $*.c

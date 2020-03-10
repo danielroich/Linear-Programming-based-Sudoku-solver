@@ -8,242 +8,129 @@
 #include <limits.h>
 #include "2d_array_utils.h"
 #include <math.h>
+#include "gurobi_variable.h"
 
 int get_num_of_parameters(Board *board)
 {
     int i;
     int j;
-    int s;
     int counter = 0;
+    int possible_values_num;
     int board_size = board->num_of_columns * board->num_of_rows;
     int *possible_values = (int *)calloc(board_size, sizeof(int));
     for (i = 0; i < board_size; i++)
     {
         for (j = 0; j < board_size; j++)
         {
-            if (get_value(i, j, board, 0) == BOARD_NULL_VALUE)
-            {
-                counter += get_possible_values(board, i, j, possible_values);
-            }
+            if (get_value(i, j, board, 0) != BOARD_NULL_VALUE)
+                continue;
+
+            possible_values_num = get_possible_values(board, i, j, possible_values);
+            counter += possible_values_num;
         }
     }
+
     return counter;
 }
 
-int add_single_value_per_cell_constraints(Board *board, GRBmodel *model, int *ind, double *val, GRBenv *env)
+gurobi_var *initilize_gurobi_vars(int num_of_params, Board *board)
 {
+
     int i;
     int j;
-    int k;
     int s;
-    char i_char[4096];
-    int error = 0;
-    char unique_name[2048] = "a";
+    int possible_values_num;
     int counter = 0;
-    int chars_to_copy;
     int board_size = board->num_of_columns * board->num_of_rows;
     int *possible_values = (int *)calloc(board_size, sizeof(int));
-    int possible_value_size;
+    gurobi_var *vars = (gurobi_var *)malloc(sizeof(gurobi_var) * num_of_params);
+
     for (i = 0; i < board_size; i++)
     {
         for (j = 0; j < board_size; j++)
         {
-            possible_value_size = get_possible_values(board, i, j, possible_values);
-
-            if (possible_value_size == -1)
+            if (get_value(i, j, board, 0) != BOARD_NULL_VALUE)
                 continue;
 
-            for (k = 0; k < possible_value_size; k++)
+            possible_values_num = get_possible_values(board, i, j, possible_values);
+            for (s = 0; s < board_size; s++)
             {
-                ind[k] = counter;
-                val[k] = 1;
-                counter++;
-            }
-
-            /* generate unique name by concatinating i value to the unique name string */
-            chars_to_copy = i != 0 ? (int)((ceil(log10(i)) + 1) * sizeof(char)) : 1;
-            sprintf(i_char, "%d", chars_to_copy);
-            strcat(unique_name, i_char);
-
-            error = GRBaddconstr(model, possible_value_size, ind, val, GRB_EQUAL, 1, unique_name);
-            if (error)
-            {
-                printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
-                return -1;
-            }
-
-            /* clean the data */
-            for (k = 0; k < possible_value_size; k++)
-            {
-                ind[k] = 0;
-                val[k] = 0;
-            }
-        }
-    }
-    return 1;
-}
-
-int add_rows_constraints(Board *board, GRBmodel *model, int *ind, double *val, GRBenv *env)
-{
-    int i;
-    int j;
-    int k;
-    int constraint_index_base = 0;
-    int value_of_constraint;
-    char i_char[4096];
-    int val_written = 0;
-    int error = 0;
-    int board_size = board->num_of_columns * board->num_of_rows;
-    int optional_occurences = 0;
-    char unique_name[2048] = "b";
-    int counter = 0;
-    int chars_to_copy;
-    int *possible_values = (int *)calloc(board_size, sizeof(int));
-    int possible_value_size;
-    for (value_of_constraint = 0; value_of_constraint < board_size; value_of_constraint++)
-    {
-        counter = 0;
-        for (i = 0; i < board_size; i++)
-        {
-            optional_occurences = 0;
-            for (j = 0; j < board_size; j++)
-            {
-
-                possible_value_size = get_possible_values(board, i, j, possible_values);
-
-                for (k = 0; k < board_size; k++)
+                if (possible_values[s] == 1)
                 {
-                    if (possible_values[k] == 1)
-                    {
-                        if (k == value_of_constraint)
-                        {
-                            ind[optional_occurences] = counter;
-                            val[optional_occurences] = 1;
-                            ++optional_occurences;
-                        }
-                        ++counter;
-                    }
+                    vars[counter].column = j;
+                    vars[counter].row = i;
+                    vars[counter].possible_value = s + 1;
+                    vars[counter].index_in_gurobi = counter;
+                    ++counter;
                 }
             }
-
-            if (optional_occurences == 0)
-                continue;
-
-            /* generate unique name by concatinating i value to the unique name string */
-            chars_to_copy = i != 0 ? (int)((ceil(log10(i)) + 1) * sizeof(char)) : 1;
-            sprintf(i_char, "%d", chars_to_copy);
-            strcat(unique_name, i_char);
-
-            error = GRBaddconstr(model, optional_occurences, ind, val, GRB_EQUAL, 1, unique_name);
-            if (error)
-            {
-                printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
-                return -1;
-            }
-
-            /* clean the data */
-            for (k = 0; k < optional_occurences; k++)
-            {
-                ind[k] = 0;
-                val[k] = 0;
-            }
         }
     }
-    return 1;
+
+    return vars;
 }
 
-int add_column_constraints(Board *board, GRBmodel *model, int *ind, double *val, GRBenv *env)
+int get_vars_by_cell(gurobi_var *vars, int row, int column, int bord_size, int num_of_params, int *gurobi_indexes)
 {
     int i;
-    int j;
-    int k;
-    int value_of_constraint;
-    char i_char[4096];
-    int board_size = board->num_of_columns * board->num_of_rows;
-    int error = 0;
-    int optional_occurences = 0;
-    char unique_name[2048] = "c";
-    int counter = 0;
-    int chars_to_copy;
-    int column_to_check;
-    int *possible_values = (int *)calloc(board_size, sizeof(int));
-    int possible_value_size;
-    for (value_of_constraint = 0; value_of_constraint < board_size; value_of_constraint++)
+    int k = 0;
+
+    for (i = 0; i < num_of_params; i++)
     {
-        for (column_to_check = 0; column_to_check < board_size; column_to_check++)
+
+        if (vars[i].column == column && vars[i].row == row)
         {
-            counter = 0;
-            optional_occurences = 0;
-            for (i = 0; i < board_size; i++)
-            {
-
-                for (j = 0; j < board_size; j++)
-                {
-                    possible_value_size = get_possible_values(board, i, j, possible_values);
-
-                    for (k = 0; k < board_size; k++)
-                    {
-                        if (possible_values[k] == 1)
-                        {
-                            if (k == value_of_constraint && j == column_to_check)
-                            {
-                                ind[optional_occurences] = counter;
-                                val[optional_occurences] = 1;
-                                ++optional_occurences;
-                            }
-                            ++counter;
-                        }
-                    }
-                }
-            }
-
-            if (optional_occurences == 0)
-                continue;
-
-            /* generate unique name by concatinating i value to the unique name string */
-            chars_to_copy = i != 0 ? (int)((ceil(log10(i)) + 1) * sizeof(char)) : 1;
-            sprintf(i_char, "%d", chars_to_copy);
-            strcat(unique_name, i_char);
-
-            error = GRBaddconstr(model, optional_occurences, ind, val, GRB_EQUAL, 1, unique_name);
-            if (error)
-            {
-                printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
-                return -1;
-            }
-
-            /* clean the data */
-            for (k = 0; k < optional_occurences; k++)
-            {
-                ind[k] = 0;
-                val[k] = 0;
-            }
+            gurobi_indexes[k] = vars[i].index_in_gurobi;
+            ++k;
         }
     }
-    return 1;
+
+    return k;
 }
 
-int add_square_constraints(Board *board, GRBmodel *model, int *ind, double *val, GRBenv *env)
+int get_vars_by_row(gurobi_var *vars, int row, int bord_size, int num_of_params, int *gurobi_indexes, int row_val)
+{
+    int i;
+    int k = 0;
+    for (i = 0; i < num_of_params; i++)
+    {
+        if (vars[i].row == row && vars[i].possible_value == row_val)
+        {
+            gurobi_indexes[k] = vars[i].index_in_gurobi;
+            ++k;
+        }
+    }
+
+    return k;
+}
+
+int get_vars_by_column(gurobi_var *vars, int column, int bord_size, int num_of_params, int *gurobi_indexes, int column_val)
+{
+    int i;
+    int k = 0;
+    for (i = 0; i < num_of_params; i++)
+    {
+        if (vars[i].column == column && vars[i].possible_value == column_val)
+        {
+            gurobi_indexes[k] = vars[i].index_in_gurobi;
+            ++k;
+        }
+    }
+
+    return k;
+}
+
+int get_vars_by_square(gurobi_var *vars, int square_index_to_check, Board *board, int num_of_params, int *gurobi_indexes, int value_in_square)
 {
     int i;
     int j;
-    int k;
-    int square_index_to_check;
-    int value_of_constraint;
-    int possible_value_size;
-    char i_char[4096];
-    int board_size = board->num_of_columns * board->num_of_rows;
-    int error = 0;
-    int optional_occurences = 0;
-    char unique_name[2048] = "d";
-    int counter = 0;
-    int chars_to_copy;
-    int value_to_check;
+    int k = 0;
     int top_left_corner_row;
     int top_left_corner_col;
-    int square_index;
+    int board_size = board->num_of_columns * board->num_of_rows;
     int **square_num_matrix = (int **)malloc(sizeof(int *) * board->num_of_columns);
-    int *possible_values = (int *)calloc(board_size, sizeof(int));
+    int counter;
+    int square_index;
 
     for (i = 0; i < board->num_of_columns; i++)
     {
@@ -255,77 +142,174 @@ int add_square_constraints(Board *board, GRBmodel *model, int *ind, double *val,
         }
     }
 
-    for (value_of_constraint = 0; value_of_constraint < board_size; value_of_constraint++)
+    for (i = 0; i < num_of_params; i++)
     {
-        for (square_index_to_check = 0; square_index_to_check < board_size; square_index_to_check++)
+        top_left_corner_row = floor(vars[i].row / board->num_of_rows) * board->num_of_rows;
+        top_left_corner_col = floor(vars[i].column / board->num_of_columns) * board->num_of_columns;
+        square_index = square_num_matrix[(top_left_corner_row / board->num_of_columns)]
+                                        [(top_left_corner_col / board->num_of_rows)];
+
+        if (square_index == square_index_to_check && vars[i].possible_value == value_in_square)
         {
-            counter = 0;
-            optional_occurences = 0;
-            for (i = 0; i < board_size; i++)
+            gurobi_indexes[k] = vars[i].index_in_gurobi;
+            ++k;
+        }
+    }
+
+    return k;
+}
+
+int add_vectors_to_constraints(GRBmodel *model, int num_of_idexes_for_constraint, int *ind, double *val, GRBenv *env)
+{
+    int error;
+    int k;
+
+    if (num_of_idexes_for_constraint == 0)
+        return;
+
+    error = GRBaddconstr(model, num_of_idexes_for_constraint, ind, val, GRB_EQUAL, 1, NULL);
+    if (error)
+    {
+        printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
+        return -1;
+    }
+
+    /* clean the data */
+    for (k = 0; k < num_of_idexes_for_constraint; k++)
+    {
+        ind[k] = 0;
+        val[k] = 0;
+    }
+
+    return 1;
+}
+
+int add_single_value_per_cell_constraints(Board *board, GRBmodel *model, int *ind, double *val,
+                                          GRBenv *env, gurobi_var *vars, int num_of_params)
+{
+    int i;
+    int j;
+    int k;
+    int board_size = board->num_of_columns * board->num_of_rows;
+    int *gurobi_indexes_for_constraint = (int *)calloc(sizeof(int), board_size);
+    int num_of_idexes_for_constraint;
+
+    for (i = 0; i < board_size; i++)
+    {
+        for (j = 0; j < board_size; j++)
+        {
+            num_of_idexes_for_constraint = get_vars_by_cell(vars, i, j, board_size, num_of_params,
+                                                            gurobi_indexes_for_constraint);
+
+            for (k = 0; k < num_of_idexes_for_constraint; k++)
             {
-
-                for (j = 0; j < board_size; j++)
-                {
-                    possible_value_size = get_possible_values(board, i, j, possible_values);
-
-                    if (possible_value_size == -1)
-                        continue;
-
-                    top_left_corner_row = floor(i / board->num_of_rows) * board->num_of_rows;
-                    top_left_corner_col = floor(j / board->num_of_columns) * board->num_of_columns;
-                    square_index = square_num_matrix[(top_left_corner_row / board->num_of_columns)][(top_left_corner_col / board->num_of_rows)];
-
-                    for (k = 0; k < board_size; k++)
-                    {
-                        if (possible_values[k] == 1)
-                        {
-                            if (k == value_of_constraint && square_index == square_index_to_check)
-                            {
-                                ind[optional_occurences] = counter;
-                                val[optional_occurences] = 1;
-                                ++optional_occurences;
-                            }
-                            ++counter;
-                        }
-                    }
-                }
+                ind[k] = gurobi_indexes_for_constraint[k];
+                val[k] = 1.0;
             }
 
-            if (optional_occurences == 0)
-                continue;
-
-            /* generate unique name by concatinating i value to the unique name string */
-            chars_to_copy = i != 0 ? (int)((ceil(log10(i)) + 1) * sizeof(char)) : 1;
-            sprintf(i_char, "%d", chars_to_copy);
-            strcat(unique_name, i_char);
-
-            error = GRBaddconstr(model, optional_occurences, ind, val, GRB_EQUAL, 1, unique_name);
-            if (error)
-            {
-                printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
-                return -1;
-            }
-
-            /* clean the data */
-            for (k = 0; k < optional_occurences; k++)
-            {
-                ind[k] = 0;
-                val[k] = 0;
-            }
+            add_vectors_to_constraints(model, num_of_idexes_for_constraint, ind, val, env);
         }
     }
     return 1;
 }
 
-int update_constraints(Board *board, GRBmodel *model, int *ind, double *val, GRBenv *env)
+int add_rows_constraints(Board *board, GRBmodel *model, int *ind, double *val, GRBenv *env,
+                         gurobi_var *vars, int num_of_params)
 {
-    add_single_value_per_cell_constraints(board, model, ind, val, env);
+    int i;
+    int j;
+    int k;
+    int value_of_constraint;
+    int num_of_idexes_for_constraint;
+    int board_size = board->num_of_columns * board->num_of_rows;
+    int *gurobi_indexes_for_constraint = (int *)calloc(sizeof(int), board_size);
 
-    add_rows_constraints(board, model, ind, val, env);
+    for (value_of_constraint = 0; value_of_constraint < board_size; value_of_constraint++)
+    {
+        for (i = 0; i < board_size; i++)
+        {
+            num_of_idexes_for_constraint = get_vars_by_row(vars, i, board_size, num_of_params,
+                                                           gurobi_indexes_for_constraint, value_of_constraint + 1);
 
-    add_column_constraints(board, model, ind, val, env);
+            for (k = 0; k < num_of_idexes_for_constraint; k++)
+            {
+                ind[k] = gurobi_indexes_for_constraint[k];
+                val[k] = 1.0;
+            }
+            add_vectors_to_constraints(model, num_of_idexes_for_constraint, ind, val, env);
+        }
+    }
 
-    add_square_constraints(board, model, ind, val, env);
+    return 1;
+}
+
+int add_column_constraints(Board *board, GRBmodel *model, int *ind, double *val, GRBenv *env,
+                           gurobi_var *vars, int num_of_params)
+{
+    int i;
+    int j;
+    int k;
+    int value_of_constraint;
+    int num_of_idexes_for_constraint;
+    int board_size = board->num_of_columns * board->num_of_rows;
+    int *gurobi_indexes_for_constraint = (int *)calloc(sizeof(int), board_size);
+
+    for (value_of_constraint = 0; value_of_constraint < board_size; value_of_constraint++)
+    {
+        for (i = 0; i < board_size; i++)
+        {
+            num_of_idexes_for_constraint = get_vars_by_column(vars, i, board_size, num_of_params,
+                                                              gurobi_indexes_for_constraint, value_of_constraint + 1);
+            for (k = 0; k < num_of_idexes_for_constraint; k++)
+            {
+                ind[k] = gurobi_indexes_for_constraint[k];
+                val[k] = 1;
+            }
+            add_vectors_to_constraints(model, num_of_idexes_for_constraint, ind, val, env);
+        }
+    }
+
+    return 1;
+}
+
+int add_square_constraints(Board *board, GRBmodel *model, int *ind, double *val, GRBenv *env,
+                           gurobi_var *vars, int num_of_params)
+{
+    int k;
+    int square_index_to_check;
+    int value_of_constraint;
+    int board_size = board->num_of_columns * board->num_of_rows;
+    int num_of_idexes_for_constraint;
+    int *gurobi_indexes_for_constraint = (int *)calloc(sizeof(int), board_size);
+
+    for (value_of_constraint = 0; value_of_constraint < board_size; value_of_constraint++)
+    {
+        for (square_index_to_check = 0; square_index_to_check < board_size; square_index_to_check++)
+        {
+            num_of_idexes_for_constraint = get_vars_by_square(vars, square_index_to_check, board, num_of_params,
+                                                              gurobi_indexes_for_constraint, value_of_constraint);
+
+            for (k = 0; k < num_of_idexes_for_constraint; k++)
+            {
+                ind[k] = gurobi_indexes_for_constraint[k];
+                val[k] = 1;
+            }
+
+            add_vectors_to_constraints(model, num_of_idexes_for_constraint, ind, val, env);
+        }
+    }
+    return 1;
+}
+
+int update_constraints(Board *board, GRBmodel *model, int *ind, double *val, GRBenv *env, gurobi_var *vars, int num_of_params)
+{
+    add_single_value_per_cell_constraints(board, model, ind, val, env, vars, num_of_params);
+
+    add_rows_constraints(board, model, ind, val, env, vars, num_of_params);
+
+    add_column_constraints(board, model, ind, val, env, vars, num_of_params);
+
+    add_square_constraints(board, model, ind, val, env, vars, num_of_params);
 
     return 1;
 }
@@ -340,14 +324,15 @@ void createBounds(double *lb, double *ub, int num_of_params)
     }
 }
 
-int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
+double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_params)
 {
+
     int i;
-    int status;
     int board_size = board->num_of_columns * board->num_of_rows;
     GRBenv *env = NULL;
     GRBmodel *model = NULL;
     int error = 0;
+    double *sol = (double *)malloc(num_of_params * sizeof(double));
     int *ind = (int *)malloc(board_size * sizeof(int));
     double *val = (double *)malloc(board_size * sizeof(double));
     double *obj = (double *)malloc(num_of_params * sizeof(double));
@@ -365,28 +350,32 @@ int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
         /* variable types - for x,y,z (cells 0,1,2 in "vtype") */
         /* other options: GRB_INTEGER, GRB_CONTINUOUS */
         if (params_mode == 1)
+        {
             vtype[i] = GRB_BINARY;
+        }
         else
+        {
             vtype[i] = GRB_CONTINUOUS;
+        }
 
         /* coefficients - for x,y,z (cells 0,1,2 in "obj")
         maximize x+y+z+k.. */
-        obj[i] = 1;
+        obj[i] = rand() % (2 * board_size);
     }
 
     /* Create environment - log file is mip1.log */
-    error = GRBloadenv(&env, "mip1");
+    error = GRBloadenv(&env, NULL);
     if (error)
     {
         printf("ERROR %d GRBloadenv(): %s\n", error, GRBgeterrormsg(env));
-        return -1;
+        return NULL;
     }
 
     error = GRBsetintparam(env, GRB_INT_PAR_LOGTOCONSOLE, 0);
     if (error)
     {
         printf("ERROR %d GRBsetintattr(): %s\n", error, GRBgeterrormsg(env));
-        return -1;
+        return NULL;
     }
 
     /* Create an empty model named "mip1" */
@@ -394,24 +383,22 @@ int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
     if (error)
     {
         printf("ERROR %d GRBnewmodel(): %s\n", error, GRBgeterrormsg(env));
-        return -1;
+        return NULL;
     }
-    
 
     error = GRBaddvars(model, num_of_params, 0, NULL, NULL, NULL, obj, lb, ub, vtype, NULL);
     if (error)
     {
         printf("ERROR %d GRBaddvars(): %s\n", error, GRBgeterrormsg(env));
-        return -1;
+        return NULL;
     }
-    
 
     /* Change objective sense to maximization */
     error = GRBsetintattr(model, GRB_INT_ATTR_MODELSENSE, GRB_MAXIMIZE);
     if (error)
     {
         printf("ERROR %d GRBsetintattr(): %s\n", error, GRBgeterrormsg(env));
-        return -1;
+        return NULL;
     }
 
     /* update the model - to integrate new variables */
@@ -420,17 +407,17 @@ int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
     if (error)
     {
         printf("ERROR %d GRBupdatemodel(): %s\n", error, GRBgeterrormsg(env));
-        return -1;
+        return NULL;
     }
 
-    update_constraints(board, model, ind, val, env);
+    update_constraints(board, model, ind, val, env, vars, num_of_params);
 
     /* Optimize model - need to call this before calculation */
     error = GRBoptimize(model);
     if (error)
     {
         printf("ERROR %d GRBoptimize(): %s\n", error, GRBgeterrormsg(env));
-        return -1;
+        return NULL;
     }
 
     /* Write model to 'mip1.lp' - this is not necessary but very helpful */
@@ -438,7 +425,7 @@ int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
     if (error)
     {
         printf("ERROR %d GRBwrite(): %s\n", error, GRBgeterrormsg(env));
-        return -1;
+        return NULL;
     }
 
     /* Get solution information */
@@ -447,7 +434,7 @@ int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
     if (error)
     {
         printf("ERROR %d GRBgetintattr(): %s\n", error, GRBgeterrormsg(env));
-        return -1;
+        return NULL;
     }
 
     if (optimstatus == GRB_OPTIMAL)
@@ -456,7 +443,7 @@ int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
         if (error)
         {
             printf("ERROR %d GRBgettdblattr(): %s\n", error, GRBgeterrormsg(env));
-            return -1;
+            return NULL;
         }
 
         /* get the solution - the assignment to each variable */
@@ -464,7 +451,7 @@ int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
         if (error)
         {
             printf("ERROR %d GRBgetdblattrarray(): %s\n", error, GRBgeterrormsg(env));
-            return -1;
+            return NULL;
         }
     }
 
@@ -483,63 +470,35 @@ int run_LP(Board *board, double *sol, int num_of_params, int params_mode)
     GRBfreemodel(model);
     GRBfreeenv(env);
 
-    status =  optimstatus == GRB_OPTIMAL ? 1 : 0;
-    printf("optimization try completed, result: %d\n", status);
+    if (optimstatus != GRB_OPTIMAL)
+        sol = NULL;
 
-    return status;
-
+    return sol;
 }
 
-OptionalCellValues *get_possible_values_from_sol(Board *board, double *sol, int row, int column, int threshold)
+OptionalCellValues get_possible_values_from_sol(Board *board, double *sol, int row, int column, int threshold,
+                                                gurobi_var *vars, int possible_values_size)
 {
     int i;
-    int j;
-    int k;
-    int s;
-    int temp_counter = 0;
-    int counter = 0;
-    int chosen_posbbile_values_index = 0;
-    OptionalCellValues *cell_values = (OptionalCellValues *)malloc(sizeof(OptionalCellValues));
+    int num_of_indexes;
+    OptionalCellValues cell_values;
     int board_size = board->num_of_columns * board->num_of_rows;
-    cell_values->column = column;
-    cell_values->row = row;
-    cell_values->possible_values = (PossibleValue *)calloc(sizeof(PossibleValue), board_size);
-    int *possible_values = (int *)calloc(board_size, sizeof(int));
-    for (i = 0; i < board_size; i++)
+    cell_values.column = column;
+    cell_values.row = row;
+    cell_values.propabilities = (int *)calloc(sizeof(int), board_size);
+    int *gurobi_relevant_indexes = (int *)calloc(sizeof(int), board_size);
+
+    num_of_indexes = get_vars_by_cell(vars, row, column, board_size, possible_values_size, gurobi_relevant_indexes);
+
+    for (i = 0; i < num_of_indexes; i++)
     {
-        for (j = 0; j < board_size; j++)
-        {
-            if (get_value(i, j, board, 0) == BOARD_NULL_VALUE)
-            {
-                temp_counter = counter;
-                counter += get_possible_values(board, i, j, possible_values);
-                for (k = temp_counter; k < counter; k++)
-                {
-                    if (i == row && j == column && sol[k] >= threshold)
-                    {
-                        chosen_posbbile_values_index = k - temp_counter;
-                        for (s = 0; s < board_size; s++)
-                        {
-                            if (possible_values[s] == 1)
-                            {
-                                if (chosen_posbbile_values_index == 0)
-                                {
-                                    cell_values->possible_values[s].value = s + 1;
-                                    cell_values->possible_values[s].propability = sol[k];
-                                }
-                                --chosen_posbbile_values_index;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        cell_values.propabilities[vars[gurobi_relevant_indexes[i]].possible_value - 1] = sol[gurobi_relevant_indexes[i]];
     }
 
     return cell_values;
 }
 
-int prob_based_decide_result(PossibleValue *cell_values, float threshold, int n)
+int prob_based_decide_result(int *cell_probs, float threshold, int n)
 {
     int i;
     /* construct a sum array from given probabilities */
@@ -547,77 +506,81 @@ int prob_based_decide_result(PossibleValue *cell_values, float threshold, int n)
     memset(prob_sum, 0, sizeof prob_sum);
 
     /* prob_sum[i] holds sum of all probability[j] for 0 <= j <=i */
-    prob_sum[0] = cell_values[0].propability * 100;
+    prob_sum[0] = cell_probs[0] * 100;
     for (i = 1; i < n; i++)
-        prob_sum[i] = prob_sum[i - 1] + (cell_values[i].propability * 100);
+        prob_sum[i] = prob_sum[i - 1] + (cell_probs[i] * 100);
 
     int r = (rand() % 100) + 1;
 
     /* based on the comparison result, return corresponding
 	 element from the input array */
     if (r <= prob_sum[0]) // handle 0'th index separately
-        return cell_values[0].value;
+        return 1;
 
     for (i = 1; i < n; i++)
     {
         if (r > prob_sum[i - 1] && r <= prob_sum[i])
         {
-            return cell_values[i].value;
+            return i + 1;
         }
     }
 
     return BOARD_NULL_VALUE;
 }
 
-void print_cell_results(OptionalCellValues *cell_values, int size)
+void print_cell_results(OptionalCellValues cell_values, int size)
 {
     int k;
     for (k = 0; k < size; k++)
     {
-        if (cell_values->possible_values[k].propability > 0)
+        if (cell_values.propabilities[k] > 0)
         {
-            printf("value %d for index %d,%d has prob of %d\n", k + 1, cell_values->row, cell_values->column, cell_values->possible_values[k].propability);
+            printf("value %d for index %d,%d has prob of %d\n", k + 1, cell_values.row, cell_values.column, cell_values.propabilities[k]);
         }
     }
 }
 
-void print_gurobi_results(Board *board, double *sol, float threshold)
+void print_gurobi_results(Board *board, double *sol, float threshold, gurobi_var *vars, int possilbe_values_size)
 {
     int i;
     int j;
     int chosen_val;
     int board_size = board->num_of_columns * board->num_of_rows;
-    OptionalCellValues *cell_values;
+    OptionalCellValues cell_values;
     for (i = 0; i < board_size; i++)
     {
         for (j = 0; j < board_size; j++)
         {
-            cell_values = get_possible_values_from_sol(board, sol, i, j, threshold);
+            cell_values = get_possible_values_from_sol(board, sol, i, j, threshold, vars, possilbe_values_size);
             print_cell_results(cell_values, board_size);
         }
     }
 }
 
-void fill_results_to_board(Board *board, double *sol, float threshold)
+void fill_results_to_board(Board *board, double *sol, float threshold, gurobi_var *vars, int num_of_params)
 {
     int i;
     int j;
     int chosen_val;
     int set_successful;
     int board_size = board->num_of_columns * board->num_of_rows;
-    OptionalCellValues ***cell_values = create_3d_possible_values_array(board_size);
+    OptionalCellValues **cell_values = create_2d_possible_values_array(board_size);
+
     for (i = 0; i < board_size; i++)
     {
         for (j = 0; j < board_size; j++)
         {
-            cell_values[i][j] = get_possible_values_from_sol(board, sol, i, j, threshold);
+            cell_values[i][j] = get_possible_values_from_sol(board, sol, i, j, threshold, vars, num_of_params);
             print_cell_results(cell_values[i][j], board_size);
-            chosen_val = prob_based_decide_result(cell_values[i][j]->possible_values, threshold, board_size);
+            chosen_val = prob_based_decide_result(cell_values[i][j].propabilities, threshold, board_size);
 
             if (chosen_val != BOARD_NULL_VALUE)
             {
                 printf("for cell %d,%d chosen val is: %d\n", i, j, chosen_val);
-                cell_values[i][j]->chosen_value = chosen_val;
+                cell_values[i][j].chosen_value = chosen_val;
+            }
+            else {
+                cell_values[i][j].chosen_value = BOARD_NULL_VALUE;
             }
         }
     }
@@ -626,10 +589,10 @@ void fill_results_to_board(Board *board, double *sol, float threshold)
     {
         for (j = 0; j < board_size; j++)
         {
-            if (cell_values[i][j]->chosen_value != BOARD_NULL_VALUE)
+            if (cell_values[i][j].chosen_value != BOARD_NULL_VALUE)
             {
-                printf("setting to index %d,%d val: %d\n", i, j, cell_values[i][j]->chosen_value);
-                set_value(i, j, cell_values[i][j]->chosen_value, board, 0);
+                printf("setting to index %d,%d val: %d\n", i, j, cell_values[i][j].chosen_value);
+                set_value(i, j, cell_values[i][j].chosen_value, board, 0);
             }
         }
     }
@@ -638,40 +601,46 @@ void fill_results_to_board(Board *board, double *sol, float threshold)
 void fill_board(Board *board, int is_integer, float threshold)
 {
     int status;
+    double *sol;
+    gurobi_var *vars;
     int num_of_params = get_num_of_parameters(board);
-    double *sol = (double *)malloc(num_of_params * sizeof(double));
-    status = run_LP(board, sol, num_of_params, 1);
+    vars = initilize_gurobi_vars(num_of_params, board);
+    sol = run_LP(board, is_integer, vars, num_of_params);
 
-    if (status == 1)
+    if (sol != NULL)
     {
-        fill_results_to_board(board, sol, threshold);
+        fill_results_to_board(board, sol, threshold, vars, num_of_params);
     }
 }
 
-OptionalCellValues *get_value_for_cell(Board *board, int row, int column, int is_integer)
+OptionalCellValues get_value_for_cell(Board *board, int row, int column, int is_integer)
 {
     int i;
     int board_size = board->num_of_columns * board->num_of_rows;
-    int status;
     int chosen_num;
+    OptionalCellValues cell_values;
+    double *sol;
+    gurobi_var *vars;
     int num_of_params = get_num_of_parameters(board);
-    OptionalCellValues* cell_values;
-    double *sol = (double *)malloc(num_of_params * sizeof(double));
-    status = run_LP(board, sol, num_of_params, 1);
-    if (status != 1)
+    vars = initilize_gurobi_vars(num_of_params, board);
+
+    sol = run_LP(board, is_integer, vars, num_of_params);
+    if (sol == NULL)
     {
-        return 0;
+        return cell_values;
     }
 
-    return get_possible_values_from_sol(board, sol, row, column, 0.1);
+    return get_possible_values_from_sol(board, sol, row, column, 0.1, vars, num_of_params);
 }
 
 int validate_ILP(Board *board)
 {
     int result;
+    double *sol;
+    gurobi_var *vars;
     int num_of_params = get_num_of_parameters(board);
-    double *sol = (double *)malloc(num_of_params * sizeof(double));
-    result = run_LP(board, sol, num_of_params, 1);
-    print_gurobi_results(board, sol, 0.01);
-    return result;
+    vars = initilize_gurobi_vars(num_of_params, board);
+    sol = run_LP(board, 1, vars, num_of_params);
+    print_gurobi_results(board, sol, 0.01, vars, num_of_params);
+    return sol != NULL;
 }

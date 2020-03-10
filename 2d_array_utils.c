@@ -43,10 +43,10 @@ int**  create_2d_array(int size) {
     return array;
 }
 
-OptionalCellValues *** create_3d_possible_values_array(int size) {
+OptionalCellValues ** create_2d_possible_values_array(int size) {
     int i;
-    OptionalCellValues *** array;
-    array = (OptionalCellValues ***)malloc(size * sizeof(OptionalCellValues**));
+    OptionalCellValues ** array;
+    array = (OptionalCellValues **)calloc(size , sizeof(OptionalCellValues*));
 
     if (array == NULL) {
         printf("Error: create_2d_array has failed\n");
@@ -54,7 +54,7 @@ OptionalCellValues *** create_3d_possible_values_array(int size) {
     }
 
     for (i=0; i<size; i++) {
-        array[i] = (OptionalCellValues **) calloc(size, sizeof(OptionalCellValues*));
+        array[i] = (OptionalCellValues *) calloc(size, sizeof(OptionalCellValues));
 
         if(array[i] == NULL) {
             printf("Error: create_2d_array has failed\n");
