@@ -394,14 +394,14 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     if (error)
     {
         printf("ERROR %d GRBloadenv(): %s\n", error, GRBgeterrormsg(env));
-        return NULL;
+        exit(0);
     }
 
     error = GRBsetintparam(env, GRB_INT_PAR_LOGTOCONSOLE, 0);
     if (error)
     {
         printf("ERROR %d GRBsetintattr(): %s\n", error, GRBgeterrormsg(env));
-        return NULL;
+        exit(0);
     }
 
     /* Create an empty model named "mip1" */
@@ -409,14 +409,14 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     if (error)
     {
         printf("ERROR %d GRBnewmodel(): %s\n", error, GRBgeterrormsg(env));
-        return NULL;
+        exit(0);
     }
 
     error = GRBaddvars(model, num_of_params, 0, NULL, NULL, NULL, obj, lb, ub, vtype, NULL);
     if (error)
     {
         printf("ERROR %d GRBaddvars(): %s\n", error, GRBgeterrormsg(env));
-        return NULL;
+        exit(0);
     }
 
     /* Change objective sense to maximization */
@@ -424,7 +424,7 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     if (error)
     {
         printf("ERROR %d GRBsetintattr(): %s\n", error, GRBgeterrormsg(env));
-        return NULL;
+        exit(0);
     }
 
     /* update the model - to integrate new variables */
@@ -433,14 +433,14 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     if (error)
     {
         printf("ERROR %d GRBupdatemodel(): %s\n", error, GRBgeterrormsg(env));
-        return NULL;
+        exit(0);
     }
 
     error = update_constraints(board, model, env, vars, num_of_params, board_size);
     if (error)
     {
         printf("ERROR: problen updating and creating the constraitns for gurobi\n");
-        return NULL;
+        exit(0);
     }
 
     /* Optimize model - need to call this before calculation */
@@ -448,7 +448,7 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     if (error)
     {
         printf("ERROR %d GRBoptimize(): %s\n", error, GRBgeterrormsg(env));
-        return NULL;
+        exit(0);
     }
 
     /* Write model to 'mip1.lp' - this is not necessary but very helpful */
@@ -456,7 +456,7 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     if (error)
     {
         printf("ERROR %d GRBwrite(): %s\n", error, GRBgeterrormsg(env));
-        return NULL;
+        exit(0);
     }
 
     /* Get solution information */
@@ -465,7 +465,7 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     if (error)
     {
         printf("ERROR %d GRBgetintattr(): %s\n", error, GRBgeterrormsg(env));
-        return NULL;
+        exit(0);
     }
 
     if (optimstatus == GRB_OPTIMAL)
@@ -474,7 +474,7 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
         if (error)
         {
             printf("ERROR %d GRBgettdblattr(): %s\n", error, GRBgeterrormsg(env));
-            return NULL;
+            exit(0);
         }
 
         /* get the solution - the assignment to each variable */
@@ -482,7 +482,7 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
         if (error)
         {
             printf("ERROR %d GRBgetdblattrarray(): %s\n", error, GRBgeterrormsg(env));
-            return NULL;
+            exit(0);
         }
     }
 
