@@ -561,7 +561,7 @@ int prob_based_decide_result(float *cell_probs, float threshold, int n)
 
     return BOARD_NULL_VALUE;
 }
-
+/*
 void print_cell_results(OptionalCellValues cell_values, int size)
 {
     int k;
@@ -573,6 +573,7 @@ void print_cell_results(OptionalCellValues cell_values, int size)
         }
     }
 }
+
 
 void print_gurobi_results(Board *board, double *sol, float threshold, gurobi_var *vars, int possilbe_values_size)
 {
@@ -591,6 +592,7 @@ void print_gurobi_results(Board *board, double *sol, float threshold, gurobi_var
     }
 }
 
+*/
 void fill_results_to_board(Board *board, double *sol, float threshold, gurobi_var *vars, int num_of_params)
 {
     int i;
@@ -674,6 +676,5 @@ int validate_ILP(Board *board)
     int num_of_params = get_num_of_parameters(board);
     vars = initilize_gurobi_vars(num_of_params, board);
     sol = run_LP(board, 1, vars, num_of_params);
-    print_gurobi_results(board, sol, 0.01, vars, num_of_params);
     return sol != NULL;
 }
