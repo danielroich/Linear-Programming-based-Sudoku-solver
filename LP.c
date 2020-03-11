@@ -277,7 +277,6 @@ int add_square_constraints(Board *board, GRBmodel *model, int *ind, double *val,
     int *gurobi_indexes_for_constraint = (int *)calloc(sizeof(int), board_size);
     int **square_num_matrix = (int **)malloc(sizeof(int *) * board->num_of_columns);
 
-    printf("creating square matrix helper\n");
     for (i = 0; i < board->num_of_columns; i++)
     {
         square_num_matrix[i] = (int *)malloc(sizeof(int) * board->num_of_rows);
@@ -306,8 +305,21 @@ int add_square_constraints(Board *board, GRBmodel *model, int *ind, double *val,
     return 1;
 }
 
-int update_constraints(Board *board, GRBmodel *model, int *ind, double *val, GRBenv *env, gurobi_var *vars, int num_of_params)
+int update_constraints(Board *board, GRBmodel *model, GRBenv *env, gurobi_var *vars, int num_of_params, int board_size)
 {
+    int *ind = (int *)malloc(board_size * sizeof(int));
+    if (ind == NULL)
+    {
+        return -1;
+    }
+
+    double *val = (double *)malloc(board_size * sizeof(double));
+    if (val == NULL)
+    {
+        free(ind);
+        return -1;
+    }
+
     add_single_value_per_cell_constraints(board, model, ind, val, env, vars, num_of_params);
 
     add_rows_constraints(board, model, ind, val, env, vars, num_of_params);
@@ -315,6 +327,9 @@ int update_constraints(Board *board, GRBmodel *model, int *ind, double *val, GRB
     add_column_constraints(board, model, ind, val, env, vars, num_of_params);
 
     add_square_constraints(board, model, ind, val, env, vars, num_of_params);
+
+    free(ind);
+    free(val);
 
     return 1;
 }
@@ -329,6 +344,15 @@ void createBounds(double *lb, double *ub, int num_of_params)
     }
 }
 
+void free_arrays(double *sol, double *obj, char *vtype, double *lb, double *ub)
+{
+    free(sol);
+    free(obj);
+    free(vtype);
+    free(lb);
+    free(ub);
+}
+
 double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_params)
 {
 
@@ -338,12 +362,44 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     GRBmodel *model = NULL;
     int error = 0;
     double *sol = (double *)malloc(num_of_params * sizeof(double));
-    int *ind = (int *)malloc(board_size * sizeof(int));
-    double *val = (double *)malloc(board_size * sizeof(double));
+    if (sol == NULL)
+    {
+        return NULL;
+    }
+
     double *obj = (double *)malloc(num_of_params * sizeof(double));
+    if (obj == NULL)
+    {
+        free(sol);
+        return NULL;
+    }
+
     char *vtype = (char *)malloc(num_of_params * sizeof(char));
+    if (vtype == NULL)
+    {
+        free(sol);
+        free(obj);
+        return NULL;
+    }
+
     double *lb = (double *)malloc(num_of_params * sizeof(double));
+    if (lb == NULL)
+    {
+        free(sol);
+        free(obj);
+        free(vtype);
+        return NULL;
+    }
+
     double *ub = (double *)malloc(num_of_params * sizeof(double));
+    if (ub == NULL)
+    {
+        free(sol);
+        free(obj);
+        free(vtype);
+        free(lb);
+        return NULL;
+    }
     int optimstatus;
     double objval;
 
@@ -365,13 +421,14 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
 
         /* coefficients - for x,y,z (cells 0,1,2 in "obj")
         maximize x+y+z+k.. */
-        obj[i] = rand() % (2 * board_size);
+        obj[i] = rand() % (board_size * 2);
     }
 
     /* Create environment - log file is mip1.log */
     error = GRBloadenv(&env, NULL);
     if (error)
     {
+        free_arrays(sol, obj, vtype, lb, ub);
         printf("ERROR %d GRBloadenv(): %s\n", error, GRBgeterrormsg(env));
         return NULL;
     }
@@ -379,6 +436,8 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     error = GRBsetintparam(env, GRB_INT_PAR_LOGTOCONSOLE, 0);
     if (error)
     {
+        GRBfreeenv(env);
+        free_arrays(sol, obj, vtype, lb, ub);
         printf("ERROR %d GRBsetintattr(): %s\n", error, GRBgeterrormsg(env));
         return NULL;
     }
@@ -387,6 +446,8 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     error = GRBnewmodel(env, &model, "mip1", num_of_params, obj, lb, ub, vtype, NULL);
     if (error)
     {
+        GRBfreeenv(env);
+        free_arrays(sol, obj, vtype, lb, ub);
         printf("ERROR %d GRBnewmodel(): %s\n", error, GRBgeterrormsg(env));
         return NULL;
     }
@@ -394,6 +455,9 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     error = GRBaddvars(model, num_of_params, 0, NULL, NULL, NULL, obj, lb, ub, vtype, NULL);
     if (error)
     {
+        GRBfreeenv(env);
+        GRBfreemodel(model);
+        free_arrays(sol, obj, vtype, lb, ub);
         printf("ERROR %d GRBaddvars(): %s\n", error, GRBgeterrormsg(env));
         return NULL;
     }
@@ -402,6 +466,9 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     error = GRBsetintattr(model, GRB_INT_ATTR_MODELSENSE, GRB_MAXIMIZE);
     if (error)
     {
+        GRBfreeenv(env);
+        GRBfreemodel(model);
+        free_arrays(sol, obj, vtype, lb, ub);
         printf("ERROR %d GRBsetintattr(): %s\n", error, GRBgeterrormsg(env));
         return NULL;
     }
@@ -411,16 +478,30 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     error = GRBupdatemodel(model);
     if (error)
     {
+        GRBfreeenv(env);
+        GRBfreemodel(model);
+        free_arrays(sol, obj, vtype, lb, ub);
         printf("ERROR %d GRBupdatemodel(): %s\n", error, GRBgeterrormsg(env));
         return NULL;
     }
 
-    update_constraints(board, model, ind, val, env, vars, num_of_params);
+    error = update_constraints(board, model, env, vars, num_of_params, board_size);
+    if (error)
+    {
+        GRBfreeenv(env);
+        GRBfreemodel(model);
+        free_arrays(sol, obj, vtype, lb, ub);
+        printf("ERROR: problen updating and creating the constraitns for gurobi\n");
+        return NULL;
+    }
 
     /* Optimize model - need to call this before calculation */
     error = GRBoptimize(model);
     if (error)
     {
+        GRBfreeenv(env);
+        GRBfreemodel(model);
+        free_arrays(sol, obj, vtype, lb, ub);
         printf("ERROR %d GRBoptimize(): %s\n", error, GRBgeterrormsg(env));
         return NULL;
     }
@@ -429,6 +510,9 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     error = GRBwrite(model, "mip1.lp");
     if (error)
     {
+        GRBfreeenv(env);
+        GRBfreemodel(model);
+        free_arrays(sol, obj, vtype, lb, ub);
         printf("ERROR %d GRBwrite(): %s\n", error, GRBgeterrormsg(env));
         return NULL;
     }
@@ -438,6 +522,9 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     error = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &optimstatus);
     if (error)
     {
+        GRBfreeenv(env);
+        GRBfreemodel(model);
+        free_arrays(sol, obj, vtype, lb, ub);
         printf("ERROR %d GRBgetintattr(): %s\n", error, GRBgeterrormsg(env));
         return NULL;
     }
@@ -447,6 +534,9 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
         error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
         if (error)
         {
+            GRBfreeenv(env);
+            GRBfreemodel(model);
+            free_arrays(sol, obj, vtype, lb, ub);
             printf("ERROR %d GRBgettdblattr(): %s\n", error, GRBgeterrormsg(env));
             return NULL;
         }
@@ -455,6 +545,9 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
         error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, num_of_params, sol);
         if (error)
         {
+            GRBfreeenv(env);
+            GRBfreemodel(model);
+            free_arrays(sol, obj, vtype, lb, ub);
             printf("ERROR %d GRBgetdblattrarray(): %s\n", error, GRBgeterrormsg(env));
             return NULL;
         }
@@ -474,6 +567,7 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     /* IMPORTANT !!! - Free model and environment */
     GRBfreemodel(model);
     GRBfreeenv(env);
+    free_arrays(sol, obj, vtype, lb, ub);
 
     if (optimstatus != GRB_OPTIMAL)
         sol = NULL;
@@ -496,9 +590,9 @@ OptionalCellValues get_possible_values_from_sol(Board *board, double *sol, int r
 
     for (i = 0; i < num_of_indexes; i++)
     {
-        if(sol[gurobi_relevant_indexes[i]] < threshold)
+        if (sol[gurobi_relevant_indexes[i]] < threshold)
             continue;
-            
+
         cell_values.propabilities[vars[gurobi_relevant_indexes[i]].possible_value - 1] = sol[gurobi_relevant_indexes[i]];
     }
 
