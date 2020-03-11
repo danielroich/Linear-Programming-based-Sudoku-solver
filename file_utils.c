@@ -155,6 +155,11 @@ int read_file_to_board(Board* board, const char* path, int check_errors){
         fclose(fptr);
         return 0;
     }
+    count_scan = fscanf(fptr,"%d",&value); 
+    if(count_scan == 1){
+        fclose(fptr);
+        return 0;
+    }
     if(count_dots != count_fixed(board)){
         fclose(fptr);
         return 0;
