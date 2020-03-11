@@ -499,7 +499,7 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     return sol;
 }
 
-OptionalCellValues get_possible_values_from_sol(Board *board, double *sol, int row, int column, int threshold,
+OptionalCellValues get_possible_values_from_sol(Board *board, double *sol, int row, int column, float threshold,
                                                 gurobi_var *vars, int possible_values_size)
 {
     int i;
@@ -511,11 +511,19 @@ OptionalCellValues get_possible_values_from_sol(Board *board, double *sol, int r
     cell_values.propabilities = (float *)calloc(sizeof(float), board_size);
     int *gurobi_relevant_indexes = (int *)calloc(sizeof(int), board_size);
     num_of_indexes = get_vars_by_cell(vars, row, column, board_size, possible_values_size, gurobi_relevant_indexes);
-
     for (i = 0; i < num_of_indexes; i++)
     {
         if (sol[gurobi_relevant_indexes[i]] < threshold)
+        {
+            /*printf("index %d,%d and represented num of: %d which has index %d of gurobi has prob of %f filtterd by threshold\n",
+                   vars[gurobi_relevant_indexes[i]].row, vars[gurobi_relevant_indexes[i]].column, vars[gurobi_relevant_indexes[i]].possible_value,
+                   gurobi_relevant_indexes[i], sol[gurobi_relevant_indexes[i]]); */
             continue;
+        }
+
+       /* printf("index %d,%d and represented num of: %d which has index %d of gurobi has prob of %f was not filtterd by threshold\n",
+                   vars[gurobi_relevant_indexes[i]].row, vars[gurobi_relevant_indexes[i]].column, vars[gurobi_relevant_indexes[i]].possible_value,
+                   gurobi_relevant_indexes[i], sol[gurobi_relevant_indexes[i]]); */
 
         cell_values.propabilities[vars[gurobi_relevant_indexes[i]].possible_value - 1] = sol[gurobi_relevant_indexes[i]];
     }
@@ -552,7 +560,7 @@ int prob_based_decide_result(float *cell_probs, float threshold, int n)
 
     return BOARD_NULL_VALUE;
 }
-/*
+
 void print_cell_results(OptionalCellValues cell_values, int size)
 {
     int k;
@@ -564,7 +572,6 @@ void print_cell_results(OptionalCellValues cell_values, int size)
         }
     }
 }
-
 
 void print_gurobi_results(Board *board, double *sol, float threshold, gurobi_var *vars, int possilbe_values_size)
 {
@@ -583,7 +590,6 @@ void print_gurobi_results(Board *board, double *sol, float threshold, gurobi_var
     }
 }
 
-*/
 void fill_results_to_board(Board *board, double *sol, float threshold, gurobi_var *vars, int num_of_params)
 {
     int i;
@@ -631,10 +637,12 @@ int fill_board(Board *board, int is_integer, float threshold)
     int i;
     int num_of_params = get_num_of_parameters(board);
     vars = initilize_gurobi_vars(num_of_params, board);
+    printf("threshold is: %f\n", threshold);
     sol = run_LP(board, is_integer, vars, num_of_params);
     if (sol == NULL)
         return 0;
 
+    print_gurobi_results(board, sol, threshold, vars, num_of_params);
     fill_results_to_board(board, sol, threshold, vars, num_of_params);
     return 1;
 }
