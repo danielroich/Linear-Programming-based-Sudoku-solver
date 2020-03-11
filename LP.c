@@ -697,7 +697,7 @@ void fill_results_to_board(Board *board, double *sol, float threshold, gurobi_va
     }
 }
 
-void fill_board(Board *board, int is_integer, float threshold)
+int fill_board(Board *board, int is_integer, float threshold)
 {
     int status;
     double *sol;
@@ -706,11 +706,11 @@ void fill_board(Board *board, int is_integer, float threshold)
     int num_of_params = get_num_of_parameters(board);
     vars = initilize_gurobi_vars(num_of_params, board);
     sol = run_LP(board, is_integer, vars, num_of_params);
+    if (sol == NULL)
+        return -1;
 
-    if (sol != NULL)
-    {
-        fill_results_to_board(board, sol, threshold, vars, num_of_params);
-    }
+    fill_results_to_board(board, sol, threshold, vars, num_of_params);
+    return 1;
 }
 
 OptionalCellValues get_value_for_cell(Board *board, int row, int column, int is_integer)

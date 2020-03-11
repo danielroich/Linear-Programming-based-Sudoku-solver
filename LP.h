@@ -7,6 +7,6 @@
 
 int validate_ILP(Board* board);
 OptionalCellValues get_value_for_cell(Board* board, int row, int column,int is_integer);
-void fill_board(Board* board, int is_integer, float threshold);
+int fill_board(Board* board, int is_integer, float threshold);
 
 #endif
