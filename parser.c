@@ -20,6 +20,24 @@ void print_error_too_many(const char *correct)
     printf("Error: too many parameters. correct command: %s.\n", correct);
 }
 
+void print_error_number(const char *para)
+{
+    printf("Error: %s parameter not a number.\n",para);
+}
+
+int is_digit(char* str){
+    unsigned int i;
+    char ch;
+    for(i=0; i<strlen(str);i++){
+        ch = str[i];
+        if(ch < '0' || ch > '9'){
+            return 0;
+        }
+    }
+    
+    return 1;
+}
+
 /* interpret user input and call actions
 return num op or 0 if invalid command/error */
 int parse_command(char *command, Board *board, Curr_move move)
@@ -102,6 +120,10 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
         x = atoi(token);
+        if(!is_digit(token)){
+            print_error_number("first");
+            return 0;
+        }
 
         next = (strtok(NULL, " \t\r\n"));
         if (next != NULL)
@@ -154,6 +176,10 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
         x = atoi(token);
+        if(!is_digit(token)){
+            print_error_number("first");
+            return 0;
+        }
 
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
@@ -162,6 +188,10 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
         y = atoi(token);
+        if(!is_digit(token)){
+            print_error_number("second");
+            return 0;
+        }
 
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
@@ -170,6 +200,10 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
         z = atoi(token);
+        if(!is_digit(token)){
+            print_error_number("third");
+            return 0;
+        }
 
         next = (strtok(NULL, " \t\r\n"));
         if (next != NULL)
@@ -274,6 +308,10 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
         x = atoi(token);
+        if(!is_digit(token)){
+            print_error_number("first");
+            return 0;
+        }
 
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
@@ -282,6 +320,10 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
         y = atoi(token);
+        if(!is_digit(token)){
+            print_error_number("second");
+            return 0;
+        }
 
         next = (strtok(NULL, " \t\r\n"));
         if (next != NULL)
@@ -411,6 +453,10 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
         x = atoi(token);
+        if(!is_digit(token)){
+            print_error_number("first");
+            return 0;
+        }
 
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
@@ -419,6 +465,10 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
         y = atoi(token);
+        if(!is_digit(token)){
+            print_error_number("second");
+            return 0;
+        }
 
         next = (strtok(NULL, " \t\r\n"));
         if (next != NULL)
@@ -475,6 +525,10 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
         x = atoi(token);
+        if(!is_digit(token)){
+            print_error_number("first");
+            return 0;
+        }
 
         token = (strtok(NULL, " \t\r\n"));
         if (token == NULL)
@@ -483,6 +537,10 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
         y = atoi(token);
+        if(!is_digit(token)){
+            print_error_number("second");
+            return 0;
+        }
 
         next = (strtok(NULL, " \t\r\n"));
         if (next != NULL)

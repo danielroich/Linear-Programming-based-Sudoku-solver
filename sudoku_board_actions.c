@@ -421,7 +421,7 @@ void hint(int x, int y, Board *board)
 }
 
 /*COMMAND 13*/
-/* TODO: hint with LP*/
+
 void guess_hint(Board *board, int row, int column)
 {
     int i;
