@@ -487,23 +487,14 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     }
 
     /* no solution found */
-    else if (optimstatus == GRB_INF_OR_UNBD)
+    else if (optimstatus != GRB_OPTIMAL)
     {
-        printf("Model is infeasible or unbounded\n");
-    }
-    /* error or calculation stopped */
-    else
-    {
-        printf("Optimization was stopped early\n");
+        sol = NULL;
     }
 
     /* IMPORTANT !!! - Free model and environment */
     GRBfreemodel(model);
     GRBfreeenv(env);
-
-    if (optimstatus != GRB_OPTIMAL)
-        sol = NULL;
-
     free_arrays(obj, vtype, lb, ub);
     return sol;
 }
