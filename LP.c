@@ -633,7 +633,7 @@ int fill_board(Board *board, int is_integer, float threshold)
     vars = initilize_gurobi_vars(num_of_params, board);
     sol = run_LP(board, is_integer, vars, num_of_params);
     if (sol == NULL)
-        return -1;
+        return 0;
 
     fill_results_to_board(board, sol, threshold, vars, num_of_params);
     return 1;

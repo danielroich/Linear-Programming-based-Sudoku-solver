@@ -282,6 +282,7 @@ int generate(Board *board, int fill, int keep)
     int rand_val, rand_row, rand_col, set;
     int count = 0;
     Board *old_board;
+    int ILP_success;
 
     if (fill < 0 || fill > empty)
     {
@@ -326,8 +327,14 @@ int generate(Board *board, int fill, int keep)
             }
         }
     }
-    /* TODO: ILP sol 
-    if fail copy from old + free old + return 0*/
+    ILP_success = fill_board(board,1,0);
+    if (ILP_success == 0)
+    {
+        copy_board(old_board, board);
+        free_board(old_board);
+        return 0;
+    }
+    
     while (board->count_filled > keep)
     {
         rand_row = (rand() % (size));
