@@ -28,8 +28,9 @@ int solve(Board *board, char *path)
     int mark_error = 1;
     Board *new_board = (Board *)malloc((sizeof(Board)));
 
-    if(board->mark_errors == 0){
-            mark_error = 0;
+    if (board->mark_errors == 0)
+    {
+        mark_error = 0;
     }
     if (new_board == NULL)
     {
@@ -76,8 +77,9 @@ always mark errors.*/
 int edit(Board *board, char *path)
 {
     int mark_error = 1;
-    if(board->mark_errors == 0){
-            mark_error = 0;
+    if (board->mark_errors == 0)
+    {
+        mark_error = 0;
     }
     if (path == NULL)
     {
@@ -255,12 +257,14 @@ int validate_board(Board *board)
     free_2d_array(cur_board_copy, size);
 
     board->count_filled = fixed;
-    if (valid_board != 1){
+    if (valid_board != 1)
+    {
         return 0;
     }
-    else{
+    else
+    {
         return 1;
-    }     
+    }
 }
 
 /*COMMAND 7*/
@@ -325,14 +329,14 @@ int generate(Board *board, int fill, int keep)
             }
         }
     }
-    ILP_success = fill_board(board,1,0);
+    ILP_success = fill_board(board, 1, 0);
     if (ILP_success == 0)
     {
         copy_board(old_board, board);
         free_board(old_board);
         return 0;
     }
-    
+
     while (board->count_filled > keep)
     {
         rand_row = (rand() % (size));
@@ -384,10 +388,11 @@ int save(Board *board, char *path)
         printf("Error: in edit mode, erroneous boards can't be saved.\n");
         return 0;
     }
-    if(board->mode == EDIT && !validate_board(board)){
+    if (board->mode == EDIT && !validate_board(board))
+    {
         printf("Error: in edit mode, boards without a solution can't be saved.\n");
         return 0;
-    } 
+    }
     succeeded = write_file_from_board(board, path);
     return succeeded;
 }
@@ -397,13 +402,21 @@ int save(Board *board, char *path)
 void hint(int x, int y, Board *board)
 {
     int i;
+    int is_succedded;
     OptionalCellValues cell_values;
     int board_size = board->num_of_columns * board->num_of_rows;
-    cell_values = get_value_for_cell(board, x, y, 1);
-    for (i = 0; i < board_size; i++)
+    cell_values = get_value_for_cell(board, x, y, 1, &is_succedded);
+    if (!is_succedded)
     {
-        if (cell_values.propabilities[i] == 1)
-            printf("Hint: set cell to %d\n", i+1);
+        printf("the board is not solvable\n");
+    }
+    else
+    {
+        for (i = 0; i < board_size; i++)
+        {
+            if (cell_values.propabilities[i] == 1)
+                printf("Hint: set cell to %d\n", i + 1);
+        }
     }
 }
 
@@ -414,11 +427,19 @@ void guess_hint(Board *board, int row, int column)
     int i;
     OptionalCellValues cell_values;
     int board_size = board->num_of_columns * board->num_of_rows;
-    cell_values = get_value_for_cell(board, row, column, 0);
-    for (i = 0; i < board_size; i++)
+    int is_succedded;
+    cell_values = get_value_for_cell(board, row, column, 0, &is_succedded);
+    if (!is_succedded)
     {
-        if (cell_values.propabilities[i] > 0)
-            printf("Hint: set cell to %d with prob of %f\n", i+1, cell_values.propabilities[i]);
+        printf("Error: the board is not solvable\n");
+    }
+    else
+    {
+        for (i = 0; i < board_size; i++)
+        {
+            if (cell_values.propabilities[i] > 0)
+                printf("Error: Hint: set cell to %d with prob of %f\n", i + 1, cell_values.propabilities[i]);
+        }
     }
 }
 

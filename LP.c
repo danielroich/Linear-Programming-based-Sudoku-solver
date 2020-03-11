@@ -390,7 +390,7 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     }
 
     /* Create environment - log file is mip1.log */
-    error = GRBloadenv(&env, NULL);
+    error = GRBloadenv(&env, "mip1");
     if (error)
     {
         printf("ERROR %d GRBloadenv(): %s\n", error, GRBgeterrormsg(env));
@@ -496,6 +496,7 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     GRBfreemodel(model);
     GRBfreeenv(env);
     free_arrays(obj, vtype, lb, ub);
+
     return sol;
 }
 
@@ -521,7 +522,7 @@ OptionalCellValues get_possible_values_from_sol(Board *board, double *sol, int r
             continue;
         }
 
-       /* printf("index %d,%d and represented num of: %d which has index %d of gurobi has prob of %f was not filtterd by threshold\n",
+        /* printf("index %d,%d and represented num of: %d which has index %d of gurobi has prob of %f was not filtterd by threshold\n",
                    vars[gurobi_relevant_indexes[i]].row, vars[gurobi_relevant_indexes[i]].column, vars[gurobi_relevant_indexes[i]].possible_value,
                    gurobi_relevant_indexes[i], sol[gurobi_relevant_indexes[i]]); */
 
@@ -647,7 +648,7 @@ int fill_board(Board *board, int is_integer, float threshold)
     return 1;
 }
 
-OptionalCellValues get_value_for_cell(Board *board, int row, int column, int is_integer)
+OptionalCellValues get_value_for_cell(Board *board, int row, int column, int is_integer, int* is_succedded)
 {
     int i;
     int board_size = board->num_of_columns * board->num_of_rows;
@@ -661,9 +662,11 @@ OptionalCellValues get_value_for_cell(Board *board, int row, int column, int is_
     sol = run_LP(board, is_integer, vars, num_of_params);
     if (sol == NULL)
     {
+        *is_succedded = 0;
         return cell_values;
     }
 
+    *is_succedded = 1;
     return get_possible_values_from_sol(board, sol, row, column, 0, vars, num_of_params);
 }
 
