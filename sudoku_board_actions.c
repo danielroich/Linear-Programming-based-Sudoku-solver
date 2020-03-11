@@ -256,11 +256,9 @@ int validate_board(Board *board)
 
     board->count_filled = fixed;
     if (valid_board != 1){
-        printf("Validation failed: board is unsolvable\n");
         return 0;
     }
     else{
-        printf("Validation passed: board is solvable\n");
         return 1;
     }     
 }

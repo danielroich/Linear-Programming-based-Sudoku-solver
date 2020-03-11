@@ -211,7 +211,13 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
 
-        validate_board(board);
+        succeeded = validate_board(board);
+        if(succeeded == 1){
+            printf("Validation passed: board is solvable\n");
+        }
+        else{
+            printf("Validation failed: board is unsolvable\n");
+        }
         return 6;
     }
 
