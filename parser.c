@@ -246,18 +246,10 @@ int parse_command(char *command, Board *board, Curr_move move)
         }
 
         guess(board, threshold); 
-    
-        /* TODO:
-        succeeded =
-        if (succeeded == 1)
-        {
-            clean_nexts(move);
-            add_new_move(move, board);
-            print_board(board);
-            return 7;
-        }
-        */
-       return 0;
+        clean_nexts(move);
+        add_new_move(move, board);
+        print_board(board);
+        return 7;
     }
 
     /*COMMAND 8*/
@@ -289,6 +281,12 @@ int parse_command(char *command, Board *board, Curr_move move)
         if (next != NULL)
         {
             print_error_too_many("generate fill keep");
+            return 0;
+        }
+
+        if (is_erroneous_board(board))
+        {
+            printf("Error: erroneous boards can't use generate.\n");
             return 0;
         }
 
