@@ -13,7 +13,6 @@ typedef struct _Stack {
 int isEmpty(Stack* stack); 
 void push(Stack* stack, BacktrackState item);
 BacktrackState pop(Stack* stack);
-BacktrackState peek(Stack* stack);
 Stack* createStack(int capacity);
 
 #endif

@@ -11,6 +11,7 @@ typedef struct _Backtrack_state {
     
     /* 1 for true */
     int is_default;
+    int was_empty_cell;
 
 } BacktrackState;
 

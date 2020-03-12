@@ -30,6 +30,8 @@ int get_num_of_parameters(Board *board)
         }
     }
 
+    free(possible_values);
+
     return counter;
 }
 
@@ -67,6 +69,7 @@ gurobi_var *initilize_gurobi_vars(int num_of_params, Board *board)
         }
     }
 
+    free(possible_values);
     return vars;
 }
 
@@ -199,6 +202,8 @@ int add_single_value_per_cell_constraints(Board *board, GRBmodel *model, int *in
             add_vectors_to_constraints(model, num_of_idexes_for_constraint, ind, val, env);
         }
     }
+
+    free(gurobi_indexes_for_constraint);
     return 1;
 }
 
@@ -229,7 +234,7 @@ int add_rows_constraints(Board *board, GRBmodel *model, int *ind, double *val, G
             add_vectors_to_constraints(model, num_of_idexes_for_constraint, ind, val, env);
         }
     }
-
+    free(gurobi_indexes_for_constraint);
     return 1;
 }
 
@@ -259,7 +264,7 @@ int add_column_constraints(Board *board, GRBmodel *model, int *ind, double *val,
             add_vectors_to_constraints(model, num_of_idexes_for_constraint, ind, val, env);
         }
     }
-
+    free(gurobi_indexes_for_constraint);
     return 1;
 }
 
@@ -302,6 +307,9 @@ int add_square_constraints(Board *board, GRBmodel *model, int *ind, double *val,
             add_vectors_to_constraints(model, num_of_idexes_for_constraint, ind, val, env);
         }
     }
+
+    free(gurobi_indexes_for_constraint);
+    free_2d_array(square_num_matrix, board->num_of_columns);
     return 1;
 }
 
@@ -516,19 +524,12 @@ OptionalCellValues get_possible_values_from_sol(Board *board, double *sol, int r
     {
         if (sol[gurobi_relevant_indexes[i]] < threshold)
         {
-            /*printf("index %d,%d and represented num of: %d which has index %d of gurobi has prob of %f filtterd by threshold\n",
-                   vars[gurobi_relevant_indexes[i]].row, vars[gurobi_relevant_indexes[i]].column, vars[gurobi_relevant_indexes[i]].possible_value,
-                   gurobi_relevant_indexes[i], sol[gurobi_relevant_indexes[i]]); */
             continue;
         }
-
-        /* printf("index %d,%d and represented num of: %d which has index %d of gurobi has prob of %f was not filtterd by threshold\n",
-                   vars[gurobi_relevant_indexes[i]].row, vars[gurobi_relevant_indexes[i]].column, vars[gurobi_relevant_indexes[i]].possible_value,
-                   gurobi_relevant_indexes[i], sol[gurobi_relevant_indexes[i]]); */
-
         cell_values.propabilities[vars[gurobi_relevant_indexes[i]].possible_value - 1] = sol[gurobi_relevant_indexes[i]];
     }
 
+    free(gurobi_relevant_indexes);
     return cell_values;
 }
 
@@ -560,35 +561,6 @@ int prob_based_decide_result(float *cell_probs, float threshold, int n)
     }
 
     return BOARD_NULL_VALUE;
-}
-
-void print_cell_results(OptionalCellValues cell_values, int size)
-{
-    int k;
-    for (k = 0; k < size; k++)
-    {
-        if (cell_values.propabilities[k] > 0)
-        {
-            printf("value %d for index %d,%d has prob of %f\n", k + 1, cell_values.row, cell_values.column, cell_values.propabilities[k]);
-        }
-    }
-}
-
-void print_gurobi_results(Board *board, double *sol, float threshold, gurobi_var *vars, int possilbe_values_size)
-{
-    int i;
-    int j;
-    int chosen_val;
-    int board_size = board->num_of_columns * board->num_of_rows;
-    OptionalCellValues cell_values;
-    for (i = 0; i < board_size; i++)
-    {
-        for (j = 0; j < board_size; j++)
-        {
-            cell_values = get_possible_values_from_sol(board, sol, i, j, threshold, vars, possilbe_values_size);
-            print_cell_results(cell_values, board_size);
-        }
-    }
 }
 
 void fill_results_to_board(Board *board, double *sol, float threshold, gurobi_var *vars, int num_of_params)
@@ -628,6 +600,8 @@ void fill_results_to_board(Board *board, double *sol, float threshold, gurobi_va
             }
         }
     }
+
+    free_possible_values_2d_array(cell_values, board_size);
 }
 
 int fill_board(Board *board, int is_integer, float threshold)
@@ -648,7 +622,7 @@ int fill_board(Board *board, int is_integer, float threshold)
     return 1;
 }
 
-OptionalCellValues get_value_for_cell(Board *board, int row, int column, int is_integer, int* is_succedded)
+OptionalCellValues get_value_for_cell(Board *board, int row, int column, int is_integer, int *is_succedded)
 {
     int i;
     int board_size = board->num_of_columns * board->num_of_rows;

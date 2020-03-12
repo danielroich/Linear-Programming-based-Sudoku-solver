@@ -277,6 +277,7 @@ void guess(Board *board, float threshold)
 /*COMMAND 8*/
 /* randomly filling fill empty cells with legal values,
 running ILP to solve the board, and then clearing all but keep random cells.*/
+
 int generate(Board *board, int fill, int keep)
 {
     int size = board->num_of_columns * board->num_of_rows;
@@ -321,7 +322,7 @@ int generate(Board *board, int fill, int keep)
             else
             {
                 if (single_possible_value(rand_row, rand_col, board) == 0)
-                { /*0 legal values for cell*/
+                { 
                     copy_board(old_board, board);
                     free_board(old_board);
                     return 0;
@@ -380,6 +381,7 @@ int redo(Board *board, Curr_move move)
 
 /*COMMAND 11*/
 /* Saves the current game board to path */
+
 int save(Board *board, char *path)
 {
     int succeeded;
@@ -408,7 +410,7 @@ void hint(int x, int y, Board *board)
     cell_values = get_value_for_cell(board, x, y, 1, &is_succedded);
     if (!is_succedded)
     {
-        printf("the board is not solvable\n");
+        printf("Error: the board is not solvable\n");
     }
     else
     {
@@ -442,6 +444,7 @@ void guess_hint(Board *board, int row, int column)
         }
     }
 }
+
 
 /*COMMAND 14*/
 int number_solutions(Board *board)

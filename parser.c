@@ -64,7 +64,7 @@ int parse_command(char *command, Board *board, Curr_move move)
     int x, y, z;
     float threshold;
     char *token, *next;
-    int succeeded;
+    int succeeded; 
     int size = board->num_of_columns * board->num_of_rows;
     int i = 0;
 
@@ -241,8 +241,9 @@ int parse_command(char *command, Board *board, Curr_move move)
         }
         return 0;
     }
-
+   
     /*COMMAND 6*/
+     
     if (strcmp(token, "validate") == 0)
     {
         if (board->mode == INIT)
@@ -273,7 +274,7 @@ int parse_command(char *command, Board *board, Curr_move move)
         }
         return 6;
     }
-
+    
     /*COMMAND 7*/
     if (strcmp(token, "guess") == 0)
     {
@@ -294,7 +295,7 @@ int parse_command(char *command, Board *board, Curr_move move)
             print_error_number("first");
             return 0;
         }
-
+        
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
         {
@@ -308,7 +309,7 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
 
-        guess(board, threshold); 
+        guess(board, threshold);
         clean_nexts(move);
         add_new_move(move, board);
         print_board(board);
@@ -454,7 +455,7 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
 
-        succeeded = save(board, token);
+        succeeded = save(board, token); 
         if (!succeeded)
             return 0;
         return 11;
