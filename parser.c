@@ -38,6 +38,25 @@ int is_digit(char* str){
     return 1;
 }
 
+int is_float(char* str){
+    unsigned int i;
+    char ch;
+    int dot = 0;
+    for(i=0; i<strlen(str);i++){
+        ch = str[i];
+        if(ch == '.'){
+            dot++;
+        }
+        if(dot > 1){
+            return 0;
+        }
+        if((ch != '.') && (ch < '0' || ch > '9')){
+            return 0;
+        }
+    }
+    return 1;
+}
+
 /* interpret user input and call actions
 return num op or 0 if invalid command/error */
 int parse_command(char *command, Board *board, Curr_move move)
@@ -271,6 +290,10 @@ int parse_command(char *command, Board *board, Curr_move move)
             return 0;
         }
         threshold = atof(token);
+        if(!is_float(token)){
+            print_error_number("first");
+            return 0;
+        }
 
         next = (strtok(NULL, " \t\r\n"));
         if(next != NULL)
