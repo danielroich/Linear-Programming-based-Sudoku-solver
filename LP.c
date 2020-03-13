@@ -57,6 +57,7 @@ gurobi_var *initilize_gurobi_vars(int num_of_params, Board *board)
             possible_values_num = get_possible_values(board, i, j, possible_values);
             for (s = 0; s < board_size; s++)
             {
+                /* if the index "s" of possible_values is 1 it means that s+1 is a possible value for the desired cell, otherwise, not*/
                 if (possible_values[s] == 1)
                 {
                     vars[counter].column = j;
@@ -156,6 +157,7 @@ int add_vectors_to_constraints(GRBmodel *model, int num_of_idexes_for_constraint
     int error;
     int k;
 
+    /* the consratint to add is empty*/
     if (num_of_idexes_for_constraint == 0)
         return;
 
@@ -166,7 +168,7 @@ int add_vectors_to_constraints(GRBmodel *model, int num_of_idexes_for_constraint
         return -1;
     }
 
-    /* clean the data */
+    /* clean the data for next constraints because we use the same arrays all the time*/
     for (k = 0; k < num_of_idexes_for_constraint; k++)
     {
         ind[k] = 0;
@@ -282,6 +284,7 @@ int add_square_constraints(Board *board, GRBmodel *model, int *ind, double *val,
     int *gurobi_indexes_for_constraint = (int *)calloc(sizeof(int), board_size);
     int **square_num_matrix = (int **)malloc(sizeof(int *) * board->num_of_columns);
 
+    /* create a matrix which represents the indexes of the squars in sudoku to help detemine the square index of a cell*/
     for (i = 0; i < board->num_of_columns; i++)
     {
         square_num_matrix[i] = (int *)malloc(sizeof(int) * board->num_of_rows);
@@ -451,7 +454,7 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
         exit(0);
     }
 
-    /* Optimize model - need to call this before calculation */
+    /* Optimize model*/
     error = GRBoptimize(model);
     if (error)
     {
@@ -459,7 +462,7 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
         exit(0);
     }
 
-    /* Write model to 'mip1.lp' - this is not necessary but very helpful */
+    /* Write model to 'mip1.lp' */
     error = GRBwrite(model, "mip1.lp");
     if (error)
     {
@@ -485,7 +488,7 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
             exit(0);
         }
 
-        /* get the solution - the assignment to each variable */
+        /* get the solution  */
         error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, num_of_params, sol);
         if (error)
         {
@@ -500,7 +503,7 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
         sol = NULL;
     }
 
-    /* IMPORTANT !!! - Free model and environment */
+    /* free allocated data except from the sol */
     GRBfreemodel(model);
     GRBfreeenv(env);
     free_arrays(obj, vtype, lb, ub);

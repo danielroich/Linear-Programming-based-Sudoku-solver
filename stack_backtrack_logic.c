@@ -51,7 +51,7 @@ int stack_based_back_track(Board *board)
             cur_state = pop(stack);
             continue;
         }
-
+        
         if (cur_state.was_empty_cell == 0 && ((get_value(cur_state.row, cur_state.column, board, 0) != BOARD_NULL_VALUE) ||
                                               (get_value(cur_state.row, cur_state.column, board, 1) != BOARD_NULL_VALUE)))
         {

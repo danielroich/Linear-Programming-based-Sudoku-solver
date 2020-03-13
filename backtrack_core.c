@@ -36,7 +36,7 @@ int get_possible_values(Board* board, int x, int y, int* possible_values) {
     int possible_values_num;
     int board_size = board->num_of_columns * board->num_of_rows;
 
-    /* ckean the possible values array in order to start fresh and if needed return 0 in the not possible values */
+    /* clean the possible values array in order to start fresh and if needed return 0 in the not possible values */
      for (i = 0; i < board_size; i++)
         {
             possible_values[i] = 0;
@@ -71,12 +71,15 @@ int get_next_attampted_value(int* possible_values, int possible_values_size, int
     {
         for (i = 0; i < size ; ++i) {
             if (possible_values[i] != 0) {
+
+                /* mark the value so we know not to choose it again and return the use-based value */
                 possible_values[i] = 0;
                 return (i + 1);
             }
         }
     }
     else {
+        /* generate a random number from the desired range */
         rand_index = rand() % possible_values_size;
         for (i = 0; i < size; ++i) {
             if (possible_values[i] == 1 && counter == rand_index) {
