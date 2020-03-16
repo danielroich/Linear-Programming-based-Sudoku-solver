@@ -615,12 +615,10 @@ int fill_board(Board *board, int is_integer, float threshold)
     int i;
     int num_of_params = get_num_of_parameters(board);
     vars = initilize_gurobi_vars(num_of_params, board);
-    printf("threshold is: %f\n", threshold);
     sol = run_LP(board, is_integer, vars, num_of_params);
     if (sol == NULL)
         return 0;
 
-    /*print_gurobi_results(board, sol, threshold, vars, num_of_params);*/
     fill_results_to_board(board, sol, threshold, vars, num_of_params);
     return 1;
 }
