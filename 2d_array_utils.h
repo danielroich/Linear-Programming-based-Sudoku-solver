@@ -3,6 +3,7 @@
 
 #include "optional_cell_values.h"
 
+/* Responsible for utitlities agains 2D arrays of specific types (did not learn generics in C) */
 void copy_board_values(int** to, int** from, int size);
 
 void free_2d_array(int **array, int size);

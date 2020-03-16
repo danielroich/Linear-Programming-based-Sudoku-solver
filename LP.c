@@ -10,6 +10,7 @@
 #include <math.h>
 #include "gurobi_variable.h"
 
+/* this value is equal the the size of gurrobi vars vector*/
 int get_num_of_parameters(Board *board)
 {
     int i;
@@ -35,6 +36,7 @@ int get_num_of_parameters(Board *board)
     return counter;
 }
 
+/* create the linkage between the gurobi vars created and the value and index in the bpard each gurobi index represents*/
 gurobi_var *initilize_gurobi_vars(int num_of_params, Board *board)
 {
 
@@ -73,7 +75,7 @@ gurobi_var *initilize_gurobi_vars(int num_of_params, Board *board)
     free(possible_values);
     return vars;
 }
-
+/* updates the result to gurobi_indexes, k variable is it's size*/
 int get_vars_by_cell(gurobi_var *vars, int row, int column, int bord_size, int num_of_params, int *gurobi_indexes)
 {
     int i;
@@ -91,7 +93,7 @@ int get_vars_by_cell(gurobi_var *vars, int row, int column, int bord_size, int n
 
     return k;
 }
-
+/* updates the result to gurobi_indexes, k variable is it's size*/
 int get_vars_by_row(gurobi_var *vars, int row, int bord_size, int num_of_params, int *gurobi_indexes, int row_val)
 {
     int i;
@@ -107,7 +109,7 @@ int get_vars_by_row(gurobi_var *vars, int row, int bord_size, int num_of_params,
 
     return k;
 }
-
+/* updates the result to gurobi_indexes, k variable is it's size*/
 int get_vars_by_column(gurobi_var *vars, int column, int bord_size, int num_of_params, int *gurobi_indexes, int column_val)
 {
     int i;
@@ -593,6 +595,8 @@ void fill_results_to_board(Board *board, double *sol, float threshold, gurobi_va
         }
     }
 
+    /* running the second time becuase of the caution not to change the board the first time deciding the values to insert
+    decoupleing these 2 logics seemed more readable */
     for (i = 0; i < board_size; i++)
     {
         for (j = 0; j < board_size; j++)
