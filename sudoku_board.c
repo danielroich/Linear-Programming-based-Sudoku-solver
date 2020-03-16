@@ -115,7 +115,6 @@ void copy_board(Board* from_board,Board* to_board){
 
 /* free memo of 2d_arrays and board*/
 void free_board(Board* board){
-    /*TODO: if correct?*/
     if(board->mark_errors == 1 || board->mark_errors == 0) /*alloceted board! create_empty_board was called*/
     {
         int size = (board->num_of_rows)*(board->num_of_columns);

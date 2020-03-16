@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
     board->mode = INIT;
     board->mark_errors = 2;
 
-    while (fgets(command, 256, stdin) && !feof(stdin))
+    while ( !feof(stdin) && fgets(command, 256, stdin))
     {
         if (strlen(command) == 255 && command[255] != '\n')
         {

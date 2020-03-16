@@ -200,7 +200,6 @@ void print_board(Board *board)
     if (board->mode == SOLVE && is_winner(board))
     {
         printf("Puzzle solved successfully!\n");
-        /*TODO: free board? free move? or INIT agree only new boards which clean the old ones?*/
         board->mode = INIT;
     }
 }
