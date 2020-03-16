@@ -7,7 +7,7 @@
 int const BOARD_NULL_VALUE = 0;
 
 /* all functions in this file get 0<=x,y<=row*col-1 */
-/* if is_fix == 1 value from fixed_board ==0 from current*/
+/* if is_fix == 1 value from fixed_board if ==0 from current_board*/
 
 int get_value(int x, int y, Board* board, int is_fix){
     if(is_fix==0){

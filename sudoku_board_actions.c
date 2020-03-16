@@ -28,14 +28,14 @@ int solve(Board *board, char *path)
     int mark_error = 1;
     Board *new_board = (Board *)malloc((sizeof(Board)));
 
-    if (board->mark_errors == 0)
-    {
-        mark_error = 0;
-    }
     if (new_board == NULL)
     {
         printf("Error: malloc has failed.\n");
         exit(0);
+    }
+    if (board->mark_errors == 0)
+    {
+        mark_error = 0;
     }
 
     succeeded = read_file_to_board(new_board, path, 1);
@@ -113,7 +113,7 @@ int edit(Board *board, char *path)
         {
             free_board(board);
             board = (Board *)malloc((sizeof(Board)));
-            if (new_board == NULL)
+            if (board == NULL)
             {
                 printf("Error: malloc has failed.\n");
                 exit(0);
@@ -242,7 +242,7 @@ int set_value_user(int x, int y, int value, Board *board)
 }
 
 /*COMMAND 6*/
-
+/* validates the current board using ILP, called if the board isn't erroneous.*/
 int validate_board(Board *board)
 {
     int **cur_board_copy;
@@ -268,7 +268,7 @@ int validate_board(Board *board)
 }
 
 /*COMMAND 7*/
-
+/* Guesses a solution to the current board using LP with threshold.*/
 void guess(Board *board, float threshold)
 {
     fill_board(board, 0, threshold);
@@ -277,7 +277,6 @@ void guess(Board *board, float threshold)
 /*COMMAND 8*/
 /* randomly filling fill empty cells with legal values,
 running ILP to solve the board, and then clearing all but keep random cells.*/
-
 int generate(Board *board, int fill, int keep)
 {
     int size = board->num_of_columns * board->num_of_rows;
@@ -381,7 +380,6 @@ int redo(Board *board, Curr_move move)
 
 /*COMMAND 11*/
 /* Saves the current game board to path */
-
 int save(Board *board, char *path)
 {
     int succeeded;
@@ -400,7 +398,7 @@ int save(Board *board, char *path)
 }
 
 /*COMMAND 12*/
-
+/* if solvable, print to the user the value of cell <X,Y> found by the ILP solution.*/
 void hint(int x, int y, Board *board)
 {
     int i;
@@ -423,7 +421,7 @@ void hint(int x, int y, Board *board)
 }
 
 /*COMMAND 13*/
-
+/* if solvable, print to the user all legal values of cell <X,Y> found by LP and their scores.*/
 void guess_hint(Board *board, int row, int column)
 {
     int i;
@@ -447,6 +445,7 @@ void guess_hint(Board *board, int row, int column)
 
 
 /*COMMAND 14*/
+/* Run an exhaustive backtracking for the current board and Print the number of solutions.*/
 int number_solutions(Board *board)
 {
     int number;
@@ -499,7 +498,7 @@ int autofill(Board *board)
 }
 
 /*COMMAND 16*/
-/*Undo all moves, reverting the board to its original loaded state.*/
+/* Undo all moves, reverting the board to its original loaded state.*/
 void reset(Curr_move move, Board *board)
 {
     /*first move is load in EDIT/SOLVE, therefore moves!=NULL*/

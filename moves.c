@@ -66,7 +66,7 @@ void clean_nexts(Curr_move move){
     } 
 }
 
-/* for moves: solve, edit, mark_errors, set, autofill, guess, generate
+/* for moves: solve, edit, set, autofill, guess, generate
 add new move to the end of the list*/
 void add_new_move(Curr_move move, Board* board){
     Move* new_node =(Move*)malloc(sizeof(Move));
@@ -76,7 +76,7 @@ void add_new_move(Curr_move move, Board* board){
     }
 
     new_node->Board_state = (Board*) malloc((sizeof(Board)));
-    if(new_node==NULL){
+    if(new_node->Board_state==NULL){
         printf("Error: malloc has failed.\n");
         exit(0);
     }
