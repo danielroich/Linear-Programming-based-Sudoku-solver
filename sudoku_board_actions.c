@@ -49,7 +49,6 @@ int solve(Board *board, char *path)
         { /*didnt allocate new_board boards*/
             free(new_board);
         }
-        printf("Error: invalid file.\n");
         return 0;
     }
     else
@@ -106,7 +105,6 @@ int edit(Board *board, char *path)
             { /*didnt allocate new_board*/
                 free(new_board);
             }
-            printf("Error: invalid file.\n");
             return 0;
         }
         else

@@ -60,11 +60,13 @@ int read_file_to_board(Board* board, const char* path, int check_errors){
 
     fptr = fopen(path,r); 
     if(fptr ==NULL){
+        printf("Error: the file/path might not exist or could not be opened.\n");
         return -1;
     }
     
     count_dots = check_only_digits(path);
-    if(count_dots==-1){ /*contain unwelcome chars!*/
+    if(count_dots==-1){
+        printf("Error: file contain unwelcome chars.\n");
         fclose(fptr);
         return -1;
     }
@@ -87,6 +89,7 @@ int read_file_to_board(Board* board, const char* path, int check_errors){
         }
     }
     if(count<2){
+        printf("Error: file not in right format.\n");
         fclose(fptr);
         return -1;
     }
@@ -111,11 +114,13 @@ int read_file_to_board(Board* board, const char* path, int check_errors){
         }
         if(count_scan == 1){
             if(value > size || value < 0){
+                printf("Error: file contain value out of range.\n");
                 fclose(fptr);
                 return 0;
             }
             if(count_dot == 1){
                 if(value == 0){
+                    printf("Error: file not in right format.\n");
                     fclose(fptr);
                     return 0;
                 }
@@ -129,6 +134,7 @@ int read_file_to_board(Board* board, const char* path, int check_errors){
                         }
                         else
                         {
+                            printf("Error: fixed cells are ilegal.\n");
                             fclose(fptr);
                             return 0;
                         }
@@ -152,15 +158,18 @@ int read_file_to_board(Board* board, const char* path, int check_errors){
         }
     }
     if(i!=size){
+        printf("Error: file contain not enough values.\n");
         fclose(fptr);
         return 0;
     }
     count_scan = fscanf(fptr,"%d",&value); 
     if(count_scan == 1){
+        printf("Error: file contain too many values.\n");
         fclose(fptr);
         return 0;
     }
     if(count_dots != count_fixed(board)){
+        printf("Error: file not in right format.\n");
         fclose(fptr);
         return 0;
     }
