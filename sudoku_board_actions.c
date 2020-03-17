@@ -10,6 +10,15 @@
 #include "LP.h"
 #include "optional_cell_values.h"
 
+void free_board_boards(Board* board){
+    if(board != NULL && board->cur_board != NULL){ /*alloceted all boards! create_empty_board was called*/
+        int size = (board->num_of_rows)*(board->num_of_columns);
+        free_2d_array(board->solved_board,size);
+        free_2d_array(board->fixed_board,size);
+        free_2d_array(board->cur_board,size);
+    }
+}
+
 /*COMMAND 17*/
 /* free memo and exit*/
 void exit_game(Board *board, Curr_move move)
@@ -28,13 +37,13 @@ int solve(Board *board, char *path)
     int succeeded;
     int mark_error = 1;
     Board *new_board = (Board *)malloc((sizeof(Board)));
-
+    
     if (new_board == NULL)
     {
         printf("Error: malloc has failed.\n");
         exit(0);
     }
-    if (board->mark_errors == 0)
+    if ((board)->mark_errors == 0)
     {
         mark_error = 0;
     }
@@ -54,18 +63,18 @@ int solve(Board *board, char *path)
     }
     else
     {
-        free_board(board);
-        board = (Board *)malloc((sizeof(Board)));
+        free_board_boards(board);
+        /*board = (Board *)malloc((sizeof(Board)));
         if (board == NULL)
         {
             printf("Error: malloc has failed.\n");
             exit(0);
-        }
-        create_empty_board(board, new_board->num_of_rows, new_board->num_of_columns);
-        copy_board(new_board, board);
+        }*/
+        create_empty_board((board), new_board->num_of_rows, new_board->num_of_columns);
+        copy_board(new_board, (board));
         free_board(new_board);
-        board->mode = SOLVE;
-        board->mark_errors = mark_error;
+        (board)->mode = SOLVE;
+        (board)->mark_errors = mark_error;
         return 1;
     }
 }
@@ -110,13 +119,13 @@ int edit(Board *board, char *path)
         }
         else
         {
-            free_board(board);
-            board = (Board *)malloc((sizeof(Board)));
+            free_board_boards(board);
+            /*board = (Board *)malloc((sizeof(Board)));
             if (board == NULL)
             {
                 printf("Error: malloc has failed.\n");
                 exit(0);
-            }
+            }*/
             create_empty_board(board, new_board->num_of_rows, new_board->num_of_columns);
             copy_board(new_board, board);
             free_board(new_board);
