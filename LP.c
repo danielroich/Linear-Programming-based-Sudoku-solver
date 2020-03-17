@@ -624,6 +624,8 @@ int fill_board(Board *board, int is_integer, float threshold)
         return 0;
 
     fill_results_to_board(board, sol, threshold, vars, num_of_params);
+    free(vars);
+    free(sol);
     return 1;
 }
 
@@ -646,7 +648,10 @@ OptionalCellValues get_value_for_cell(Board *board, int row, int column, int is_
     }
 
     *is_succedded = 1;
-    return get_possible_values_from_sol(board, sol, row, column, 0, vars, num_of_params);
+    cell_values = get_possible_values_from_sol(board, sol, row, column, 0, vars, num_of_params);
+    free(vars);
+    free(sol);
+    return cell_values;
 }
 
 int validate_ILP(Board *board)
@@ -657,5 +662,12 @@ int validate_ILP(Board *board)
     int num_of_params = get_num_of_parameters(board);
     vars = initilize_gurobi_vars(num_of_params, board);
     sol = run_LP(board, 1, vars, num_of_params);
-    return sol != NULL;
+    free(vars);
+    if (sol != NULL)
+    {
+        free(sol);
+        return 1;
+    }
+
+    return 0;
 }
