@@ -107,7 +107,7 @@ void copy_board(Board* from_board,Board* to_board){
     /* allocated same sizes before call this func!*/
     to_board->mode = from_board->mode;
     to_board->count_filled = from_board->count_filled;
-    to_board->mark_errors = from_board->mark_errors; 
+    /*to_board->mark_errors = from_board->mark_errors; parameter for all game!*/
     copy_board_values(to_board->cur_board,from_board->cur_board,size);
     copy_board_values(to_board->fixed_board,from_board->fixed_board,size);
     copy_board_values(to_board->solved_board,from_board->solved_board,size);
