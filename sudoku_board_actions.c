@@ -10,15 +10,6 @@
 #include "LP.h"
 #include "optional_cell_values.h"
 
-void free_board_boards(Board* board){
-    if(board != NULL && board->cur_board != NULL){ /*alloceted all boards! create_empty_board was called*/
-        int size = (board->num_of_rows)*(board->num_of_columns);
-        free_2d_array(board->solved_board,size);
-        free_2d_array(board->fixed_board,size);
-        free_2d_array(board->cur_board,size);
-    }
-}
-
 /*COMMAND 17*/
 /* free memo and exit*/
 void exit_game(Board *board, Curr_move move)
@@ -28,6 +19,16 @@ void exit_game(Board *board, Curr_move move)
     clean_list(move);
     free(move);
     exit(0);
+}
+
+/* in order to clean board boards before new solve/edit*/
+void free_board_boards(Board* board){
+    if(board != NULL && board->cur_board != NULL){ /*alloceted all boards! create_empty_board was called*/
+        int size = (board->num_of_rows)*(board->num_of_columns);
+        free_2d_array(board->solved_board,size);
+        free_2d_array(board->fixed_board,size);
+        free_2d_array(board->cur_board,size);
+    }
 }
 
 /*COMMAND 1*/
@@ -64,12 +65,6 @@ int solve(Board *board, char *path)
     else
     {
         free_board_boards(board);
-        /*board = (Board *)malloc((sizeof(Board)));
-        if (board == NULL)
-        {
-            printf("Error: malloc has failed.\n");
-            exit(0);
-        }*/
         create_empty_board((board), new_board->num_of_rows, new_board->num_of_columns);
         copy_board(new_board, (board));
         free_board(new_board);
@@ -92,6 +87,7 @@ int edit(Board *board, char *path)
     }
     if (path == NULL)
     {
+        free_board_boards(board);
         create_empty_board(board, 3, 3);
     }
     else
@@ -120,12 +116,6 @@ int edit(Board *board, char *path)
         else
         {
             free_board_boards(board);
-            /*board = (Board *)malloc((sizeof(Board)));
-            if (board == NULL)
-            {
-                printf("Error: malloc has failed.\n");
-                exit(0);
-            }*/
             create_empty_board(board, new_board->num_of_rows, new_board->num_of_columns);
             copy_board(new_board, board);
             free_board(new_board);
