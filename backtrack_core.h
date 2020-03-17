@@ -5,6 +5,8 @@
 #include "sudoku_board.h"
 #include "sudoku_board_actions.h"
 
+/* Core functions that can be used for any backtracking implamantation */
+
 int get_next_row(const Board* board, int cur_row, int cur_column);
 int get_next_column(const Board* board, int cur_column);
 int get_possible_values(Board* board, int x, int y, int* possible_values);
