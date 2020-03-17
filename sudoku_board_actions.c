@@ -476,6 +476,7 @@ int autofill(Board *board)
     if (is_erroneous_board(board))
     {
         printf("Error: erroneous boards can't be autofill.\n");
+        free_2d_array(autofill_values, size);
         return 0;
     }
     for (i = 0; i < size; i++)
