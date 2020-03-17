@@ -17,6 +17,7 @@ void exit_game(Board *board, Curr_move move)
     printf("Exiting...\n");
     free_board(board);
     clean_list(move);
+    free(move);
     exit(0);
 }
 
