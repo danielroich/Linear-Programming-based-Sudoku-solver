@@ -46,16 +46,19 @@ int main(int argc, char *argv[])
     seed(seed_num);
 
     printf("Welcome to sudoku! please load board to start.\n");
+    
+    /* initial values for first solve/edit */ 
     *move = NULL;
     board->mode = INIT;
     board->mark_errors = 1;
+    board->cur_board = NULL;
 
     while ( !feof(stdin) && fgets(command, 256, stdin))
     {
         if (strlen(command) == 255 && command[255] != '\n')
         {
             printf("Error: too many characters were entered in a single line.\n");
-            /*the entire line may be ignored*/
+            /* the entire line may be ignored*/
             while (!feof(stdin) && fgetc(stdin) != '\n')
                 continue;
         }
