@@ -38,7 +38,7 @@ int solve(Board *board, char *path)
     int succeeded;
     int mark_error = 1;
     Board *new_board = (Board *)malloc((sizeof(Board)));
-    
+
     if (new_board == NULL)
     {
         printf("Error: malloc has failed.\n");
@@ -318,7 +318,7 @@ int generate(Board *board, int fill, int keep)
             else
             {
                 if (single_possible_value(rand_row, rand_col, board) == 0)
-                { 
+                {
                     copy_board(old_board, board);
                     free_board(old_board);
                     return 0;
@@ -415,6 +415,12 @@ void hint(int x, int y, Board *board)
                 printf("Hint: set cell to %d\n", i + 1);
         }
     }
+
+    if (cell_values.propabilities != NULL)
+    {
+        free(cell_values.propabilities);
+    }
+    
 }
 
 /*COMMAND 13*/
@@ -435,11 +441,15 @@ void guess_hint(Board *board, int row, int column)
         for (i = 0; i < board_size; i++)
         {
             if (cell_values.propabilities[i] > 0)
-                printf("Error: Hint: set cell to %d with prob of %f\n", i + 1, cell_values.propabilities[i]);
+                printf("Hint: set cell to %d with prob of %f\n", i + 1, cell_values.propabilities[i]);
         }
     }
-}
 
+    if (cell_values.propabilities != NULL)
+    {
+        free(cell_values.propabilities);
+    }
+}
 
 /*COMMAND 14*/
 /* Run an exhaustive backtracking for the current board and Print the number of solutions.*/
