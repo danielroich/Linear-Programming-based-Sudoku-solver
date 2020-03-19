@@ -622,7 +622,13 @@ int fill_board(Board *board, int is_integer, float threshold)
     vars = initilize_gurobi_vars(num_of_params, board);
     sol = run_LP(board, is_integer, vars, num_of_params);
     if (sol == NULL)
+    {
+        if (vars != NULL)
+        {
+            free(vars);
+        }
         return 0;
+    }
 
     fill_results_to_board(board, sol, threshold, vars, num_of_params);
     free(vars);
@@ -645,6 +651,11 @@ OptionalCellValues get_value_for_cell(Board *board, int row, int column, int is_
     if (sol == NULL)
     {
         *is_succedded = 0;
+        if (vars != NULL)
+        {
+            free(vars);
+        }
+
         return cell_values;
     }
 
