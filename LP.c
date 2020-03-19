@@ -655,25 +655,58 @@ OptionalCellValues get_value_for_cell(Board *board, int row, int column, int is_
     return cell_values;
 }
 
+int check_if_sol_covers_board(Board *board, double *sol, int num_of_params)
+{
+    int i;
+    int j;
+    int counter = 0;
+    int needed_num_of_values = 0;
+    int board_size = board->num_of_columns * board->num_of_rows;
+    for (i = 0; i < board_size; i++)
+    {
+        for (j = 0; j < board_size; j++)
+        {
+            if (get_value(i, j, board, 0) == BOARD_NULL_VALUE)
+            {
+                ++needed_num_of_values;
+            }
+        }
+    }
+
+    for (i = 0; i < num_of_params; i++)
+    {
+        if (sol[i] > 0)
+        {
+            ++counter;
+        }
+    }
+    return counter == needed_num_of_values;
+}
+
 int validate_ILP(Board *board)
 {
+    int result;
+    int i;
     double *sol;
     gurobi_var *vars;
     int num_of_params = get_num_of_parameters(board);
 
     /* there aren't any possbiel values, therefore the board is 100% not valid */
-    if (num_of_params == 0 )
+    if (num_of_params == 0)
     {
         return 0;
     }
-    
+
     vars = initilize_gurobi_vars(num_of_params, board);
     sol = run_LP(board, 1, vars, num_of_params);
     free(vars);
+
+    /* we got a solution from gurobi, we need to make sure it covers the entire board*/
     if (sol != NULL)
     {
+        result = check_if_sol_covers_board(board, sol, num_of_params);
         free(sol);
-        return 1;
+        return result;
     }
 
     return 0;
