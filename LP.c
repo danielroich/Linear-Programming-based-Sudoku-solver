@@ -502,6 +502,7 @@ double *run_LP(Board *board, int params_mode, gurobi_var *vars, int num_of_param
     /* no solution found */
     else if (optimstatus != GRB_OPTIMAL)
     {
+        free(sol);
         sol = NULL;
     }
 
@@ -656,10 +657,16 @@ OptionalCellValues get_value_for_cell(Board *board, int row, int column, int is_
 
 int validate_ILP(Board *board)
 {
-    int result;
     double *sol;
     gurobi_var *vars;
     int num_of_params = get_num_of_parameters(board);
+
+    /* there aren't any possbiel values, therefore the board is 100% not valid */
+    if (num_of_params == 0 )
+    {
+        return 0;
+    }
+    
     vars = initilize_gurobi_vars(num_of_params, board);
     sol = run_LP(board, 1, vars, num_of_params);
     free(vars);
